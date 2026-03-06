@@ -9,12 +9,17 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     
     <!-- DataTables CSS -->
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.bootstrap5.min.css">
     
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- jsPDF e autoTable -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.29/jspdf.plugin.autotable.min.js"></script>
 
     <style>
         /* ==================== VARIÁVEIS DE CORES ==================== */
@@ -46,7 +51,7 @@
         
         /* ==================== ESTILOS GERAIS ==================== */
         body {
-            font-family: 'Montserrat', Segoe UI, Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Montserrat', Open Sans, sans-serif;
             background-color: var(--background-light);
             padding-bottom: 15px;
             overflow-y: visible !important;
@@ -283,7 +288,7 @@
         .badge-situacao {
             padding: 4px 10px;
             border-radius: 15px;
-            font-size: 15px;
+            font-size: 8px;
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 0.3px;
@@ -421,7 +426,7 @@
             color: white;
             padding: 4px 12px;
             border-radius: 15px;
-            font-size: 15px;
+            font-size: 12px;
             font-weight: 600;
         }
         
@@ -555,6 +560,22 @@
             padding: 12px 10px;
             vertical-align: middle;
             font-size: 15px;
+        }
+        
+        /* Alinhamento de valores à direita */
+        .table tbody td.valor {
+            text-align: right !important;
+            font-weight: normal !important;
+        }
+        
+        /* Datas centralizadas */
+        .table tbody td.data {
+            text-align: center !important;
+        }
+        
+        /* Remover negrito do nome */
+        .table tbody td.nome {
+            font-weight: normal !important;
         }
         
         .table tbody td.quantidade {
@@ -862,6 +883,11 @@
         .table-total-row td.quantidade {
             text-align: center;
         }
+        
+        /* Remover negrito dos valores no rodapé */
+        .table-total-row td strong {
+            font-weight: 600 !important;
+        }
 
         /* ==================== LINK CLICÁVEL ==================== */
         .orgao-link {
@@ -1146,6 +1172,38 @@
             color: var(--accent-red);
         }
 
+        /* ==================== ESTILOS PARA PDF ==================== */
+        @media print {
+            .btn-primary-custom, .btn-secondary-custom, .btn-search-custom, 
+            .btn-export, .btn-share, .filter-container, .actions-container, 
+            .nav-tabs-container, .share-dropdown, .loading-overlay,
+            .btn-action, .pagination-container, .search-box-container,
+            .items-per-page, .right-aligned-container, .table-badge,
+            .btn-history, .action-buttons {
+                display: none !important;
+            }
+            
+            .table-container {
+                box-shadow: none;
+                border: 1px solid #000;
+            }
+            
+            .table thead th {
+                background-color: #29435A !important;
+                color: white !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+            
+            .pdf-header, .pdf-footer {
+                display: block !important;
+            }
+        }
+        
+        .pdf-header, .pdf-footer {
+            display: none;
+        }
+        
         /* ==================== RESPONSIVIDADE ==================== */
         @media (max-width: 768px) {
             .main-header {
@@ -1423,10 +1481,10 @@
                 <div class="actions-container mb-4">
                     <div class="export-buttons">
                         <button class="btn-export" id="exportCSVDashboard1">
-                            <i class="fas fa-file-csv me-2"></i> Exportar CSV
+                            <i class="fas fa-file-csv me-2"></i> CSV
                         </button>
                         <button class="btn-export" id="printDashboard1">
-                            <i class="fas fa-print me-2"></i> Imprimir
+                            <i class="fas fa-file-pdf me-2"></i> PDF
                         </button>
                         <!-- Botão de Compartilhar -->
                         <div class="share-dropdown">
@@ -1598,10 +1656,10 @@
                     <div class="d-flex align-items-center gap-3 w-100">
                         <div class="export-buttons">
                             <button class="btn-export" id="exportCSVDashboard2">
-                                <i class="fas fa-file-csv me-2"></i> Exportar CSV
+                                <i class="fas fa-file-csv me-2"></i> CSV
                             </button>
                             <button class="btn-export" id="printDashboard2">
-                                <i class="fas fa-print me-2"></i> Imprimir
+                                <i class="fas fa-file-pdf me-2"></i> PDF
                             </button>
                             <!-- Botão de Compartilhar -->
                             <div class="share-dropdown">
@@ -1635,7 +1693,7 @@
                             </div>
 
                        <div class="items-per-page">
-                           <span>Itens por página:</span>
+                           <span>Itens:</span>
                            <select id="itemsPerPageDashboard2">
                                <option value="10">10</option>
                                <option value="25">25</option>
@@ -1722,29 +1780,17 @@
                     <div class="p-4">
                         <div class="row">
                             <div class="col-md-6 col-12">
-                                <div class="card-stats">
-                                    <i class="fas fa-database fa-3x mb-3" style="color: var(--primary-dark);"></i>
-                                    <h4>Fonte dos Dados</h4>
-                                    <p class="text-muted" style="font-size: 13px;">Dados atualizados automaticamente do GitHub</p>
-                                    <div class="mt-3">
-                                        <a href="https://github.com/transparencia-mg/estagiarios" 
+                                <div class="card-stats p-4 bg-white rounded shadow-sm h-100">
+                                    <h4 class="fw-bold text-start mb-3">Portal de Dados Abertos</h4>
+                                    <p class="text-muted text-justify" style="font-size: 13px; text-align: justify;">
+                                        Acesse o conjunto de dados de Estrutura Organizacional, documentado conforme especificações Frictionless Data (dados sem fricção) e possibilitam a validação automática dos dados.
+                                    </p>
+                                    <div class="mt-4 text-end">
+                                        <a href="https://dados.mg.gov.br/dataset/estrutura_organizacional" 
                                            target="_blank" 
-                                           class="btn-export w-100 d-block text-decoration-none">
-                                            <i class="fab fa-github me-2"></i>Acessar Repositório
-                                        </a>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-6 col-12">
-                                <div class="card-stats">
-                                    <i class="fas fa-external-link-alt fa-3x mb-3" style="color: var(--primary-dark);"></i>
-                                    <h4>Portal de Dados Abertos</h4>
-                                    <p class="text-muted" style="font-size: 15px;">Acesse o portal oficial de dados abertos de Minas Gerais</p>
-                                    <div class="mt-3">
-                                        <a href="https://dados.mg.gov.br/dataset/estagiarios" 
-                                           target="_blank" 
-                                           class="btn-export w-100 d-block text-decoration-none">
-                                            <i class="fas fa-external-link-alt me-2"></i>Acessar Portal
+                                           class="btn-export text-decoration-none fw-bold d-inline-block px-4 py-2"
+                                           style="color: var(--primary-dark); background-color: white; border: 1px solid var(--primary-dark); border-radius: 4px; transition: all 0.3s ease;">
+                                            Acessar Portal de Dados MG
                                         </a>
                                     </div>
                                 </div>
@@ -1822,16 +1868,6 @@
                                 </table>
                             </div>
                             
-                            <div class="alert alert-info mt-3">
-                                <i class="fas fa-info-circle me-2"></i>
-                                <strong>Fonte dos Dados:</strong> Os dados são carregados automaticamente do repositório GitHub 
-                                <a href="https://github.com/transparencia-mg/estagiarios" target="_blank">transparencia-mg/estagiarios</a>
-                            </div>
-                            
-                            <div class="alert alert-success mt-2">
-                                <i class="fas fa-sync-alt me-2"></i>
-                                <strong>Atualização Automática:</strong> Os dados são atualizados automaticamente quando novos arquivos são adicionados ao repositório GitHub.
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -2534,9 +2570,9 @@
             
             // Exportação
             document.getElementById('exportCSVDashboard1').addEventListener('click', () => exportToCSV('dashboard1'));
-            document.getElementById('printDashboard1').addEventListener('click', () => printDashboard('dashboard1'));
+            document.getElementById('printDashboard1').addEventListener('click', () => exportToPDF('dashboard1'));
             document.getElementById('exportCSVDashboard2').addEventListener('click', () => exportToCSV('dashboard2'));
-            document.getElementById('printDashboard2').addEventListener('click', () => printDashboard('dashboard2'));
+            document.getElementById('printDashboard2').addEventListener('click', () => exportToPDF('dashboard2'));
             
             // Download por ano na aba Downloads
             document.getElementById('downloadAnoCSV').addEventListener('click', downloadYearCSV);
@@ -3360,7 +3396,7 @@
             // Gerar rodapé com colunas numéricas centralizadas
             const footerHTML = `
                 <tr class="table-total-row">
-                    <td><strong>TOTAL GERAL (${totalOrgaos.toLocaleString('pt-BR')} órgãos)</strong></td>
+                    <td><strong>TOTAL GERAL</strong></td>
                     <td><strong>-</strong></td>
                     <td class="text-center"><strong>${totalEstagiarios.toLocaleString('pt-BR')}</strong></td>
                     <td class="text-center"><strong>${totalEmAndamento.toLocaleString('pt-BR')}</strong></td>
@@ -3531,7 +3567,6 @@
             // Calcular totais
             const totalEstagiarios = estagiariosArray.length;
             const valorTotal = estagiariosArray.reduce((sum, e) => sum + (e.valor_remuneracao || 0), 0);
-            const valorMedio = totalEstagiarios > 0 ? valorTotal / totalEstagiarios : 0;
             const orgaosUnicos = [...new Set(estagiariosArray.map(e => e.orgao))].length;
             
             // Contar por situação
@@ -3550,37 +3585,39 @@
             const endIndex = Math.min(startIndex + itemsPerPage, estagiariosArray.length);
             const currentData = estagiariosArray.slice(startIndex, endIndex);
             
-            // Gerar HTML da tabela
+            // Gerar HTML da tabela - Removido negrito do nome
             const rowsHTML = currentData.map(estagiario => {
                 const situacao = (!estagiario.data_fim || estagiario.data_fim.trim() === '') ? 'Em Andamento' : 'Concluído';
                 const situacaoClass = situacao === 'Em Andamento' ? 'badge-em-andamento' : 'badge-concluido';
                 
                 return `
                 <tr>
-                    <td><strong>${estagiario.nome_estagiario || 'Nome não informado'}</strong></td>
+                    <td class="nome">${estagiario.nome_estagiario || 'Nome não informado'}</td>
                     <td>${estagiario.masp || '-'}</td>
                     <td>${estagiario.sigla_orgao || estagiario.orgao || '-'}</td>
-                    <td>${formatDate(estagiario.data_inicio)}</td>
-                    <td>${formatDate(estagiario.data_fim)}</td>
-                    <td><strong>${formatCurrency(estagiario.valor_remuneracao || 0)}</strong></td>
+                    <td class="data">${formatDate(estagiario.data_inicio)}</td>
+                    <td class="data">${formatDate(estagiario.data_fim)}</td>
+                    <td class="valor">${formatCurrency(estagiario.valor_remuneracao || 0)}</td>
                     <td><span class="badge-situacao ${situacaoClass}">${situacao}</span></td>
                     <td class="actions-column">
                         <div class="action-buttons">
                             <button class="btn-action btn-history" onclick="showEstagiarioHistory('${estagiario.masp}', '${(estagiario.nome_estagiario || '').replace(/'/g, "\\'")}')" title="Ver Histórico">
-                                <i class="fas fa-history"></i><span>Histórico</span>
+                                <i class="fas fa-history"></i><span></span>
                             </button>
                         </div>
                     </td>
                 </tr>
             `}).join('');
             
-            // Gerar rodapé
+            // Gerar rodapé com totalização do valor total
             const footerHTML = `
                 <tr class="table-total-row">
-                    <td colspan="2"><strong>TOTAL GERAL: ${totalEstagiarios.toLocaleString('pt-BR')} estagiários</strong></td>
+                    <td><strong>TOTAL GERAL</strong></td>
+                    <td></td>
                     <td><strong>${orgaosUnicos.toLocaleString('pt-BR')} órgãos</strong></td>
                     <td></td>
                     <td></td>
+                    <td class="valor"><strong>${formatCurrency(valorTotal)}</strong></td>
                     <td></td>
                     <td></td>
                 </tr>
@@ -3840,6 +3877,318 @@
             }
         }
 
+        // ==================== FUNÇÃO DE EXPORTAÇÃO PARA PDF ====================
+        function exportToPDF(dashboard) {
+            if (dashboard === 'dashboard1') {
+                exportResumoPDF();
+            } else if (dashboard === 'dashboard2') {
+                exportEstagiariosPDF();
+            }
+        }
+
+        function exportResumoPDF() {
+            if (filteredData.length === 0) {
+                alert('Não há dados para exportar.');
+                return;
+            }
+            
+            showLoading(true);
+            
+            try {
+                // Agrupar por órgão
+                const grupos = {};
+                filteredData.forEach(estagiario => {
+                    const orgao = estagiario.orgao || 'Órgão não informado';
+                    const sigla = estagiario.sigla_orgao || orgao.substring(0, 10);
+                    
+                    if (!grupos[orgao]) {
+                        grupos[orgao] = {
+                            orgao: orgao,
+                            sigla: sigla,
+                            total_estagiarios: 0,
+                            em_andamento: 0,
+                            concluido: 0
+                        };
+                    }
+                    
+                    grupos[orgao].total_estagiarios++;
+                    
+                    if (!estagiario.data_fim || estagiario.data_fim.trim() === '') {
+                        grupos[orgao].em_andamento++;
+                    } else {
+                        grupos[orgao].concluido++;
+                    }
+                });
+                
+                const resumoArray = Object.values(grupos);
+                
+                // Ordenar por total de estagiários (decrescente)
+                resumoArray.sort((a, b) => b.total_estagiarios - a.total_estagiarios);
+                
+                // Calcular totais
+                const totalEstagiarios = resumoArray.reduce((sum, item) => sum + item.total_estagiarios, 0);
+                const totalEmAndamento = resumoArray.reduce((sum, item) => sum + item.em_andamento, 0);
+                const totalConcluido = resumoArray.reduce((sum, item) => sum + item.concluido, 0);
+                
+                // Criar PDF
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF({
+                    orientation: 'landscape',
+                    unit: 'mm',
+                    format: 'a4'
+                });
+                
+                // Cabeçalho
+                doc.setFontSize(16);
+                doc.setTextColor(41, 67, 90); // Primary dark
+                doc.text('Governo de Minas Gerais', 14, 15);
+                
+                doc.setFontSize(14);
+                doc.setTextColor(0, 0, 0);
+                doc.text('Relatório de Estagiários - Visão Geral por Órgão', 14, 22);
+                
+                doc.setFontSize(10);
+                doc.setTextColor(100, 100, 100);
+                const dataAtual = new Date().toLocaleDateString('pt-BR') + ' ' + new Date().toLocaleTimeString('pt-BR');
+                doc.text(`Período: ${monthNames[currentMonth] || currentMonth}/${currentYear}`, 14, 28);
+                doc.text(`Emitido em: ${dataAtual}`, 14, 33);
+                
+                doc.setLineWidth(0.5);
+                doc.setDrawColor(185, 60, 66); // Accent red
+                doc.line(14, 35, 280, 35);
+                
+                // Preparar dados para a tabela
+                const tableData = resumoArray.map(item => [
+                    item.orgao,
+                    item.sigla,
+                    item.total_estagiarios.toString(),
+                    item.em_andamento.toString(),
+                    item.concluido.toString()
+                ]);
+                
+                // Adicionar linha de total
+                tableData.push([
+                    'TOTAL GERAL',
+                    '-',
+                    totalEstagiarios.toString(),
+                    totalEmAndamento.toString(),
+                    totalConcluido.toString()
+                ]);
+                
+                // Configurar tabela
+                doc.autoTable({
+                    head: [['Órgão', 'Sigla', 'Total Estagiários', 'Em Andamento', 'Concluído']],
+                    body: tableData,
+                    startY: 40,
+                    theme: 'grid',
+                    headStyles: {
+                        fillColor: [41, 67, 90],
+                        textColor: [255, 255, 255],
+                        fontStyle: 'bold',
+                        halign: 'center'
+                    },
+                    bodyStyles: {
+                        fontSize: 9
+                    },
+                    columnStyles: {
+                        0: { cellWidth: 90 },
+                        1: { cellWidth: 25, halign: 'center' },
+                        2: { cellWidth: 40, halign: 'center' },
+                        3: { cellWidth: 40, halign: 'center' },
+                        4: { cellWidth: 40, halign: 'center' }
+                    },
+                    foot: [['TOTAL GERAL', '-', totalEstagiarios.toString(), totalEmAndamento.toString(), totalConcluido.toString()]],
+                    footStyles: {
+                        fillColor: [240, 240, 240],
+                        textColor: [0, 0, 0],
+                        fontStyle: 'bold',
+                        halign: 'center'
+                    },
+                    didParseCell: function(data) {
+                        // Destacar a linha de total
+                        if (data.row.index === tableData.length - 1) {
+                            data.cell.styles.fillColor = [245, 245, 245];
+                            data.cell.styles.fontStyle = 'bold';
+                        }
+                    }
+                });
+                
+                // Rodapé
+                const pageCount = doc.internal.getNumberOfPages();
+                for (let i = 1; i <= pageCount; i++) {
+                    doc.setPage(i);
+                    doc.setFontSize(8);
+                    doc.setTextColor(150, 150, 150);
+                    doc.text(
+                        `Página ${i} de ${pageCount} - Relatório gerado em ${dataAtual}`,
+                        doc.internal.pageSize.width / 2,
+                        doc.internal.pageSize.height - 10,
+                        { align: 'center' }
+                    );
+                }
+                
+                // Salvar PDF
+                doc.save(`visao_geral_estagiarios_${currentYear}_${currentMonth}.pdf`);
+                
+            } catch (error) {
+                console.error('Erro ao gerar PDF:', error);
+                alert('Erro ao gerar PDF. Por favor, tente novamente.');
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        function exportEstagiariosPDF() {
+            if (filteredData.length === 0) {
+                alert('Não há dados para exportar.');
+                return;
+            }
+            
+            showLoading(true);
+            
+            try {
+                // Ordenar dados por nome
+                const dadosOrdenados = [...filteredData].sort((a, b) => 
+                    (a.nome_estagiario || '').localeCompare(b.nome_estagiario || '')
+                );
+                
+                // Calcular totais
+                const valorTotal = filteredData.reduce((sum, e) => sum + (e.valor_remuneracao || 0), 0);
+                
+                // Criar PDF
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF({
+                    orientation: 'landscape',
+                    unit: 'mm',
+                    format: 'a4'
+                });
+                
+                // Cabeçalho
+                doc.setFontSize(16);
+                doc.setTextColor(41, 67, 90);
+                doc.text('Governo de Minas Gerais', 14, 15);
+                
+                doc.setFontSize(14);
+                doc.setTextColor(0, 0, 0);
+                doc.text('Relatório de Estagiários - Consulta Individual', 14, 22);
+                
+                doc.setFontSize(10);
+                doc.setTextColor(100, 100, 100);
+                const dataAtual = new Date().toLocaleDateString('pt-BR') + ' ' + new Date().toLocaleTimeString('pt-BR');
+                doc.text(`Período: ${monthNames[currentMonth] || currentMonth}/${currentYear}`, 14, 28);
+                doc.text(`Emitido em: ${dataAtual}`, 14, 33);
+                
+                doc.setLineWidth(0.5);
+                doc.setDrawColor(185, 60, 66);
+                doc.line(14, 35, 280, 35);
+                
+                // Preparar dados para a tabela
+                const tableData = dadosOrdenados.map(e => {
+                    const situacao = (!e.data_fim || e.data_fim.trim() === '') ? 'Em Andamento' : 'Concluído';
+                    return [
+                        e.nome_estagiario || '-',
+                        e.masp || '-',
+                        e.sigla_orgao || e.orgao || '-',
+                        formatDate(e.data_inicio),
+                        formatDate(e.data_fim),
+                        formatCurrency(e.valor_remuneracao || 0),
+                        situacao
+                    ];
+                });
+                
+                // Adicionar linha de total
+                const totalOrgaos = [...new Set(filteredData.map(e => e.orgao))].length;
+                tableData.push([
+                    'TOTAL GERAL',
+                    '',
+                    `${totalOrgaos} órgãos`,
+                    '',
+                    '',
+                    formatCurrency(valorTotal),
+                    ''
+                ]);
+                
+                // Configurar tabela
+                doc.autoTable({
+                    head: [['Nome', 'MASP', 'Órgão', 'Data Início', 'Data Fim', 'Valor (R$)', 'Situação']],
+                    body: tableData,
+                    startY: 40,
+                    theme: 'grid',
+                    headStyles: {
+                        fillColor: [41, 67, 90],
+                        textColor: [255, 255, 255],
+                        fontStyle: 'bold',
+                        halign: 'center'
+                    },
+                    bodyStyles: {
+                        fontSize: 8
+                    },
+                    columnStyles: {
+                        0: { cellWidth: 60 },
+                        1: { cellWidth: 25, halign: 'center' },
+                        2: { cellWidth: 35 },
+                        3: { cellWidth: 25, halign: 'center' },
+                        4: { cellWidth: 25, halign: 'center' },
+                        5: { cellWidth: 25, halign: 'right' }, // Alinhamento à direita
+                        6: { cellWidth: 30, halign: 'center' }
+                    },
+                    foot: [['TOTAL GERAL', '', `${totalOrgaos} órgãos`, '', '', formatCurrency(valorTotal), '']],
+                    footStyles: {
+                        fillColor: [240, 240, 240],
+                        textColor: [0, 0, 0],
+                        fontStyle: 'bold',
+                        halign: 'center'
+                    },
+                    didParseCell: function(data) {
+                        // Destacar a linha de total
+                        if (data.row.index === tableData.length - 1) {
+                            data.cell.styles.fillColor = [245, 245, 245];
+                            data.cell.styles.fontStyle = 'bold';
+                        }
+                        
+                        // Alinhar valores à direita
+                        if (data.column.index === 5 && data.row.index !== tableData.length - 1) {
+                            data.cell.styles.halign = 'right';
+                            data.cell.styles.fontStyle = 'normal'; // Remover negrito
+                        }
+                        
+                        // Datas centralizadas
+                        if (data.column.index === 3 || data.column.index === 4) {
+                            data.cell.styles.halign = 'center';
+                        }
+                        
+                        // Nome sem negrito
+                        if (data.column.index === 0 && data.row.index !== tableData.length - 1) {
+                            data.cell.styles.fontStyle = 'normal';
+                        }
+                    }
+                });
+                
+                // Rodapé
+                const pageCount = doc.internal.getNumberOfPages();
+                for (let i = 1; i <= pageCount; i++) {
+                    doc.setPage(i);
+                    doc.setFontSize(8);
+                    doc.setTextColor(150, 150, 150);
+                    doc.text(
+                        `Página ${i} de ${pageCount} - Relatório gerado em ${dataAtual}`,
+                        doc.internal.pageSize.width / 2,
+                        doc.internal.pageSize.height - 10,
+                        { align: 'center' }
+                    );
+                }
+                
+                // Salvar PDF
+                doc.save(`estagiarios_${currentYear}_${currentMonth}.pdf`);
+                
+            } catch (error) {
+                console.error('Erro ao gerar PDF:', error);
+                alert('Erro ao gerar PDF. Por favor, tente novamente.');
+            } finally {
+                showLoading(false);
+            }
+        }
+
         // ==================== FUNÇÕES GLOBAIS E UTILITÁRIOS ====================
 
         window.filtrarPorOrgao = function(orgao) {
@@ -3917,31 +4266,11 @@
             }
         }
 
-        function printDashboard(source) {
-            // Salvar a aba atual
-            const currentTab = document.querySelector('.nav-link.active');
-            const currentTabId = currentTab ? currentTab.id : 'dashboard1-tab';
-            
-            // Mostrar todas as abas para impressão
-            document.querySelectorAll('.tab-pane').forEach(tab => {
-                tab.classList.add('show', 'active');
-            });
-            
-            // Imprimir
-            window.print();
-            
-            // Restaurar estado original
-            document.querySelectorAll('.tab-pane').forEach(tab => {
-                tab.classList.remove('show', 'active');
-            });
-            
-            // Ativar a aba original
-            if (currentTabId === 'dashboard1-tab') {
-                document.getElementById('dashboard1').classList.add('show', 'active');
-            } else if (currentTabId === 'dashboard2-tab') {
-                document.getElementById('dashboard2').classList.add('show', 'active');
-            } else if (currentTabId === 'dashboard3-tab') {
-                document.getElementById('dashboard3').classList.add('show', 'active');
+        function exportToPDF(source) {
+            if (source === 'dashboard1') {
+                exportResumoPDF();
+            } else if (source === 'dashboard2') {
+                exportEstagiariosPDF();
             }
         }
 
