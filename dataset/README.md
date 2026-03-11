@@ -2,7 +2,7 @@ Conjunto de dados que reúne informações cadastrais, funcionais e de remunera�
 
 Os dados são organizados em arquivos anuais e seguem um padrão estruturado, facilitando o uso por cidadãos, pesquisadores, órgãos de controle e desenvolvedores
 
-Periodicidade de Atualização: Mensal
+Periodicidade de Atualização: Mensal.
 
 ## Como participar
 
@@ -24,5 +24,6 @@ Além disso, fique a vontade para utilizar os demais canais oficiais de atendime
 - [Fale Conosco](https://www.mg.gov.br/planejamento/pagina/atendimento/fale-conosco/fale-conosco): Dúvidas
 - [Manifestações de Ouvidoria](http://www.ouvidoriageral.mg.gov.br/): Denúncia, Reclamação, Crítica, Elogio ou Sugestões
 - [Pedido de Acesso à Informação](http://www.acessoainformacao.mg.gov.br/sistema/site/index.html): Acesso às informações dos órgãos e entidades estaduais que não estejam publicamente disponíveis.
+
 
 
