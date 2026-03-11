@@ -2,8 +2,7 @@ name: estagiarios
 owner_org: secretaria-de-estado-de-planejamento-e-gestao-seplag
 profile: data-package
 resources:
-  - description: Conjunto de dados contendo informações cadastrais, funcionais e de remuneração dos estagiários vinculados aos órgãos e entidades do Governo do Estado de Minas Gerais.
-    dialect:
+  - dialect:
       delimiter: ;
     encoding: utf-8-sig
     format: csv
@@ -59,8 +58,7 @@ resources:
           description: Valor da remuneração paga ao estagiário no período de referência.
     scheme: file
     title: Estagiarios 2022
-  - description: Conjunto de dados contendo informações cadastrais, funcionais e de remuneração dos estagiários vinculados aos órgãos e entidades do Governo do Estado de Minas Gerais.
-    dialect:
+  - dialect:
       delimiter: ;
     encoding: utf-8-sig
     format: csv
@@ -116,8 +114,7 @@ resources:
           description: Valor da remuneração paga ao estagiário no período de referência.
     scheme: file
     title: Estagiarios 2023
-  - description: Conjunto de dados contendo informações cadastrais, funcionais e de remuneração dos estagiários vinculados aos órgãos e entidades do Governo do Estado de Minas Gerais.
-    dialect:
+  - dialect:
       delimiter: ;
     encoding: utf-8-sig
     format: csv
@@ -173,8 +170,7 @@ resources:
           description: Valor da remuneração paga ao estagiário no período de referência.
     scheme: file
     title: Estagiarios 2024
-  - description: Conjunto de dados contendo informações cadastrais, funcionais e de remuneração dos estagiários vinculados aos órgãos e entidades do Governo do Estado de Minas Gerais.
-    dialect:
+  - dialect:
       delimiter: ;
     encoding: utf-8-sig
     format: csv
