@@ -18,47 +18,69 @@
         "fields": [
           {
             "name": "ano_mesreferencia",
-            "type": "string"
+            "type": "string",
+            "title": "Ano e mês de referência",
+            "description": "Ano e mês de referência das informações."
           },
           {
             "name": "nome_estagiario",
-            "type": "string"
+            "type": "string",
+            "title": "Nome do Estagiário",
+            "description": "Nome completo do estagiário."
           },
           {
             "name": "masp",
-            "type": "integer"
+            "type": "integer",
+            "title": "MASP",
+            "description": "Número de identificação funcional do estagiário (MASP)."
           },
           {
             "name": "codigo_situacao_funcional",
-            "type": "integer"
+            "type": "integer",
+            "title": "Código da situação funcional",
+            "description": "Código que identifica a situação funcional do estagiário"
           },
           {
             "name": "situacao_funcional",
-            "type": "string"
+            "type": "string",
+            "title": "Situação funcional",
+            "description": "Descrição da situação funcional do estagiário."
           },
           {
             "name": "data_inicio",
-            "type": "date"
+            "type": "date",
+            "title": "Data de Início",
+            "description": "Data de início do estágio."
           },
           {
             "name": "data_fim",
-            "type": "date"
+            "type": "date",
+            "title": "Data de término do estágio.",
+            "description": "Data de término do estágio."
           },
           {
             "name": "codigo_orgao",
-            "type": "integer"
+            "type": "integer",
+            "title": "Código do Órgão",
+            "description": "Código do órgão ou entidade de exercício."
           },
           {
             "name": "orgao",
-            "type": "any"
+            "type": "any",
+            "title": "Órgão",
+            "description": "Nome do órgão ou entidade de exercício."
           },
           {
             "name": "sigla_orgao",
-            "type": "string"
+            "type": "string",
+            "title": "Sigla do Órgão",
+            "description": "igla do órgão ou entidade de exercício."
           },
           {
             "name": "valor_remuneracao",
-            "type": "string"
+            "type": "string",
+            "title": "Valor da remuneração",
+            "description": "Valor da remuneração paga ao estagiário no período de referência."
           }
         ]
       },
