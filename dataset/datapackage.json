@@ -1,0 +1,318 @@
+{
+  "name": "portal_estagiarios",
+  "owner_org": "secretaria-de-estado-de-planejamento-e-gestao-seplag",
+  "profile": "data-package",
+  "resources": [
+    {
+      "description": "Insira a descrição/explicação detalhada deste recurso.",
+      "dialect": {
+        "delimiter": ";"
+      },
+      "encoding": "utf-8-sig",
+      "format": "csv",
+      "hashing": "md5",
+      "name": "estagiarios_2022",
+      "path": "data/estagiarios_2022.csv",
+      "profile": "tabular-data-resource",
+      "schema": {
+        "fields": [
+          {
+            "name": "ano_mesreferencia",
+            "type": "string"
+          },
+          {
+            "name": "nome_estagiario",
+            "type": "string"
+          },
+          {
+            "name": "masp",
+            "type": "integer"
+          },
+          {
+            "name": "codigo_situacao_funcional",
+            "type": "integer"
+          },
+          {
+            "name": "situacao_funcional",
+            "type": "string"
+          },
+          {
+            "name": "data_inicio",
+            "type": "date"
+          },
+          {
+            "name": "data_fim",
+            "type": "date"
+          },
+          {
+            "name": "codigo_orgao",
+            "type": "integer"
+          },
+          {
+            "name": "orgao",
+            "type": "string"
+          },
+          {
+            "name": "sigla_orgao",
+            "type": "string"
+          },
+          {
+            "name": "valor_remuneracao",
+            "type": "string"
+          }
+        ]
+      },
+      "scheme": "file",
+      "title": "Insira um título humanamente legível para este recurso."
+    },
+    {
+      "description": "Insira a descrição/explicação detalhada deste recurso.",
+      "dialect": {
+        "delimiter": ";"
+      },
+      "encoding": "utf-8-sig",
+      "format": "csv",
+      "hashing": "md5",
+      "name": "estagiarios_2023",
+      "path": "data/estagiarios_2023.csv",
+      "profile": "tabular-data-resource",
+      "schema": {
+        "fields": [
+          {
+            "name": "ano_mesreferencia",
+            "type": "string"
+          },
+          {
+            "name": "nome_estagiario",
+            "type": "string"
+          },
+          {
+            "name": "masp",
+            "type": "integer"
+          },
+          {
+            "name": "codigo_situacao_funcional",
+            "type": "integer"
+          },
+          {
+            "name": "situacao_funcional",
+            "type": "string"
+          },
+          {
+            "name": "data_inicio",
+            "type": "date"
+          },
+          {
+            "name": "data_fim",
+            "type": "any"
+          },
+          {
+            "name": "codigo_orgao",
+            "type": "integer"
+          },
+          {
+            "name": "orgao",
+            "type": "string"
+          },
+          {
+            "name": "sigla_orgao",
+            "type": "string"
+          },
+          {
+            "name": "valor_remuneracao",
+            "type": "string"
+          }
+        ]
+      },
+      "scheme": "file",
+      "title": "Insira um título humanamente legível para este recurso."
+    },
+    {
+      "description": "Insira a descrição/explicação detalhada deste recurso.",
+      "dialect": {
+        "delimiter": ";"
+      },
+      "encoding": "utf-8-sig",
+      "format": "csv",
+      "hashing": "md5",
+      "name": "estagiarios_2024",
+      "path": "data/estagiarios_2024.csv",
+      "profile": "tabular-data-resource",
+      "schema": {
+        "fields": [
+          {
+            "name": "ano_mesreferencia",
+            "type": "string"
+          },
+          {
+            "name": "nome_estagiario",
+            "type": "string"
+          },
+          {
+            "name": "masp",
+            "type": "integer"
+          },
+          {
+            "name": "codigo_situacao_funcional",
+            "type": "integer"
+          },
+          {
+            "name": "situacao_funcional",
+            "type": "string"
+          },
+          {
+            "name": "data_inicio",
+            "type": "date"
+          },
+          {
+            "name": "data_fim",
+            "type": "any"
+          },
+          {
+            "name": "codigo_orgao",
+            "type": "integer"
+          },
+          {
+            "name": "orgao",
+            "type": "string"
+          },
+          {
+            "name": "sigla_orgao",
+            "type": "string"
+          },
+          {
+            "name": "valor_remuneracao",
+            "type": "string"
+          }
+        ]
+      },
+      "scheme": "file",
+      "title": "Insira um título humanamente legível para este recurso."
+    },
+    {
+      "description": "Insira a descrição/explicação detalhada deste recurso.",
+      "dialect": {
+        "delimiter": ";"
+      },
+      "encoding": "utf-8-sig",
+      "format": "csv",
+      "hashing": "md5",
+      "name": "estagiarios_2025",
+      "path": "data/estagiarios_2025.csv",
+      "profile": "tabular-data-resource",
+      "schema": {
+        "fields": [
+          {
+            "name": "ano_mesreferencia",
+            "type": "string"
+          },
+          {
+            "name": "nome_estagiario",
+            "type": "string"
+          },
+          {
+            "name": "masp",
+            "type": "integer"
+          },
+          {
+            "name": "codigo_situacao_funcional",
+            "type": "integer"
+          },
+          {
+            "name": "situacao_funcional",
+            "type": "string"
+          },
+          {
+            "name": "data_inicio",
+            "type": "date"
+          },
+          {
+            "name": "data_fim",
+            "type": "any"
+          },
+          {
+            "name": "codigo_orgao",
+            "type": "integer"
+          },
+          {
+            "name": "orgao",
+            "type": "string"
+          },
+          {
+            "name": "sigla_orgao",
+            "type": "string"
+          },
+          {
+            "name": "valor_remuneracao",
+            "type": "string"
+          }
+        ]
+      },
+      "scheme": "file",
+      "title": "Insira um título humanamente legível para este recurso."
+    },
+    {
+      "description": "Insira a descrição/explicação detalhada deste recurso.",
+      "dialect": {
+        "delimiter": ";"
+      },
+      "encoding": "utf-8-sig",
+      "format": "csv",
+      "hashing": "md5",
+      "name": "estagiarios_2026",
+      "path": "data/estagiarios_2026.csv",
+      "profile": "tabular-data-resource",
+      "schema": {
+        "fields": [
+          {
+            "name": "ano_mesreferencia",
+            "type": "integer"
+          },
+          {
+            "name": "nome_estagiario",
+            "type": "string"
+          },
+          {
+            "name": "masp",
+            "type": "integer"
+          },
+          {
+            "name": "codigo_situacao_funcional",
+            "type": "integer"
+          },
+          {
+            "name": "situacao_funcional",
+            "type": "string"
+          },
+          {
+            "name": "data_inicio",
+            "type": "date"
+          },
+          {
+            "name": "data_fim",
+            "type": "any"
+          },
+          {
+            "name": "codigo_orgao",
+            "type": "integer"
+          },
+          {
+            "name": "orgao",
+            "type": "string"
+          },
+          {
+            "name": "sigla_orgao",
+            "type": "string"
+          },
+          {
+            "name": "valor_remuneracao",
+            "type": "string"
+          }
+        ]
+      },
+      "scheme": "file",
+      "title": "Insira um título humanamente legível para este recurso."
+    }
+  ],
+  "title": "Portal_estagiarios"
+}
