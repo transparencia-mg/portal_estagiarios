@@ -1,11 +1,10 @@
 {
   "version": "4.16.6",
-  "time": 1.664,
+  "time": 1.725,
   "errors": [],
   "tasks": [
     {
       "resource": {
-        "description": "Insira a descrição/explicação detalhada deste recurso.",
         "dialect": {
           "delimiter": ";"
         },
@@ -64,7 +63,7 @@
           ]
         },
         "scheme": "file",
-        "title": "Insira um título humanamente legível para este recurso.",
+        "title": "Estagiários 2022",
         "stats": {
           "hash": "595a5155c528072c6120c05bd8ef6fdd",
           "bytes": 71712,
@@ -102,7 +101,6 @@
     },
     {
       "resource": {
-        "description": "Insira a descrição/explicação detalhada deste recurso.",
         "dialect": {
           "delimiter": ";"
         },
@@ -161,7 +159,7 @@
           ]
         },
         "scheme": "file",
-        "title": "Insira um título humanamente legível para este recurso.",
+        "title": "Estagiários 2023",
         "stats": {
           "hash": "46f7aaf2ec7823c04d2198738e053638",
           "bytes": 1028421,
@@ -169,7 +167,7 @@
           "rows": 7970
         }
       },
-      "time": 0.295,
+      "time": 0.299,
       "scope": [
         "hash-count-error",
         "byte-count-error",
@@ -199,7 +197,6 @@
     },
     {
       "resource": {
-        "description": "Insira a descrição/explicação detalhada deste recurso.",
         "dialect": {
           "delimiter": ";"
         },
@@ -258,7 +255,7 @@
           ]
         },
         "scheme": "file",
-        "title": "Insira um título humanamente legível para este recurso.",
+        "title": "Estagiários 2024",
         "stats": {
           "hash": "d5acea05bd4c05fde092a5fd01b1fe3d",
           "bytes": 2139180,
@@ -266,7 +263,7 @@
           "rows": 16763
         }
       },
-      "time": 0.579,
+      "time": 0.598,
       "scope": [
         "hash-count-error",
         "byte-count-error",
@@ -296,7 +293,6 @@
     },
     {
       "resource": {
-        "description": "Insira a descrição/explicação detalhada deste recurso.",
         "dialect": {
           "delimiter": ";"
         },
@@ -355,7 +351,7 @@
           ]
         },
         "scheme": "file",
-        "title": "Insira um título humanamente legível para este recurso.",
+        "title": "Estagiários 2025",
         "stats": {
           "hash": "0e98e9c524ca15deb4f68d7b72ae9c96",
           "bytes": 2321616,
@@ -363,7 +359,7 @@
           "rows": 17979
         }
       },
-      "time": 0.615,
+      "time": 0.627,
       "scope": [
         "hash-count-error",
         "byte-count-error",
@@ -393,7 +389,6 @@
     },
     {
       "resource": {
-        "description": "Insira a descrição/explicação detalhada deste recurso.",
         "dialect": {
           "delimiter": ";"
         },
@@ -452,7 +447,7 @@
           ]
         },
         "scheme": "file",
-        "title": "Insira um título humanamente legível para este recurso.",
+        "title": "Estagiários 2026",
         "stats": {
           "hash": "",
           "bytes": 0,
@@ -460,7 +455,7 @@
           "rows": 0
         }
       },
-      "time": 0.088,
+      "time": 0.102,
       "scope": [
         "hash-count-error",
         "byte-count-error",
