@@ -180,7 +180,7 @@ resources:
     profile: tabular-data-resource
     schema:
       fields:
-       - name: ano_mesreferencia
+        - name: ano_mesreferencia
           type: string
           title: Ano e mês de referência
           description: Ano e mês de referência das informações.
