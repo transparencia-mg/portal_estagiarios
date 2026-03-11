@@ -1766,6 +1766,7 @@
                                     <option value="2023">2023</option>
                                     <option value="2024">2024</option>
                                     <option value="2025">2025</option>
+                                    <option value="2026">2026</option>
                                 </select>
                             </div>
                         </div>
@@ -1968,7 +1969,8 @@
             '2022': 'estagiarios_2022.csv',
             '2023': 'estagiarios_2023.csv',
             '2024': 'estagiarios_2024.csv',
-            '2025': 'estagiarios_2025.csv'
+            '2025': 'estagiarios_2025.csv',
+            '2026': 'estagiarios_2026.csv'
         };
 
         const monthNames = {
@@ -2371,7 +2373,7 @@
                     complete: function (results) {
                         console.log(`Parse completo para ${year}: ${results.data.length} registros`);
                         
-                        // Função para processar data no formato 2025/01
+                        // Função para processar data no formato 2026/01
                         const processarDataReferencia = (ref) => {
                             if (!ref || typeof ref !== 'string') {
                                 console.warn('Referência de data vazia ou inválida');
@@ -2380,7 +2382,7 @@
                             
                             const str = ref.trim();
                             
-                            // Formato 2025/01
+                            // Formato 2026/01
                             if (str.includes('/')) {
                                 const [anoStr, mesStr] = str.split('/');
                                 const ano = parseInt(anoStr, 10);
@@ -2728,12 +2730,12 @@
             if (!anoMes) return '-';
             
             try {
-                // Formato: 2025-01 -> 01/2025
+                // Formato: 2026-01 -> 01/2026
                 if (anoMes.includes('-')) {
                     const [ano, mes] = anoMes.split('-');
                     return `${mes}/${ano}`;
                 }
-                // Formato: 2025/01 -> 01/2025
+                // Formato: 2026/01 -> 01/2026
                 else if (anoMes.includes('/')) {
                     const [ano, mes] = anoMes.split('/');
                     return `${mes}/${ano}`;
