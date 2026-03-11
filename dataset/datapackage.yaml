@@ -2,8 +2,7 @@ name: portal_estagiarios
 owner_org: secretaria-de-estado-de-planejamento-e-gestao-seplag
 profile: data-package
 resources:
-  - description: Insira a descrição/explicação detalhada deste recurso.
-    dialect:
+  - dialect:
       delimiter: ;
     encoding: utf-8-sig
     format: csv
@@ -36,9 +35,8 @@ resources:
         - name: valor_remuneracao
           type: string
     scheme: file
-    title: Insira um título humanamente legível para este recurso.
-  - description: Insira a descrição/explicação detalhada deste recurso.
-    dialect:
+    title: Estagiários 2022
+  - dialect:
       delimiter: ;
     encoding: utf-8-sig
     format: csv
@@ -71,9 +69,8 @@ resources:
         - name: valor_remuneracao
           type: string
     scheme: file
-    title: Insira um título humanamente legível para este recurso.
-  - description: Insira a descrição/explicação detalhada deste recurso.
-    dialect:
+    title: Estagiários 2023
+  - dialect:
       delimiter: ;
     encoding: utf-8-sig
     format: csv
@@ -106,9 +103,8 @@ resources:
         - name: valor_remuneracao
           type: string
     scheme: file
-    title: Insira um título humanamente legível para este recurso.
-  - description: Insira a descrição/explicação detalhada deste recurso.
-    dialect:
+    title: Estagiários 2024
+  - dialect:
       delimiter: ;
     encoding: utf-8-sig
     format: csv
@@ -141,9 +137,8 @@ resources:
         - name: valor_remuneracao
           type: string
     scheme: file
-    title: Insira um título humanamente legível para este recurso.
-  - description: Insira a descrição/explicação detalhada deste recurso.
-    dialect:
+    title: Estagiários 2025
+  - dialect:
       delimiter: ;
     encoding: utf-8-sig
     format: csv
@@ -176,5 +171,5 @@ resources:
         - name: valor_remuneracao
           type: string
     scheme: file
-    title: Insira um título humanamente legível para este recurso.
-title: Portal_estagiarios
+    title: Estagiários 2026
+title: Estagiários
