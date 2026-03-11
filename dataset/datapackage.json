@@ -4,7 +4,6 @@
   "profile": "data-package",
   "resources": [
     {
-      "description": "Insira a descrição/explicação detalhada deste recurso.",
       "dialect": {
         "delimiter": ";"
       },
@@ -63,10 +62,9 @@
         ]
       },
       "scheme": "file",
-      "title": "Insira um título humanamente legível para este recurso."
+      "title": "Estagiários 2022"
     },
     {
-      "description": "Insira a descrição/explicação detalhada deste recurso.",
       "dialect": {
         "delimiter": ";"
       },
@@ -125,10 +123,9 @@
         ]
       },
       "scheme": "file",
-      "title": "Insira um título humanamente legível para este recurso."
+      "title": "Estagiários 2023"
     },
     {
-      "description": "Insira a descrição/explicação detalhada deste recurso.",
       "dialect": {
         "delimiter": ";"
       },
@@ -187,10 +184,9 @@
         ]
       },
       "scheme": "file",
-      "title": "Insira um título humanamente legível para este recurso."
+      "title": "Estagiários 2024"
     },
     {
-      "description": "Insira a descrição/explicação detalhada deste recurso.",
       "dialect": {
         "delimiter": ";"
       },
@@ -249,10 +245,9 @@
         ]
       },
       "scheme": "file",
-      "title": "Insira um título humanamente legível para este recurso."
+      "title": "Estagiários 2025"
     },
     {
-      "description": "Insira a descrição/explicação detalhada deste recurso.",
       "dialect": {
         "delimiter": ";"
       },
@@ -311,8 +306,8 @@
         ]
       },
       "scheme": "file",
-      "title": "Insira um título humanamente legível para este recurso."
+      "title": "Estagiários 2026"
     }
   ],
-  "title": "Portal_estagiarios"
+  "title": "Estagiários"
 }
