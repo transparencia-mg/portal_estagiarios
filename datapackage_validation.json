@@ -1,6 +1,6 @@
 {
   "version": "4.16.6",
-  "time": 1.74,
+  "time": 1.418,
   "errors": [],
   "tasks": [
     {
@@ -71,7 +71,7 @@
           "rows": 517
         }
       },
-      "time": 0.035,
+      "time": 0.031,
       "scope": [
         "hash-count-error",
         "byte-count-error",
@@ -167,7 +167,7 @@
           "rows": 7970
         }
       },
-      "time": 0.294,
+      "time": 0.241,
       "scope": [
         "hash-count-error",
         "byte-count-error",
@@ -263,7 +263,7 @@
           "rows": 16763
         }
       },
-      "time": 0.612,
+      "time": 0.493,
       "scope": [
         "hash-count-error",
         "byte-count-error",
@@ -359,7 +359,7 @@
           "rows": 17979
         }
       },
-      "time": 0.648,
+      "time": 0.524,
       "scope": [
         "hash-count-error",
         "byte-count-error",
@@ -455,7 +455,7 @@
           "rows": 0
         }
       },
-      "time": 0.091,
+      "time": 0.068,
       "scope": [
         "hash-count-error",
         "byte-count-error",
@@ -1515,7 +1515,7 @@
             "2025-09-02",
             "",
             "2351",
-            "Universidade Estadual de Montes Claros",
+            "Universidade Estadual de Minas Gerais",
             "UEMG",
             "1365,88"
           ],
@@ -2228,7 +2228,7 @@
             "2024-02-21",
             "",
             "2351",
-            "Universidade Estadual de Montes Claros",
+            "Universidade Estadual de Minas Gerais",
             "UEMG",
             "1365,88"
           ],
@@ -3623,7 +3623,7 @@
             "2025-09-08",
             "",
             "2351",
-            "Universidade Estadual de Montes Claros",
+            "Universidade Estadual de Minas Gerais",
             "UEMG",
             "1365,88"
           ],
@@ -5328,7 +5328,7 @@
             "2024-04-16",
             "",
             "2351",
-            "Universidade Estadual de Montes Claros",
+            "Universidade Estadual de Minas Gerais",
             "UEMG",
             "1365,88"
           ],
@@ -7870,7 +7870,7 @@
             "2025-09-08",
             "2026-01-04",
             "2351",
-            "Universidade Estadual de Montes Claros",
+            "Universidade Estadual de Minas Gerais",
             "UEMG",
             "182,12"
           ],
@@ -9017,7 +9017,7 @@
             "2025-04-14",
             "",
             "2351",
-            "Universidade Estadual de Montes Claros",
+            "Universidade Estadual de Minas Gerais",
             "UEMG",
             "1365,88"
           ],
@@ -9265,7 +9265,7 @@
             "2025-01-02",
             "",
             "2351",
-            "Universidade Estadual de Montes Claros",
+            "Universidade Estadual de Minas Gerais",
             "UEMG",
             "1365,88"
           ],
@@ -10660,7 +10660,7 @@
             "2025-04-01",
             "",
             "2351",
-            "Universidade Estadual de Montes Claros",
+            "Universidade Estadual de Minas Gerais",
             "UEMG",
             "1365,88"
           ],
@@ -12148,7 +12148,7 @@
             "2024-08-01",
             "",
             "2351",
-            "Universidade Estadual de Montes Claros",
+            "Universidade Estadual de Minas Gerais",
             "UEMG",
             "1365,88"
           ],
@@ -15527,7 +15527,7 @@
             "2025-07-10",
             "",
             "2351",
-            "Universidade Estadual de Montes Claros",
+            "Universidade Estadual de Minas Gerais",
             "UEMG",
             "1365,88"
           ],
@@ -15713,7 +15713,7 @@
             "2024-10-17",
             "",
             "2351",
-            "Universidade Estadual de Montes Claros",
+            "Universidade Estadual de Minas Gerais",
             "UEMG",
             "1365,88"
           ],
@@ -16550,7 +16550,7 @@
             "2025-08-04",
             "",
             "2351",
-            "Universidade Estadual de Montes Claros",
+            "Universidade Estadual de Minas Gerais",
             "UEMG",
             "1365,88"
           ],
@@ -17604,7 +17604,7 @@
             "2025-03-12",
             "",
             "2351",
-            "Universidade Estadual de Montes Claros",
+            "Universidade Estadual de Minas Gerais",
             "UEMG",
             "1365,88"
           ],
@@ -19867,7 +19867,7 @@
             "2025-08-18",
             "",
             "2351",
-            "Universidade Estadual de Montes Claros",
+            "Universidade Estadual de Minas Gerais",
             "UEMG",
             "1365,88"
           ],
@@ -21231,7 +21231,7 @@
             "2024-12-02",
             "",
             "2351",
-            "Universidade Estadual de Montes Claros",
+            "Universidade Estadual de Minas Gerais",
             "UEMG",
             "1365,88"
           ],
@@ -22998,7 +22998,7 @@
             "2025-08-18",
             "",
             "2351",
-            "Universidade Estadual de Montes Claros",
+            "Universidade Estadual de Minas Gerais",
             "UEMG",
             "1365,88"
           ],
@@ -24672,7 +24672,7 @@
             "2025-01-14",
             "",
             "2351",
-            "Universidade Estadual de Montes Claros",
+            "Universidade Estadual de Minas Gerais",
             "UEMG",
             "1365,88"
           ],
@@ -25013,7 +25013,7 @@
             "2025-03-12",
             "",
             "2351",
-            "Universidade Estadual de Montes Claros",
+            "Universidade Estadual de Minas Gerais",
             "UEMG",
             "1365,88"
           ],
@@ -25819,7 +25819,7 @@
             "2024-05-06",
             "",
             "2351",
-            "Universidade Estadual de Montes Claros",
+            "Universidade Estadual de Minas Gerais",
             "UEMG",
             "1365,88"
           ],
@@ -25912,7 +25912,7 @@
             "2025-04-14",
             "",
             "2351",
-            "Universidade Estadual de Montes Claros",
+            "Universidade Estadual de Minas Gerais",
             "UEMG",
             "1365,88"
           ],
@@ -27028,7 +27028,7 @@
             "2025-05-05",
             "",
             "2351",
-            "Universidade Estadual de Montes Claros",
+            "Universidade Estadual de Minas Gerais",
             "UEMG",
             "1365,88"
           ],
@@ -28206,7 +28206,7 @@
             "2025-08-04",
             "",
             "2351",
-            "Universidade Estadual de Montes Claros",
+            "Universidade Estadual de Minas Gerais",
             "UEMG",
             "1365,88"
           ],
@@ -28950,7 +28950,7 @@
             "2025-03-12",
             "",
             "2351",
-            "Universidade Estadual de Montes Claros",
+            "Universidade Estadual de Minas Gerais",
             "UEMG",
             "1365,88"
           ],
@@ -29384,7 +29384,7 @@
             "2025-01-27",
             "",
             "2351",
-            "Universidade Estadual de Montes Claros",
+            "Universidade Estadual de Minas Gerais",
             "UEMG",
             "1365,88"
           ],
