@@ -5,29 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
     <title>Estagiários - Governo de Minas Gerais</title>
 
-    <!-- ============================================================
-         BIBLIOTECAS EXTERNAS
-    ============================================================ -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-    <!-- PDF -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.29/jspdf.plugin.autotable.min.js"></script>
-
-    <!-- Chart.js | PapaParse | jQuery -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 
     <style>
-
-        /* ============================================================
-           1. VARIÁVEIS DE CORES
-        ============================================================ */
         :root {
             --primary-dark:      #1a3a5c;
             --primary-darker:    #0f2a44;
@@ -38,979 +28,167 @@
             --warning-yellow:    #ffc107;
             --info-blue:         #17a2b8;
         }
-
-
-        /* ============================================================
-           2. RESET E CONFIGURAÇÕES GLOBAIS
-        ============================================================ */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        html, body {
-            width: 100%;
-            overflow-x: hidden;
-            margin: 0;
-            padding: 0;
-            height: auto;
-            min-height: auto;
-        }
-
+        * { margin:0; padding:0; box-sizing:border-box; }
+        html, body { width:100%; overflow-x:hidden; margin:0; padding:0; height:auto; min-height:auto; }
         body {
-            font-family: 'Montserrat', Segoe UI, Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--background-light);
-            padding-bottom: 15px;
-            overflow-x: hidden;
-            min-height: auto;
-            height: auto;
-            position: relative;
+            font-family:'Montserrat',Segoe UI,Tahoma,Geneva,Verdana,sans-serif;
+            background-color:var(--background-light);
+            padding-bottom:15px;
+            overflow-x:hidden;
         }
+        body,button,input,select,textarea,span,div { font-family:'Montserrat',sans-serif !important; }
+        .material-icons { font-family:'Material Icons' !important; font-size:14px; vertical-align:middle; }
 
-        body, button, input, select, textarea, span, div {
-            font-family: 'Montserrat', sans-serif !important;
-        }
+        .main-container { height:auto; min-height:auto; overflow:visible; position:relative; }
+        .container-fluid { width:100%; max-width:88% !important; padding:0 40px; margin:0; }
+        .container { max-width:85% !important; }
+        .dashboard-container { width:100%; max-width:100%; padding:0 40px; margin:0 auto; }
+        .tab-content,.tab-pane { width:100%; height:auto; min-height:auto; overflow:visible; }
+        .table-container { height:auto; min-height:auto; overflow:visible; position:relative; }
+        .iframe-mode { overflow:visible !important; }
 
-        .material-icons {
-            font-family: 'Material Icons' !important;
-            font-size: 14px;
-            vertical-align: middle;
-        }
-
-
-        /* ============================================================
-           3. LAYOUT PRINCIPAL
-        ============================================================ */
-        .main-container {
-            height: auto;
-            min-height: auto;
-            overflow: visible;
-            position: relative;
-        }
-
-        .container-fluid {
-            width: 100%;
-            max-width: 88% !important;
-            padding: 0 40px;
-            margin: 0;
-            height: auto;
-            min-height: auto;
-        }
-
-        .container {
-            max-width: 85% !important;
-        }
-
-        .dashboard-container {
-            width: 100%;
-            max-width: 100%;
-            padding: 0 40px;
-            margin: 0 auto;
-            height: auto;
-            min-height: auto;
-        }
-
-        .tab-content,
-        .tab-pane {
-            width: 100%;
-            height: auto;
-            min-height: auto;
-            overflow: visible;
-        }
-
-        .table-container {
-            height: auto;
-            min-height: auto;
-            overflow: visible;
-            position: relative;
-        }
-
-        .iframe-mode {
-            overflow: visible !important;
-        }
-
-
-        /* ============================================================
-           4. DATA DE ATUALIZAÇÃO
-        ============================================================ */
-        .data-atualizacao-container {
-            display: flex;
-            justify-content: left;
-            align-items: center;
-            margin: 15px 0;
-        }
-
+        .data-atualizacao-container { display:flex; justify-content:left; align-items:center; margin:15px 0; }
         .data-atualizacao-box {
-            background: transparent !important;
-            border-radius: 8px;
-            padding: 8px 15px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 12px;
-            color: var(--primary-dark);
-            font-weight: 600;
-            box-shadow: none;
-        }
-
-        .data-atualizacao-box i {
-            font-size: 14px;
-            color: var(--accent-red);
-        }
-
-
-        /* ============================================================
-           5. FILTROS
-        ============================================================ */
-        .filter-container {
-            background: white;
-            border-radius: 10px;
-            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
-            padding: 20px;
-            margin-bottom: 20px;
-            border-left: none;
-            width: 100%;
-        }
-
-        .filter-label {
-            font-size: 13px;
-            font-weight: 600;
-            color: #1a3a5c;
-            margin-bottom: 6px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .filter-label i {
-            font-size: 14px;
-            color: var(--accent-red);
-        }
-
-        .form-control,
-        .form-select {
-            border: 2px solid #e9ecef;
-            border-radius: 6px;
-            padding: 10px 12px;
-            font-size: 13px;
-            transition: all 0.3s ease;
-            height: auto;
-            width: 100%;
-        }
-
-        .form-control:focus,
-        .form-select:focus {
-            border-color: var(--accent-red);
-            box-shadow: 0 0 0 2px rgba(185, 60, 66, 0.15);
-        }
-
-        .modern-select {
-            border: 1.5px solid #dfe5ec !important;
-            border-radius: 8px !important;
-            padding: 10px 12px !important;
-            font-size: 14px !important;
-            height: 48px !important;
-            line-height: 1.5 !important;
-            background-color: #fff;
-            transition: all 0.2s ease;
-            width: 100%;
-        }
-
-        .modern-select:focus {
-            border-color: #1a3a5c !important;
-            box-shadow: 0 0 0 2px rgba(26, 58, 92, 0.1);
-        }
-
-        .filters-row {
-            display: flex;
-            gap: 15px;
-            width: 100%;
-            flex-wrap: nowrap;
-        }
-
-        .filter-group {
-            flex: 1;
-        }
-
-        .botoes-abaixo {
-            margin-top: 15px;
-            display: flex;
-            gap: 10px;
-        }
-
-
-        /* ============================================================
-           6. CARDS DE MÉTRICAS
-        ============================================================ */
-        .metric-card {
-            background: white;
-            border-radius: 8px;
-            border: 1px solid #e5e9ef;
-            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.06);
-            overflow: hidden;
-            height: 100%;
-        }
-
-        .metric-header {
-            background: #20445d;
-            color: white;
-            font-size: 14px;
-            font-weight: 600;
-            padding: 10px 15px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .metric-header.success { background: #20445d; }
-        .metric-header.warning { background: #20445d; }
-        .metric-header.info    { background: #20445d; }
-
-        .metric-body {
-            padding: 12px 15px;
-        }
-
-        .metric-value {
-            font-size: 20px;
-            font-weight: 600;
-            color: #171c21;
-        }
-
-        .metric-sub {
-            font-size: 11px;
-            color: #6c757d;
-            margin-top: 4px;
-        }
-
-
-        /* ============================================================
-           7. GRÁFICOS
-        ============================================================ */
-        .chart-container {
-            background: white;
-            border-radius: 10px;
-            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.06);
-            margin-bottom: 20px;
-            min-height: 320px;
-            padding: 0;
-            overflow: hidden;
-            overflow-x: auto;
-        }
-
-        .chart-container canvas {
-            max-width: 100%;
-        }
-
-        .chart-header {
-            background: #20445d;
-            color: white;
-            padding: 12px 16px;
-            margin: 0;
-        }
-
-        .chart-title {
-            font-size: 14px;
-            font-weight: 600;
-            color: white;
-            margin: 0;
-        }
-
-        .chart-wrapper {
-            height: 260px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 10px 15px;
-            width: 100%;
-        }
-
-        .chart-wrapper canvas {
-            width: 100% !important;
-            height: 100% !important;
-        }
-
-        /* Pizza layout */
-        .chart-wrapper.chart-pizza {
-            height: 260px;
-            padding: 10px 20px 0 20px;
-        }
-
-        .chart-pizza-layout {
-            display: flex;
-            flex-direction: row;
-	    flex-wrap: wrap;
-            align-items: center;
-            justify-content: center;
-            width: 100%;
-            height: 100%;
-            gap: 15px;
-            padding: 8px 10px;
-        }
-
-        .chart-pizza-box {
-            width: 220px;
-            height: 200px;
-            flex-shrink: 0;
-        }
-
-        .legend-grid {
-            display: flex;
-            flex-direction: row;
-	    flex-wrap: wrap;
-            justify-content: center;
-            align-items: flex-start;
-	    gap: 6px 10px; 
-            font-size: 10px;
-            min-width: 300px;
-            white-space: nowrap;
-        }
-
-        .legend-item {
-            width: calc(33.33% - 10px);
-	    display: flex;
-            align-items: center;
-            gap: 6px;
-            white-space: nowrap;
-        }
-
-        .legend-color {
-            width: 12px;
-            height: 12px;
-            border-radius: 2px;
-            flex-shrink: 0;
-        }
-
-
-        /* ============================================================
-           8. TABELAS
-        ============================================================ */
-        .table-header {
-            background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary-darker) 100%);
-            color: white;
-            padding: 15px 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-
-        .table-title {
-            font-size: 13px;
-            font-weight: 600;
-            margin: 0;
-        }
-
-        .table-badge {
-            background: #1a3a5c;
-            color: white;
-            padding: 5px 12px;
-            border-radius: 12px;
-            font-size: 12px;
-            font-weight: 600;
-            white-space: nowrap;
-        }
-
-        .table-fixed-header-container {
-            position: relative;
-            overflow: auto;
-            width: 100%;
-            max-height: 600px;
-        }
-
-        .table-fixed-header-container table thead th {
-            background-color: #54697b;
-            color: white !important;
-            position: sticky;
-            top: 0;
-            z-index: 10;
-            font-weight: 600;
-            padding: 12px 10px;
-            font-size: 13px;
-            text-transform: uppercase;
-            white-space: nowrap;
-        }
-
-        .table {
-            width: 100%;
-            font-size: 13px;
-            border-collapse: collapse;
-            table-layout: auto;
-        }
-
-        .table th,
-        .table td {
-            border: 1px solid #d6dee6;
-        }
-
-        .table thead th {
-            background-color: #54697b !important;
-            color: white !important;
-            font-weight: 600;
-            font-size: 13px;
-            padding: 12px 10px;
-            text-transform: uppercase;
-            border: 1px solid #d6dee6;
-        }
-
-        .table thead th:first-child { border-top-left-radius: 8px; }
-        .table thead th:last-child  { border-top-right-radius: 8px; }
-
-        .table tbody tr {
-            background-color: #ffffff;
-        }
-
-        .table tbody td {
-            padding: 12px 10px;
-            vertical-align: middle;
-            border-bottom: 1px solid #f1f1f1;
-        }
-
-        .table tbody tr:hover {
-            background-color: rgba(41, 67, 90, 0.04);
-        }
-
-        .table tfoot {
-            position: sticky;
-            bottom: 0;
-            z-index: 20;
-        }
-
-        .table tfoot tr,
-        .table tfoot td {
-            background-color: #dfe3e8 !important;
-            font-weight: 700;
-        }
-
-        .table-bordered {
-            border: 1px solid #dee2e6;
-            width: 100%;
-        }
-
-        .table-bordered th,
-        .table-bordered td {
-            border: 1px solid #dee2e6;
-            padding: 12px;
-            vertical-align: top;
-        }
-
-        .table-responsive {
-            display: block;
-            width: 100%;
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-        }
-
-        .orgao-link {
-            color: #006a82;
-            text-decoration: none;
-            font-weight: 400;
-            cursor: pointer;
-        }
-
-        .orgao-link:hover {
-            color: var(--accent-red);
-            text-decoration: underline;
-        }
-
-        .nome-link {
-            color: #006a82 !important;
-            text-decoration: none !important;
-            font-weight: 400;
-        }
-
-        .nome-link:hover {
-            color: #b93c42 !important;
-            text-decoration: underline !important;
-        }
-
-
-        /* ============================================================
-           9. CABEÇALHOS ORDENÁVEIS
-        ============================================================ */
-        .sortable-header {
-            cursor: pointer;
-            position: relative;
-            padding-right: 25px !important;
-        }
-
-        .sortable-header:hover {
-            background-color: #2a4a6e !important;
-        }
-
-        .sortable-header i {
-            font-size: 14px;
-            position: absolute;
-            right: 5px;
-            top: 50%;
-            transform: translateY(-50%);
-            opacity: 0.8;
-        }
-
-
-        /* ============================================================
-           10. BADGES DE SITUAÇÃO
-        ============================================================ */
-        .badge-situacao {
-            padding: 2px 8px;
-            border-radius: 12px;
-            font-size: 9px;
-            font-weight: 500;
-            text-transform: uppercase;
-            letter-spacing: 0.2px;
-	    white-space: nowrap;
-        }
-
-        .badge-em-andamento {
-            background-color: rgba(40, 167, 69, 0.15);
-            color: var(--success-green);
-            border: 1px solid rgba(40, 167, 69, 0.3);
-        }
-
-        .badge-concluido {
-            background-color: rgba(23, 162, 184, 0.15);
-            color: var(--info-blue);
-            border: 1px solid rgba(23, 162, 184, 0.3);
-        }
-
-
-        /* ============================================================
-           11. BOTÕES
-        ============================================================ */
-        .btn-primary-custom,
-        .btn-pesquisa {
-            background: linear-gradient(to right, #20445d, #20445d);
-            border: none;
-            padding: 0 16px;
-            font-weight: 600;
-            border-radius: 6px;
-            transition: all 0.3s ease;
-            font-size: 14px;
-            color: white;
-            display: inline-flex;
-            align-items: center;
-            gap: 3px;
-            cursor: pointer;
-            height: 32px;
-            min-width: unset;
-            white-space: nowrap;
-            justify-content: flex-start;
-        }
-
-        .btn-primary-custom:hover,
-        .btn-pesquisa:hover {
-            background: linear-gradient(to right, var(--accent-red), #a32c32);
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(185, 60, 66, 0.2);
-            color: white;
-        }
-
-        .btn-secondary-custom {
-            background: white;
-            border: 2px solid var(--primary-darker);
-            color: var(--primary-darker);
-            padding: 0 16px;
-            font-weight: 600;
-            font-size: 14px;
-            border-radius: 6px;
-            transition: all 0.3s ease;
-            display: inline-flex;
-            align-items: center;
-            gap: 3px;
-            cursor: pointer;
-            height: 32px;
-            white-space: nowrap;
-            text-decoration: none !important;
-        }
-
-        .btn-secondary-custom:hover {
-            background-color: #132837 !important;
-            color: white !important;
-            border-color: #132837 !important;
-        }
-
-        .btn-export {
-            appearance: none;
-            -webkit-appearance: none;
-            background: transparent !important;
-            border: 1px solid #d6dee6;
-            color: #1a3a5c;
-            padding: 0 16px;
-            border-radius: 6px;
-            font-size: 14px;
-            font-weight: 500;
-            display: inline-flex;
-            align-items: center;
-            gap: 3px;
-            height: 32px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .btn-export i {
-            font-size: 14px !important;
-        }
-
-        button.btn-export:hover {
-            background-color: #1a3a5c !important;
-            border-color: #1a3a5c !important;
-            color: #ffffff !important;
-        }
-
-        .btn-action {
-            padding: 6px;
-            border-radius: 8px;
-            border: 1.5px solid #1a3a5c;
-            background-color: #ffffff;
-            color: #1a3a5c;
-            width: 34px;
-            height: 32px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s ease;
-            cursor: pointer;
-        }
-
-        .btn-action:hover {
-            background-color: #1a3a5c;
-            color: #ffffff;
-        }
-
-        #btnTopo {
-            background: #eeeff5;
-            color: #1a3a5c;
-            border: 1px solid #d6dee6;
-            border-radius: 12px;
-            padding: 0 16px;
-            font-size: 14px;
-            font-weight: 600;
-            display: inline-flex;
-            align-items: center;
-            gap: 3px;
-            cursor: pointer;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-            transition: all 0.3s ease;
-            height: 32px;
-        }
-
-        #btnTopo:hover {
-            background-color: #1a3a5c;
-            color: #ffffff;
-            border-color: #1a3a5c;
-        }
-
-
-        /* ============================================================
-           12. BUSCA NA TABELA
-        ============================================================ */
-        .table-search-container {
-            display: flex;
-            align-items: center;
-            white-space: nowrap;
-            background: #ffffff;
-            border: 1px solid #d6dee6;
-            border-radius: 8px;
-            padding: 6px 12px;
-            height: 42px;
-        }
-
-        .table-search-container:hover {
-            border-color: #1a3a5c;
-            background: #ffffff;
-        }
-
-        .table-search-input {
-            border: none !important;
-            outline: none;
-            background: transparent;
-            font-size: 13px;
-            width: 200px;
-            color: #1a3a5c;
-        }
-
-        .table-search-input::placeholder {
-            color: #94a3b8;
-        }
-
-
-        /* ============================================================
-           13. NAVEGAÇÃO (abas)
-        ============================================================ */
-        .nav-tabs-container {
-            background: transparent;
-            padding: 10px 0;
-            margin-top: 15px;
-            margin-bottom: 15px;
-            width: 100%;
-        }
-
-        .nav-tabs {
-            border: none !important;
-            gap: 10px;
-            width: 100%;
-        }
-
-        .nav-tabs .nav-link {
-            border: none !important;
-            background: #ffffff !important;
-            border-radius: 10px !important;
-            padding: 8px 18px !important;
-            font-weight: 500;
-            font-size: 14px;
-            color: #1a3a5c !important;
-            display: inline-flex !important;
-            align-items: center;
-            gap: 6px;
-            transition: all .25s ease;
-        }
-
-        .nav-tabs .nav-link:hover {
-            background: #e6e9ed !important;
-        }
-
-        .nav-tabs .nav-link.active {
-            background: #234c63 !important;
-            color: #fff !important;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-        }
-
-        .nav-tabs .material-icons {
-            font-size: 14px !important;
-        }
-
-
-        /* ============================================================
-           14. MODAL
-        ============================================================ */
-        .modal-full-custom {
-            max-width: 80% !important;
-            width: 80% !important;
-        }
-
-        .modal-creative .modal-header {
-            background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary-darker) 100%);
-            color: white !important;
-            padding: 15px;
-            border-bottom: none;
-        }
-
-        .modal-creative .modal-header .modal-title {
-            color: white !important;
-            font-weight: 600;
-            font-size: 14px;
-        }
-
-        .modal-creative .modal-header .btn-close {
-            filter: brightness(0) invert(1);
-            opacity: 1;
-        }
-
-        .modal-creative .modal-header .btn-close:hover {
-            opacity: 0.8;
-        }
-
-        .info-card {
-            background: white;
-            border-radius: 10px;
-            padding: 15px 20px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
-            margin-bottom: 15px;
-        }
-
-        .info-label {
-            font-size: 11px;
-            text-transform: uppercase;
-            color: #6c757d;
-            font-weight: 600;
-            margin-bottom: 4px;
-        }
-
-        .info-value {
-            font-size: 13px;
-            font-weight: 600;
-            color: var(--primary-dark);
-            word-break: break-word;
-        }
-
-        .info-value.highlight {
-            font-size: 13px;
-            color: var(--accent-red);
-        }
-
-
-        /* ============================================================
-           15. PAGINAÇÃO
-        ============================================================ */
-        .pagination-container {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px 20px;
-            background: white;
-            border-top: 1px solid #dee2e6;
-            width: 100%;
-        }
-
-        .pagination-info {
-            font-size: 13px;
-            color: #6c757d;
-        }
-
-        .pagination .page-link {
-            color: var(--primary-dark);
-            border-color: #dee2e6;
-        }
-
-        .pagination .page-link:hover {
-            color: var(--accent-red);
-            background-color: #f8f9fa;
-            border-color: #dee2e6;
-        }
-
-        .pagination .page-item.active .page-link {
-            background-color: var(--primary-dark);
-            border-color: var(--primary-dark);
-            color: white;
-        }
-
-        .items-per-page {
-            height: 38px;
-            min-width: 80px;
-            border-radius: 10px;
-            border: 1px solid #d6dee6;
-            padding: 6px 30px 6px 10px;
-            font-size: 14px;
-            font-weight: 600;
-            color: #1a3a5c;
-            background-color: #ffffff;
-            appearance: none;
-            -webkit-appearance: none;
-            -moz-appearance: none;
-            cursor: pointer;
-            background-image: url("data:image/svg+xml;utf8,<svg fill='%231a3a5c' height='20' viewBox='0 0 24 24' width='20' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/></svg>");
-            background-repeat: no-repeat;
-            background-position: right 8px center;
-        }
-
-
-        /* ============================================================
-           16. TOAST
-        ============================================================ */
-        .toast-sucesso {
-            position: fixed;
-            bottom: 30px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: #e6f4ea;
-            color: #1e4620;
-            border-radius: 12px;
-            padding: 14px 20px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            z-index: 9999;
-            min-width: 250px;
-        }
-
-        .toast-content {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 100%;
-            text-align: center;
-            gap: 10px;
-        }
-
-        .toast-content i {
-            color: #28a745;
-            font-size: 14px;
-        }
-
-        .toast-close {
-            cursor: pointer;
-            font-size: 14px;
-            margin-left: 10px;
-        }
-
-        @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to   { opacity: 1; transform: translateY(0); }
-        }
-
-        /* ============================================================
-           17. METADADOS
-        ============================================================ */
-        h5 {
-            font-size: 1.25rem;
-            color: var(--primary-dark);
-            padding-bottom: 10px;
-        }
-
-        /* ============================================================
-           18. RESPONSIVIDADE
-        ============================================================ */
-        @media (max-width: 992px) {
-            .container-fluid,
-            .dashboard-container {
-                padding: 0 15px;
-            }
-        }
-
-        @media (max-width: 768px) {
-            .filters-row {
-                flex-direction: column;
-                align-items: stretch;
-            }
-
-            .table-search-input {
-                width: 100% !important;
-            }
-
-            .d-flex.justify-content-between {
-                flex-direction: column;
-                gap: 15px;
-                align-items: flex-start !important;
-            }
-        }
-
+            background:transparent !important; border-radius:8px; padding:8px 15px;
+            display:flex; align-items:center; gap:8px; font-size:12px;
+            color:var(--primary-dark); font-weight:600; box-shadow:none;
+        }
+        .data-atualizacao-box i { font-size:14px; color:var(--accent-red); }
+
+        .filter-container { background:white; border-radius:10px; box-shadow:0 3px 12px rgba(0,0,0,.08); padding:20px; margin-bottom:20px; width:100%; }
+        .filter-label { font-size:13px; font-weight:600; color:#1a3a5c; margin-bottom:6px; text-transform:uppercase; letter-spacing:.5px; }
+        .filter-label i { font-size:14px; color:var(--accent-red); }
+        .form-control,.form-select { border:2px solid #e9ecef; border-radius:6px; padding:10px 12px; font-size:13px; transition:all .3s ease; height:auto; width:100%; }
+        .form-control:focus,.form-select:focus { border-color:var(--accent-red); box-shadow:0 0 0 2px rgba(185,60,66,.15); }
+        .modern-select { border:1.5px solid #dfe5ec !important; border-radius:8px !important; padding:10px 12px !important; font-size:14px !important; height:48px !important; line-height:1.5 !important; background-color:#fff; transition:all .2s ease; width:100%; }
+        .modern-select:focus { border-color:#1a3a5c !important; box-shadow:0 0 0 2px rgba(26,58,92,.1); }
+        .filters-row { display:flex; gap:15px; width:100%; flex-wrap:nowrap; }
+        .filter-group { flex:1; }
+        .botoes-abaixo { margin-top:15px; display:flex; gap:10px; }
+
+        .metric-card { background:white; border-radius:8px; border:1px solid #e5e9ef; box-shadow:0 3px 12px rgba(0,0,0,.06); overflow:hidden; height:100%; }
+        .metric-header { background:#20445d; color:white; font-size:14px; font-weight:600; padding:10px 15px; display:flex; justify-content:space-between; align-items:center; }
+        .metric-body { padding:12px 15px; }
+        .metric-value { font-size:20px; font-weight:600; color:#171c21; }
+        .metric-sub { font-size:11px; color:#6c757d; margin-top:4px; }
+
+        .chart-container { background:white; border-radius:10px; box-shadow:0 3px 12px rgba(0,0,0,.06); margin-bottom:20px; min-height:320px; padding:0; overflow:hidden; overflow-x:auto; }
+        .chart-header { background:#20445d; color:white; padding:12px 16px; margin:0; }
+        .chart-title { font-size:14px; font-weight:600; color:white; margin:0; }
+        .chart-wrapper { height:260px; display:flex; align-items:center; justify-content:center; padding:10px 15px; width:100%; }
+        .chart-wrapper canvas { width:100% !important; height:100% !important; }
+        .chart-wrapper.chart-pizza { height:260px; padding:10px 20px 0 20px; }
+        .chart-pizza-layout { display:flex; flex-direction:row; flex-wrap:wrap; align-items:center; justify-content:center; width:100%; height:100%; gap:15px; padding:8px 10px; }
+        .chart-pizza-box { width:220px; height:200px; flex-shrink:0; }
+        .legend-grid { display:flex; flex-direction:row; flex-wrap:wrap; justify-content:center; align-items:flex-start; gap:6px 10px; font-size:10px; min-width:300px; }
+        .legend-item { width:calc(33.33% - 10px); display:flex; align-items:center; gap:6px; white-space:nowrap; }
+        .legend-color { width:12px; height:12px; border-radius:2px; flex-shrink:0; }
+
+        .table-header { background:linear-gradient(135deg,var(--primary-dark) 0%,var(--primary-darker) 100%); color:white; padding:15px 20px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; }
+        .table-title { font-size:13px; font-weight:600; margin:0; }
+        .table-badge { background:#1a3a5c; color:white; padding:5px 12px; border-radius:12px; font-size:12px; font-weight:600; white-space:nowrap; }
+        .table-fixed-header-container { position:relative; overflow:auto; width:100%; max-height:600px; }
+        .table-fixed-header-container table thead th { background-color:#54697b; color:white !important; position:sticky; top:0; z-index:10; font-weight:600; padding:12px 10px; font-size:13px; text-transform:uppercase; white-space:nowrap; }
+        .table { width:100%; font-size:13px; border-collapse:collapse; table-layout:auto; }
+        .table th,.table td { border:1px solid #d6dee6; }
+        .table thead th { background-color:#54697b !important; color:white !important; font-weight:600; font-size:13px; padding:12px 10px; text-transform:uppercase; border:1px solid #d6dee6; }
+        .table thead th:first-child { border-top-left-radius:8px; }
+        .table thead th:last-child  { border-top-right-radius:8px; }
+        .table tbody tr { background-color:#ffffff; }
+        .table tbody td { padding:12px 10px; vertical-align:middle; border-bottom:1px solid #f1f1f1; }
+        .table tbody tr:hover { background-color:rgba(41,67,90,.04); }
+        .table tfoot { position:sticky; bottom:0; z-index:20; }
+        .table tfoot tr,.table tfoot td { background-color:#dfe3e8 !important; font-weight:700; }
+        .table-bordered { border:1px solid #dee2e6; width:100%; }
+        .table-bordered th,.table-bordered td { border:1px solid #dee2e6; padding:12px; vertical-align:top; }
+        .table-responsive { display:block; width:100%; overflow-x:auto; -webkit-overflow-scrolling:touch; }
+        .orgao-link { color:#006a82; text-decoration:none; font-weight:400; cursor:pointer; }
+        .orgao-link:hover { color:var(--accent-red); text-decoration:underline; }
+
+        .sortable-header { cursor:pointer; position:relative; padding-right:25px !important; }
+        .sortable-header:hover { background-color:#2a4a6e !important; }
+        .sortable-header i { font-size:14px; position:absolute; right:5px; top:50%; transform:translateY(-50%); opacity:.8; }
+
+        .badge-situacao { padding:2px 8px; border-radius:12px; font-size:9px; font-weight:500; text-transform:uppercase; letter-spacing:.2px; white-space:nowrap; }
+        .badge-em-andamento { background-color:rgba(40,167,69,.15); color:var(--success-green); border:1px solid rgba(40,167,69,.3); }
+        .badge-concluido    { background-color:rgba(23,162,184,.15); color:var(--info-blue); border:1px solid rgba(23,162,184,.3); }
+
+        .btn-primary-custom,.btn-pesquisa { background:linear-gradient(to right,#20445d,#20445d); border:none; padding:0 16px; font-weight:600; border-radius:6px; transition:all .3s ease; font-size:14px; color:white; display:inline-flex; align-items:center; gap:3px; cursor:pointer; height:32px; white-space:nowrap; }
+        .btn-primary-custom:hover,.btn-pesquisa:hover { background:linear-gradient(to right,var(--accent-red),#a32c32); transform:translateY(-1px); box-shadow:0 4px 12px rgba(185,60,66,.2); color:white; }
+        .btn-secondary-custom { background:white; border:2px solid var(--primary-darker); color:var(--primary-darker); padding:0 16px; font-weight:600; font-size:14px; border-radius:6px; transition:all .3s ease; display:inline-flex; align-items:center; gap:3px; cursor:pointer; height:32px; white-space:nowrap; text-decoration:none !important; }
+        .btn-secondary-custom:hover { background-color:#132837 !important; color:white !important; border-color:#132837 !important; }
+        .btn-export { appearance:none; -webkit-appearance:none; background:transparent !important; border:1px solid #d6dee6; color:#1a3a5c; padding:0 16px; border-radius:6px; font-size:14px; font-weight:500; display:inline-flex; align-items:center; gap:3px; height:32px; cursor:pointer; transition:all .2s ease; }
+        .btn-export i { font-size:14px !important; }
+        button.btn-export:hover { background-color:#1a3a5c !important; border-color:#1a3a5c !important; color:#ffffff !important; }
+        .btn-action { padding:6px; border-radius:8px; border:1.5px solid #1a3a5c; background-color:#ffffff; color:#1a3a5c; width:34px; height:32px; display:inline-flex; align-items:center; justify-content:center; transition:all .2s ease; cursor:pointer; }
+        .btn-action:hover { background-color:#1a3a5c; color:#ffffff; }
+        #btnTopo { background:#eeeff5; color:#1a3a5c; border:1px solid #d6dee6; border-radius:12px; padding:0 16px; font-size:14px; font-weight:600; display:inline-flex; align-items:center; gap:3px; cursor:pointer; box-shadow:0 2px 8px rgba(0,0,0,.08); transition:all .3s ease; height:32px; }
+        #btnTopo:hover { background-color:#1a3a5c; color:#ffffff; border-color:#1a3a5c; }
+
+        .table-search-container { display:flex; align-items:center; white-space:nowrap; background:#ffffff; border:1px solid #d6dee6; border-radius:8px; padding:6px 12px; height:42px; }
+        .table-search-container:hover { border-color:#1a3a5c; }
+        .table-search-input { border:none !important; outline:none; background:transparent; font-size:13px; width:200px; color:#1a3a5c; }
+        .table-search-input::placeholder { color:#94a3b8; }
+
+        .nav-tabs-container { background:transparent; padding:10px 0; margin-top:15px; margin-bottom:15px; width:100%; }
+        .nav-tabs { border:none !important; gap:10px; width:100%; }
+        .nav-tabs .nav-link { border:none !important; background:#ffffff !important; border-radius:10px !important; padding:8px 18px !important; font-weight:500; font-size:14px; color:#1a3a5c !important; display:inline-flex !important; align-items:center; gap:6px; transition:all .25s ease; }
+        .nav-tabs .nav-link:hover { background:#e6e9ed !important; }
+        .nav-tabs .nav-link.active { background:#234c63 !important; color:#fff !important; box-shadow:0 4px 10px rgba(0,0,0,.15); }
+        .nav-tabs .material-icons { font-size:14px !important; }
+
+        .modal-full-custom { max-width:80% !important; width:80% !important; }
+        .modal-creative .modal-header { background:linear-gradient(135deg,var(--primary-dark) 0%,var(--primary-darker) 100%); color:white !important; padding:15px; border-bottom:none; }
+        .modal-creative .modal-header .modal-title { color:white !important; font-weight:600; font-size:14px; }
+        .modal-creative .modal-header .btn-close { filter:brightness(0) invert(1); opacity:1; }
+        .info-card { background:white; border-radius:10px; padding:15px 20px; box-shadow:0 2px 6px rgba(0,0,0,.05); margin-bottom:15px; }
+        .info-label { font-size:11px; text-transform:uppercase; color:#6c757d; font-weight:600; margin-bottom:4px; }
+        .info-value { font-size:13px; font-weight:600; color:var(--primary-dark); word-break:break-word; }
+
+        .pagination-container { display:flex; justify-content:space-between; align-items:center; padding:15px 20px; background:white; border-top:1px solid #dee2e6; width:100%; }
+        .pagination-info { font-size:13px; color:#6c757d; }
+        .pagination .page-link { color:var(--primary-dark); border-color:#dee2e6; }
+        .pagination .page-link:hover { color:var(--accent-red); background-color:#f8f9fa; }
+        .pagination .page-item.active .page-link { background-color:var(--primary-dark); border-color:var(--primary-dark); color:white; }
+        .items-per-page { height:38px; min-width:80px; border-radius:10px; border:1px solid #d6dee6; padding:6px 30px 6px 10px; font-size:14px; font-weight:600; color:#1a3a5c; background-color:#ffffff; appearance:none; -webkit-appearance:none; cursor:pointer; background-image:url("data:image/svg+xml;utf8,<svg fill='%231a3a5c' height='20' viewBox='0 0 24 24' width='20' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/></svg>"); background-repeat:no-repeat; background-position:right 8px center; }
+
+        .toast-sucesso { position:fixed; bottom:30px; left:50%; transform:translateX(-50%); background:#e6f4ea; color:#1e4620; border-radius:12px; padding:14px 20px; box-shadow:0 10px 25px rgba(0,0,0,.15); display:none; align-items:center; justify-content:center; gap:10px; z-index:9999; min-width:250px; }
+        .toast-content { display:flex; align-items:center; justify-content:center; width:100%; text-align:center; gap:10px; }
+        .toast-content i { color:#28a745; font-size:14px; }
+        .toast-close { cursor:pointer; font-size:14px; margin-left:10px; }
+        @keyframes fadeInUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+
+        h5 { font-size:1.25rem; color:var(--primary-dark); padding-bottom:10px; }
+
+        @media(max-width:992px){.container-fluid,.dashboard-container{padding:0 15px;}}
+        @media(max-width:768px){.filters-row{flex-direction:column;align-items:stretch;}.table-search-input{width:100% !important;}.d-flex.justify-content-between{flex-direction:column;gap:15px;align-items:flex-start !important;}}
     </style>
 </head>
 <body class="iframe-mode">
 
-<!-- ============================================================
-     ESTRUTURA PRINCIPAL
-============================================================ -->
 <div class="main-container">
     <div class="container-fluid dashboard-container">
 
-        <!-- Navegação por abas -->
         <div class="nav-tabs-container">
             <ul class="nav nav-tabs" id="dashboardTabs" role="tablist">
                 <li class="nav-item">
-                    <button class="nav-link active" id="dashboard1-tab"
-                        data-bs-toggle="tab" data-bs-target="#dashboard1">
+                    <button class="nav-link active" id="dashboard1-tab" data-bs-toggle="tab" data-bs-target="#dashboard1">
                         <i class="material-icons">bar_chart</i>Visão Geral
                     </button>
                 </li>
                 <li class="nav-item">
-                    <button class="nav-link" id="dashboard2-tab"
-                        data-bs-toggle="tab" data-bs-target="#dashboard2">
+                    <button class="nav-link" id="dashboard2-tab" data-bs-toggle="tab" data-bs-target="#dashboard2">
                         <i class="material-icons">person_search</i>Consulta Individual
                     </button>
                 </li>
                 <li class="nav-item">
-                    <button class="nav-link" id="dashboard3-tab"
-                        data-bs-toggle="tab" data-bs-target="#dashboard3">
+                    <button class="nav-link" id="dashboard3-tab" data-bs-toggle="tab" data-bs-target="#dashboard3">
                         <i class="material-icons">download</i>Downloads
                     </button>
                 </li>
             </ul>
         </div>
 
-        <!-- Data de atualização -->
         <div class="data-atualizacao-container">
             <div class="data-atualizacao-box">
                 <i class="material-icons">update</i>
@@ -1018,13 +196,10 @@
             </div>
         </div>
 
-        <!-- Conteúdo das abas -->
         <div class="tab-content" id="dashboardTabsContent">
 
-            <!-- ===== DASHBOARD 1: VISÃO GERAL ===== -->
+            <!-- DASHBOARD 1: VISÃO GERAL -->
             <div class="tab-pane fade show active" id="dashboard1" role="tabpanel">
-
-                <!-- Filtros Dashboard 1 -->
                 <div class="filter-container">
                     <div class="filters-row">
                         <div class="filter-group">
@@ -1067,21 +242,15 @@
                     </div>
                 </div>
 
-                <!-- Cards de Métricas -->
                 <div class="row mb-4" id="summaryCards"></div>
 
-                <!-- Gráficos -->
                 <div class="row mb-4">
                     <div class="col-md-4 col-12">
                         <div class="chart-container">
-                            <div class="chart-header">
-                                <h4 class="chart-title">Estagiários por Órgão</h4>
-                            </div>
+                            <div class="chart-header"><h4 class="chart-title">Estagiários por Órgão</h4></div>
                             <div class="chart-wrapper chart-pizza">
                                 <div class="chart-pizza-layout">
-                                    <div class="chart-pizza-box">
-                                        <canvas id="chartOrgao"></canvas>
-                                    </div>
+                                    <div class="chart-pizza-box"><canvas id="chartOrgao"></canvas></div>
                                     <div class="legend-grid" id="legendOrgao"></div>
                                 </div>
                             </div>
@@ -1089,19 +258,13 @@
                     </div>
                     <div class="col-md-4 col-12">
                         <div class="chart-container">
-                            <div class="chart-header">
-                                <h4 class="chart-title">Distribuição por Situação</h4>
-                            </div>
-                            <div class="chart-wrapper">
-                                <canvas id="chartSituacao"></canvas>
-                            </div>
+                            <div class="chart-header"><h4 class="chart-title">Distribuição por Situação</h4></div>
+                            <div class="chart-wrapper"><canvas id="chartSituacao"></canvas></div>
                         </div>
                     </div>
                     <div class="col-md-4 col-12">
                         <div class="chart-container">
-                            <div class="chart-header">
-                                <h4 class="chart-title">Valor Médio de Remuneração</h4>
-                            </div>
+                            <div class="chart-header"><h4 class="chart-title">Valor Médio de Remuneração</h4></div>
                             <div class="chart-wrapper">
                                 <div style="width:100%;height:240px;position:relative;">
                                     <canvas id="chartRemuneracao"></canvas>
@@ -1111,18 +274,11 @@
                     </div>
                 </div>
 
-                <!-- Ações e busca Visão Geral -->
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <div class="d-flex gap-2">
-                        <button class="btn-export" id="exportCSVDashboard1">
-                            <i class="material-icons">description</i>CSV
-                        </button>
-                        <button class="btn-export" id="printDashboard1">
-                            <i class="material-icons">print</i>PDF
-                        </button>
-                        <button class="btn-export" onclick="copiarLinkDireto()">
-                            <i class="material-icons">link</i>Copiar Link
-                        </button>
+                        <button class="btn-export" id="exportCSVDashboard1"><i class="material-icons">description</i>CSV</button>
+                        <button class="btn-export" id="printDashboard1"><i class="material-icons">print</i>PDF</button>
+                        <button class="btn-export" onclick="copiarLinkDireto()"><i class="material-icons">link</i>Copiar Link</button>
                     </div>
                     <div class="d-flex align-items-center gap-2 ms-auto flex-nowrap">
                         <span class="table-badge" id="resumoCountDashboard1">0 órgãos</span>
@@ -1133,27 +289,16 @@
                     </div>
                 </div>
 
-                <!-- Tabela Visão Geral -->
                 <div class="table-container">
                     <div class="table-fixed-header-container">
                         <table class="table" id="visaoGeralTable">
                             <thead>
                                 <tr>
-                                    <th class="sortable-header" data-sort="orgao" onclick="sortTable('visaoGeral','orgao')">
-                                        Órgão <i class="material-icons">unfold_more</i>
-                                    </th>
-                                    <th class="sortable-header" data-sort="sigla" onclick="sortTable('visaoGeral','sigla')">
-                                        Sigla <i class="material-icons">unfold_more</i>
-                                    </th>
-                                    <th class="text-center sortable-header" data-sort="total_estagiarios" onclick="sortTable('visaoGeral','total_estagiarios')">
-                                        Total <i class="material-icons">unfold_more</i>
-                                    </th>
-                                    <th class="text-center sortable-header" data-sort="em_andamento" onclick="sortTable('visaoGeral','em_andamento')">
-                                        Em Andamento <i class="material-icons">unfold_more</i>
-                                    </th>
-                                    <th class="text-center sortable-header" data-sort="concluido" onclick="sortTable('visaoGeral','concluido')">
-                                        Concluído <i class="material-icons">unfold_more</i>
-                                    </th>
+                                    <th class="sortable-header" data-sort="orgao" onclick="sortTable('visaoGeral','orgao')">Órgão <i class="material-icons">unfold_more</i></th>
+                                    <th class="sortable-header" data-sort="sigla" onclick="sortTable('visaoGeral','sigla')">Sigla <i class="material-icons">unfold_more</i></th>
+                                    <th class="text-center sortable-header" data-sort="total_estagiarios" onclick="sortTable('visaoGeral','total_estagiarios')">Total <i class="material-icons">unfold_more</i></th>
+                                    <th class="text-center sortable-header" data-sort="em_andamento" onclick="sortTable('visaoGeral','em_andamento')">Em Andamento <i class="material-icons">unfold_more</i></th>
+                                    <th class="text-center sortable-header" data-sort="concluido" onclick="sortTable('visaoGeral','concluido')">Concluído <i class="material-icons">unfold_more</i></th>
                                 </tr>
                             </thead>
                             <tbody id="resumoTableBody"></tbody>
@@ -1164,27 +309,18 @@
                         <div class="pagination-info" id="paginationInfoDashboard1">Mostrando 0-0 de 0 registros</div>
                         <nav><ul class="pagination mb-0" id="paginationDashboard1"></ul></nav>
                         <select class="items-per-page" id="itemsPerPageDashboard1">
-                            <option value="10">10</option>
-                            <option value="25">25</option>
-                            <option value="50" selected>50</option>
-                            <option value="100">100</option>
+                            <option value="10">10</option><option value="25">25</option>
+                            <option value="50" selected>50</option><option value="100">100</option>
                         </select>
                     </div>
                 </div>
-
                 <div style="display:flex;justify-content:flex-end;margin-top:10px;">
-                    <div id="btnTopo" onclick="voltarAoTopo()">
-                        <i class="material-icons">arrow_upward</i>Voltar ao topo
-                    </div>
+                    <div id="btnTopo" onclick="voltarAoTopo()"><i class="material-icons">arrow_upward</i>Voltar ao topo</div>
                 </div>
+            </div>
 
-            </div><!-- fim dashboard1 -->
-
-
-            <!-- ===== DASHBOARD 2: CONSULTA INDIVIDUAL ===== -->
+            <!-- DASHBOARD 2: CONSULTA INDIVIDUAL -->
             <div class="tab-pane fade" id="dashboard2" role="tabpanel">
-
-                <!-- Filtros Dashboard 2 -->
                 <div class="filter-container">
                     <div class="filters-row" style="flex-wrap:wrap;">
                         <div class="filter-group">
@@ -1232,27 +368,16 @@
                         </div>
                     </div>
                     <div class="botoes-abaixo">
-                        <button class="btn-pesquisa" id="pesquisarEstagiarios">
-                            <i class="material-icons">search</i>Pesquisar
-                        </button>
-                        <button class="btn-secondary-custom" id="limparFiltrosDashboard2">
-                            <i class="material-icons">clear</i>Limpar Filtros
-                        </button>
+                        <button class="btn-pesquisa" id="pesquisarEstagiarios"><i class="material-icons">search</i>Pesquisar</button>
+                        <button class="btn-secondary-custom" id="limparFiltrosDashboard2"><i class="material-icons">clear</i>Limpar Filtros</button>
                     </div>
                 </div>
 
-                <!-- Ações e busca Consulta Individual -->
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <div class="d-flex gap-2">
-                        <button class="btn-export" id="exportCSVDashboard2">
-                            <i class="material-icons">description</i>CSV
-                        </button>
-                        <button class="btn-export" id="printDashboard2">
-                            <i class="material-icons">print</i>PDF
-                        </button>
-                        <button class="btn-export" onclick="copiarLinkDireto()">
-                            <i class="material-icons">link</i>Copiar Link
-                        </button>
+                        <button class="btn-export" id="exportCSVDashboard2"><i class="material-icons">description</i>CSV</button>
+                        <button class="btn-export" id="printDashboard2"><i class="material-icons">print</i>PDF</button>
+                        <button class="btn-export" onclick="copiarLinkDireto()"><i class="material-icons">link</i>Copiar Link</button>
                     </div>
                     <div class="d-flex align-items-center gap-2 ms-auto">
                         <span class="table-badge" id="resumoCountDashboard2">0 estagiários</span>
@@ -1263,33 +388,18 @@
                     </div>
                 </div>
 
-                <!-- Tabela Consulta Individual -->
                 <div class="table-container">
                     <div class="table-fixed-header-container">
                         <table class="table" id="empregadosTable">
                             <thead>
                                 <tr>
-                                    <th class="sortable-header" data-sort="nome_estagiario" onclick="sortTable('estagiarios','nome_estagiario')">
-                                        Nome <i class="material-icons">unfold_more</i>
-                                    </th>
-                                    <th class="sortable-header" data-sort="masp" onclick="sortTable('estagiarios','masp')">
-                                        MASP <i class="material-icons">unfold_more</i>
-                                    </th>
-                                    <th class="sortable-header" data-sort="sigla_orgao" onclick="sortTable('estagiarios','sigla_orgao')">
-                                        Sigla <i class="material-icons">unfold_more</i>
-                                    </th>
-                                    <th class="sortable-header text-center" data-sort="data_inicio" onclick="sortTable('estagiarios','data_inicio')">
-                                        Data Início <i class="material-icons">unfold_more</i>
-                                    </th>
-                                    <th class="sortable-header text-center" data-sort="data_fim" onclick="sortTable('estagiarios','data_fim')">
-                                        Data Fim <i class="material-icons">unfold_more</i>
-                                    </th>
-                                    <th class="sortable-header text-right" data-sort="valor_remuneracao" onclick="sortTable('estagiarios','valor_remuneracao')">
-                                        Valor (R$) <i class="material-icons">unfold_more</i>
-                                    </th>
-                                    <th class="sortable-header" data-sort="situacao" onclick="sortTable('estagiarios','situacao')">
-                                        Situação <i class="material-icons">unfold_more</i>
-                                    </th>
+                                    <th class="sortable-header" data-sort="nome_estagiario" onclick="sortTable('estagiarios','nome_estagiario')">Nome <i class="material-icons">unfold_more</i></th>
+                                    <th class="sortable-header" data-sort="masp" onclick="sortTable('estagiarios','masp')">MASP <i class="material-icons">unfold_more</i></th>
+                                    <th class="sortable-header" data-sort="sigla_orgao" onclick="sortTable('estagiarios','sigla_orgao')">Sigla <i class="material-icons">unfold_more</i></th>
+                                    <th class="sortable-header text-center" data-sort="data_inicio" onclick="sortTable('estagiarios','data_inicio')">Data Início <i class="material-icons">unfold_more</i></th>
+                                    <th class="sortable-header text-center" data-sort="data_fim" onclick="sortTable('estagiarios','data_fim')">Data Fim <i class="material-icons">unfold_more</i></th>
+                                    <th class="sortable-header text-right" data-sort="valor_remuneracao" onclick="sortTable('estagiarios','valor_remuneracao')">Valor (R$) <i class="material-icons">unfold_more</i></th>
+                                    <th class="sortable-header" data-sort="situacao" onclick="sortTable('estagiarios','situacao')">Situação <i class="material-icons">unfold_more</i></th>
                                     <th class="text-center">Ações</th>
                                 </tr>
                             </thead>
@@ -1301,109 +411,77 @@
                         <div class="pagination-info" id="paginationInfoDashboard2">Mostrando 0-0 de 0 registros</div>
                         <nav><ul class="pagination mb-0" id="paginationDashboard2"></ul></nav>
                         <select class="items-per-page" id="itemsPerPageDashboard2">
-                            <option value="10">10</option>
-                            <option value="25">25</option>
-                            <option value="50" selected>50</option>
-                            <option value="100">100</option>
+                            <option value="10">10</option><option value="25">25</option>
+                            <option value="50" selected>50</option><option value="100">100</option>
                         </select>
                     </div>
                 </div>
-
                 <div style="display:flex;justify-content:flex-end;margin-top:10px;">
-                    <div id="btnTopo" onclick="voltarAoTopo()">
-                        <i class="material-icons">arrow_upward</i>Voltar ao topo
-                    </div>
+                    <div id="btnTopo" onclick="voltarAoTopo()"><i class="material-icons">arrow_upward</i>Voltar ao topo</div>
                 </div>
+            </div>
 
-            </div><!-- fim dashboard2 -->
-
-
-            <!-- ===== DASHBOARD 3: DOWNLOADS ===== -->
+            <!-- DASHBOARD 3: DOWNLOADS -->
             <div class="tab-pane fade" id="dashboard3" role="tabpanel">
-
                 <div class="filter-container">
                     <div class="filters-row">
                         <div class="filter-group">
                             <label class="filter-label">ANO</label>
                             <select class="form-select modern-select" id="anoDownload">
                                 <option value="">Selecione</option>
-                                <option value="2022">2022</option>
-                                <option value="2023">2023</option>
-                                <option value="2024">2024</option>
-                                <option value="2025">2025</option>
+                                <option value="2022">2022</option><option value="2023">2023</option>
+                                <option value="2024">2024</option><option value="2025">2025</option>
                                 <option value="2026">2026</option>
                             </select>
                         </div>
                     </div>
                     <div class="botoes-abaixo">
-                        <button class="btn-pesquisa" id="downloadAnoCSV">
-                            <i class="material-icons">download</i>Baixar CSV do Ano Selecionado
-                        </button>
+                        <button class="btn-pesquisa" id="downloadAnoCSV"><i class="material-icons">download</i>Baixar CSV do Ano Selecionado</button>
                         <a href="https://dados.mg.gov.br/dataset/portal_estagiarios" target="_blank" class="btn-secondary-custom">
                             <i class="material-icons">open_in_new</i>Acessar Portal de Dados Abertos
                         </a>
                     </div>
                 </div>
-
                 <div class="mt-4">
                     <div class="mb-3">
                         <h5 style="border:none;margin-bottom:8px;">Dicionário de Dados</h5>
                         <div class="d-flex gap-2">
-                            <button class="btn-export" onclick="baixarDicionarioCSV()">
-                                <i class="material-icons">description</i> CSV
-                            </button>
-                            <button class="btn-export" onclick="baixarDicionarioPDF()">
-                                <i class="material-icons">print</i> PDF
-                            </button>
-                            <button class="btn-export" onclick="copiarLinkDireto()">
-                                <i class="material-icons">link</i> Copiar Link
-                            </button>
+                            <button class="btn-export" onclick="baixarDicionarioCSV()"><i class="material-icons">description</i> CSV</button>
+                            <button class="btn-export" onclick="baixarDicionarioPDF()"><i class="material-icons">print</i> PDF</button>
+                            <button class="btn-export" onclick="copiarLinkDireto()"><i class="material-icons">link</i> Copiar Link</button>
                         </div>
                     </div>
                 </div>
-
                 <div class="table-responsive">
                     <table class="table table-bordered">
-                        <thead>
-                            <tr>
-                                <th>Campo</th>
-                                <th>Descrição</th>
-                                <th>Tipo</th>
-                            </tr>
-                        </thead>
+                        <thead><tr><th>Campo</th><th>Descrição</th><th>Tipo</th></tr></thead>
                         <tbody>
-                            <tr><td>ano_mesreferencia</td>    <td>Ano e mês de referência do registro (YYYY-MM)</td>                   <td>Texto/Data</td></tr>
-                            <tr><td>nome_estagiario</td>      <td>Nome completo do estagiário</td>                                    <td>Texto</td></tr>
-                            <tr><td>masp</td>                 <td>Número da Matrícula do Servidor Público (MASP)</td>                 <td>Texto/Número</td></tr>
-                            <tr><td>codigo_situacao_funcional</td><td>Código da situação funcional do estagiário</td>               <td>Número</td></tr>
-                            <tr><td>situacao_funcional</td>   <td>Descrição da situação funcional (Ativo, Inativo, etc.)</td>        <td>Texto</td></tr>
-                            <tr><td>data_inicio</td>          <td>Data de início do estágio</td>                                     <td>Data</td></tr>
-                            <tr><td>data_fim</td>             <td>Data de término do estágio (se aplicável)</td>                     <td>Data</td></tr>
-                            <tr><td>codigo_orgao</td>         <td>Código do órgão onde o estagiário atua</td>                        <td>Número</td></tr>
-                            <tr><td>orgao</td>               <td>Nome completo do órgão</td>                                        <td>Texto</td></tr>
-                            <tr><td>sigla_orgao</td>         <td>Sigla do órgão</td>                                               <td>Texto</td></tr>
-                            <tr><td>valor_remuneracao</td>   <td>Valor da remuneração do estagiário (em R$)</td>                    <td>Número Decimal</td></tr>
+                            <tr><td>ano_mesreferencia</td><td>Ano e mês de referência do registro (YYYY-MM)</td><td>Texto/Data</td></tr>
+                            <tr><td>nome_estagiario</td><td>Nome completo do estagiário</td><td>Texto</td></tr>
+                            <tr><td>masp</td><td>Número da Matrícula do Servidor Público (MASP)</td><td>Texto/Número</td></tr>
+                            <tr><td>codigo_situacao_funcional</td><td>Código da situação funcional do estagiário</td><td>Número</td></tr>
+                            <tr><td>situacao_funcional</td><td>Descrição da situação funcional</td><td>Texto</td></tr>
+                            <tr><td>data_inicio</td><td>Data de início do estágio</td><td>Data</td></tr>
+                            <tr><td>data_fim</td><td>Data de término do estágio (se aplicável)</td><td>Data</td></tr>
+                            <tr><td>codigo_orgao</td><td>Código do órgão onde o estagiário atua</td><td>Número</td></tr>
+                            <tr><td>orgao</td><td>Nome completo do órgão</td><td>Texto</td></tr>
+                            <tr><td>sigla_orgao</td><td>Sigla do órgão</td><td>Texto</td></tr>
+                            <tr><td>valor_remuneracao</td><td>Valor da remuneração do estagiário (em R$)</td><td>Número Decimal</td></tr>
                         </tbody>
                     </table>
                 </div>
-
-            </div><!-- fim dashboard3 -->
+            </div>
 
         </div>
     </div>
 </div>
 
-
-<!-- ============================================================
-     MODAL DE HISTÓRICO DO ESTAGIÁRIO
-============================================================ -->
+<!-- MODAL HISTÓRICO -->
 <div class="modal fade" id="historicModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-full-custom modal-dialog-centered modal-dialog-scrollable">
         <div class="modal-content modal-creative">
             <div class="modal-header">
-                <h5 class="modal-title" id="historicModalLabel">
-                    <i class="material-icons">history</i> Histórico do Estagiário
-                </h5>
+                <h5 class="modal-title" id="historicModalLabel"><i class="material-icons">history</i> Histórico do Estagiário</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body" id="historicModalBody">
@@ -1413,24 +491,15 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn-export" id="modalBtnPDF">
-                    <i class="material-icons">print</i> PDF
-                </button>
-                <button type="button" class="btn-export" id="modalBtnCSV">
-                    <i class="material-icons">description</i> CSV
-                </button>
-                <button type="button" class="btn-secondary-custom" data-bs-dismiss="modal">
-                    <i class="material-icons me-2">close</i>Fechar
-                </button>
+                <button type="button" class="btn-export" id="modalBtnPDF"><i class="material-icons">print</i> PDF</button>
+                <button type="button" class="btn-export" id="modalBtnCSV"><i class="material-icons">description</i> CSV</button>
+                <button type="button" class="btn-secondary-custom" data-bs-dismiss="modal"><i class="material-icons me-2">close</i>Fechar</button>
             </div>
         </div>
     </div>
 </div>
 
-
-<!-- ============================================================
-     TOAST DE LINK COPIADO
-============================================================ -->
+<!-- TOAST -->
 <div id="toastSucesso" class="toast-sucesso">
     <div class="toast-content">
         <i class="material-icons">check_circle</i>
@@ -1439,1395 +508,941 @@
     <span class="toast-close" onclick="fecharToast()">✖</span>
 </div>
 
-
-<!-- ============================================================
-     SCRIPTS
-============================================================ -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-
 <script>
 
-    // ============================================================
-    // 1. VARIÁVEIS GLOBAIS
-    // ============================================================
-    let estagiariosData = [];
-    let filteredData = [];
-    let allData = {};
-    let currentPageDashboard1 = 1;
-    let currentPageDashboard2 = 1;
-    let itemsPerPageDashboard1 = 50;
-    let itemsPerPageDashboard2 = 50;
-    let charts = {};
-    let currentYear = '';
-    let currentMonth = '';
-    let currentSortDashboard1 = { column: 'orgao', order: 'asc' };
-    let currentSortDashboard2 = { column: 'nome_estagiario', order: 'asc' };
+// ============================================================
+// VARIÁVEIS GLOBAIS
+// ============================================================
+let estagiariosData = [];   // dados do ano atual carregado
+let filteredData    = [];   // dados filtrados exibidos nas tabelas
+let allData         = {};   // cache { '2022': [...], '2023': [...], ... }
 
-    const GITHUB_BASE_URL = 'https://raw.githubusercontent.com/transparencia-mg/estagiarios/main/dataset/data/';
+let currentYear  = '';
+let currentMonth = '';
 
-    const CSV_FILES_BY_YEAR = {
-        '2022': 'estagiarios_2022.csv',
-        '2023': 'estagiarios_2023.csv',
-        '2024': 'estagiarios_2024.csv',
-        '2025': 'estagiarios_2025.csv',
-        '2026': 'estagiarios_2026.csv'
-    };
+let currentPageDashboard1    = 1;
+let currentPageDashboard2    = 1;
+let itemsPerPageDashboard1   = 50;
+let itemsPerPageDashboard2   = 50;
+let currentSortDashboard1    = { column:'orgao',            order:'asc' };
+let currentSortDashboard2    = { column:'nome_estagiario',  order:'asc' };
+let charts = {};
 
-    const monthNames = {
-        '01': 'Janeiro', '02': 'Fevereiro', '03': 'Março',
-        '04': 'Abril', '05': 'Maio', '06': 'Junho',
-        '07': 'Julho', '08': 'Agosto', '09': 'Setembro',
-        '10': 'Outubro', '11': 'Novembro', '12': 'Dezembro'
-    };
-
-    const chartPalette = [
-        '#2f4b63','#39a585','#5f6f7f','#f28c28','#7aa6c2','#8e44ad','#e67e22','#16a085'
-    ];
+const GITHUB_BASE_URL = 'https://raw.githubusercontent.com/transparencia-mg/estagiarios/main/dataset/data/';
+const CSV_FILES_BY_YEAR = {
+    '2022':'estagiarios_2022.csv',
+    '2023':'estagiarios_2023.csv',
+    '2024':'estagiarios_2024.csv',
+    '2025':'estagiarios_2025.csv',
+    '2026':'estagiarios_2026.csv'
+};
+const monthNames = {
+    '01':'Janeiro','02':'Fevereiro','03':'Março','04':'Abril',
+    '05':'Maio','06':'Junho','07':'Julho','08':'Agosto',
+    '09':'Setembro','10':'Outubro','11':'Novembro','12':'Dezembro'
+};
+const chartPalette = ['#2f4b63','#39a585','#5f6f7f','#f28c28','#7aa6c2','#8e44ad','#e67e22','#16a085'];
 
 
-    // ============================================================
-    // 2. INICIALIZAÇÃO
-    // ============================================================
-    document.addEventListener('DOMContentLoaded', function () {
-        setupEventListeners();
-        setupAtualizacaoData();
-        initApp();
+// ============================================================
+// INICIALIZAÇÃO
+// ============================================================
+document.addEventListener('DOMContentLoaded', async function () {
+    setupEventListeners();
+    await initApp();
+    setupAtualizacaoData();
 
-        document.querySelectorAll('[data-bs-toggle="tab"]').forEach(tab => {
-            tab.addEventListener('shown.bs.tab', () => setTimeout(iframeUpdateHeight, 300));
+    document.querySelectorAll('[data-bs-toggle="tab"]').forEach(tab => {
+        tab.addEventListener('shown.bs.tab', () => setTimeout(iframeUpdateHeight, 300));
+    });
+    window.addEventListener('resize', () => {
+        clearTimeout(window.resizeTimer);
+        window.resizeTimer = setTimeout(iframeUpdateHeight, 250);
+    });
+});
+
+
+// ============================================================
+// iframeUpdateHeight
+// ============================================================
+function iframeUpdateHeight() {
+    try {
+        const h = Math.max(document.body.scrollHeight, document.documentElement.scrollHeight) + 10;
+        if (window.parent && window.parent !== window) {
+            window.parent.postMessage({ iframeHeight:h, height:h, type:'resize' }, '*');
+        }
+    } catch(e) {}
+}
+
+
+// ============================================================
+// DATA DE ATUALIZAÇÃO (GitHub API) — roda em paralelo, não bloqueia
+// ============================================================
+async function setupAtualizacaoData() {
+    const el = document.getElementById('data-atualizacao-header');
+    try {
+        const latestYear = Object.keys(CSV_FILES_BY_YEAR).sort().reverse()[0];
+        const arq  = CSV_FILES_BY_YEAR[latestYear];
+        const url  = `https://api.github.com/repos/transparencia-mg/estagiarios/commits?path=dataset/data/${arq}&per_page=1`;
+        const resp = await fetch(url);
+        const data = await resp.json();
+        if (data && data.length > 0) {
+            el.textContent = new Date(data[0].commit.committer.date).toLocaleDateString('pt-BR');
+        } else {
+            el.textContent = 'Não disponível';
+        }
+    } catch(e) {
+        el.textContent = 'Erro ao carregar';
+    }
+}
+
+
+// ============================================================
+// EVENT LISTENERS
+// ============================================================
+function setupEventListeners() {
+    document.getElementById('aplicarFiltros').addEventListener('click',        () => applyFilters('dashboard1'));
+    document.getElementById('limparFiltros').addEventListener('click',         clearAllFilters);
+    document.getElementById('pesquisarEstagiarios').addEventListener('click',  () => applyFilters('dashboard2'));
+    document.getElementById('limparFiltrosDashboard2').addEventListener('click', clearDashboard2Filters);
+
+    document.getElementById('exportCSVDashboard1').addEventListener('click',   () => exportToCSV('dashboard1'));
+    document.getElementById('printDashboard1').addEventListener('click',       () => exportToPDF('dashboard1'));
+    document.getElementById('exportCSVDashboard2').addEventListener('click',   () => exportToCSV('dashboard2'));
+    document.getElementById('printDashboard2').addEventListener('click',       () => exportToPDF('dashboard2'));
+    document.getElementById('downloadAnoCSV').addEventListener('click',        downloadYearCSV);
+
+    document.getElementById('searchEstagiarios').addEventListener('input', e => filterEstagiariosTable(e.target.value.toLowerCase()));
+    document.getElementById('searchResumo').addEventListener('input',      e => filterResumoTable(e.target.value.toLowerCase()));
+
+    document.getElementById('itemsPerPageDashboard1').addEventListener('change', function() {
+        itemsPerPageDashboard1 = parseInt(this.value);
+        currentPageDashboard1 = 1;
+        updateResumoTable();
+    });
+    document.getElementById('itemsPerPageDashboard2').addEventListener('change', function() {
+        itemsPerPageDashboard2 = parseInt(this.value);
+        currentPageDashboard2 = 1;
+        updateEstagiariosTable();
+    });
+
+    // Ao trocar o ano — recarrega CSV se necessário e reaplica filtros
+    document.getElementById('anoDashboard1').addEventListener('change', async function() {
+        await switchYearData(this.value);
+        // Sincroniza o outro select de ano
+        document.getElementById('anoDashboard2').value = this.value;
+        applyFilters('dashboard1');
+    });
+    document.getElementById('anoDashboard2').addEventListener('change', async function() {
+        await switchYearData(this.value);
+        document.getElementById('anoDashboard1').value = this.value;
+        applyFilters('dashboard2');
+    });
+
+    document.getElementById('modalBtnPDF').addEventListener('click', () => { if (window._modalHistorico) exportarHistoricoPDF(); });
+    document.getElementById('modalBtnCSV').addEventListener('click', () => { if (window._modalHistorico) exportarHistoricoCSV(); });
+}
+
+
+// ============================================================
+// INICIALIZAR APLICAÇÃO
+// ============================================================
+async function initApp() {
+    const latestYear = Object.keys(CSV_FILES_BY_YEAR).sort().reverse()[0];
+    currentYear = latestYear;
+
+    await loadYearData(latestYear);              // carrega CSV
+    determineLatestMonth();                       // define currentMonth e filteredData
+    updateFilterOptions();                        // popula selects de mês/órgão
+    syncSelectsToCurrentPeriod();                 // seta valores visuais dos selects
+    updateDashboard1();
+    updateDashboard2();
+
+    setTimeout(iframeUpdateHeight, 300);
+}
+
+
+// ============================================================
+// TROCAR ANO
+// ============================================================
+async function switchYearData(year) {
+    if (!year) return;
+    currentYear = year;
+
+    if (!allData[year]) {
+        await loadYearData(year);
+    }
+    estagiariosData = allData[year] || [];
+
+    // Determina o mês mais recente disponível no novo ano
+    const mesesDisponiveis = [...new Set(
+        estagiariosData.filter(e => e.MES).map(e => e.MES)
+    )].sort().reverse();
+
+    currentMonth = mesesDisponiveis.length > 0 ? mesesDisponiveis[0] : '01';
+
+    updateFilterOptions();
+    syncSelectsToCurrentPeriod();
+}
+
+
+// ============================================================
+// SINCRONIZAR SELECTS COM PERÍODO ATUAL
+// ============================================================
+function syncSelectsToCurrentPeriod() {
+    ['anoDashboard1','anoDashboard2'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.value = currentYear;
+    });
+    ['mesDashboard1','mesDashboard2'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el && currentMonth) el.value = currentMonth;
+    });
+}
+
+
+// ============================================================
+// CARREGAR CSV DO ANO
+// ============================================================
+function loadYearData(year) {
+    return new Promise((resolve, reject) => {
+        const url = `${GITHUB_BASE_URL}${CSV_FILES_BY_YEAR[year]}`;
+        Papa.parse(url, {
+            download: true,
+            header: true,
+            skipEmptyLines: true,
+            encoding: 'UTF-8',
+            delimiter: ';',
+            complete: function(results) {
+                const data = results.data.map(row => {
+                    try {
+                        // Normalizar chaves
+                        const r = {};
+                        Object.keys(row).forEach(k => { r[k.toLowerCase().trim()] = row[k]; });
+
+                        // Extrair ano_mesreferencia de várias possibilidades de nome de coluna
+                        let anoMes = r['ano_mesreferencia'] || r['ano_mes'] || r['mes_referencia'] || r['ano_mes_referencia'] || '';
+                        let ANO = '', MES = '';
+
+                        if (anoMes) {
+                            const sep = anoMes.includes('-') ? '-' : anoMes.includes('/') ? '/' : null;
+                            if (sep) {
+                                const parts = anoMes.split(sep);
+                                if (parts.length === 2) {
+                                    // Detecta se está em formato YYYY-MM ou MM-YYYY
+                                    if (parts[0].length === 4) {
+                                        ANO = parts[0];
+                                        MES = parts[1].padStart(2, '0');
+                                    } else {
+                                        ANO = parts[1];
+                                        MES = parts[0].padStart(2, '0');
+                                    }
+                                }
+                            }
+                        }
+
+                        // Fallback: campos separados
+                        if (!ANO) { ANO = r['ano'] || r['ano_referencia'] || ''; }
+                        if (!MES) { MES = r['mes'] || r['mes_referencia'] || ''; }
+                        if (MES) MES = String(MES).padStart(2, '0');
+
+                        if (!ANO || !MES) return null;
+
+                        return {
+                            ano_mesreferencia:       anoMes,
+                            nome_estagiario:         (r['nome_estagiario'] || '').trim(),
+                            masp:                    (r['masp'] || '').toString().trim(),
+                            codigo_situacao_funcional: r['codigo_situacao_funcional'] || '',
+                            situacao_funcional:      r['situacao_funcional'] || '',
+                            data_inicio:             (r['data_inicio'] || '').trim(),
+                            data_fim:                (r['data_fim'] || '').trim(),
+                            codigo_orgao:            r['codigo_orgao'] || '',
+                            orgao:                   (r['orgao'] || '').trim(),
+                            sigla_orgao:             (r['sigla_orgao'] || '').trim(),
+                            valor_remuneracao:       parseFloat((r['valor_remuneracao'] || '0').toString().replace(',', '.')) || 0,
+                            ANO:  String(ANO),
+                            MES:  String(MES).padStart(2, '0')
+                        };
+                    } catch(e) { return null; }
+                }).filter(r => r !== null);
+
+                allData[year] = data;
+                if (year === currentYear) estagiariosData = data;
+                resolve();
+            },
+            error: function(err) { console.error('Erro ao carregar', year, err); reject(err); }
         });
+    });
+}
 
-        window.addEventListener('resize', () => {
-            clearTimeout(window.resizeTimer);
-            window.resizeTimer = setTimeout(iframeUpdateHeight, 250);
+
+// ============================================================
+// DETERMINAR MÊS MAIS RECENTE E POPULAR filteredData
+// ============================================================
+function determineLatestMonth() {
+    if (!estagiariosData || estagiariosData.length === 0) {
+        filteredData = [];
+        return;
+    }
+
+    const meses = [...new Set(estagiariosData.map(e => e.MES))].sort().reverse();
+    currentMonth = meses.length > 0 ? meses[0] : '01';
+
+    filteredData = estagiariosData.filter(e =>
+        String(e.ANO) === String(currentYear) &&
+        String(e.MES).padStart(2,'0') === String(currentMonth).padStart(2,'0')
+    );
+}
+
+
+// ============================================================
+// ATUALIZAR OPÇÕES DE FILTRO (meses, órgãos)
+// ============================================================
+function updateFilterOptions() {
+    const dados = allData[currentYear] || [];
+
+    // Meses disponíveis no ano atual, ordem decrescente
+    const meses = [...new Set(dados.map(e => e.MES).filter(Boolean))].sort().reverse();
+
+    ['mesDashboard1','mesDashboard2'].forEach(id => {
+        const sel = document.getElementById(id);
+        if (!sel) return;
+        sel.innerHTML = '';
+        if (meses.length === 0) {
+            sel.innerHTML = '<option value="">Sem dados</option>';
+            return;
+        }
+        meses.forEach(m => {
+            const opt = document.createElement('option');
+            opt.value = m;
+            opt.textContent = monthNames[m] || m;
+            if (m === currentMonth) opt.selected = true;
+            sel.appendChild(opt);
         });
     });
 
-
-    // ============================================================
-    // 3. IFRAME HEIGHT
-    // ============================================================
-    function iframeUpdateHeight() {
-        try {
-            const h = Math.max(document.body.scrollHeight, document.documentElement.scrollHeight) + 10;
-            if (window.parent && window.parent !== window) {
-                window.parent.postMessage({ iframeHeight: h, height: h, type: 'resize' }, '*');
-            }
-        } catch(e) {}
-    }
+    // Lista de órgãos
+    const orgaos = [...new Set(dados.map(e => e.orgao).filter(Boolean))].sort();
+    ['orgaosListDashboard1','orgaosListDashboard2'].forEach(id => {
+        const dl = document.getElementById(id);
+        if (!dl) return;
+        dl.innerHTML = orgaos.map(o => `<option value="${o.replace(/"/g,'&quot;')}">`).join('');
+    });
+}
 
 
-    // ============================================================
-    // 4. DATA DE ATUALIZAÇÃO (GitHub API)
-    // ============================================================
-    async function setupAtualizacaoData() {
-        const elementoData = document.getElementById('data-atualizacao-header');
-        try {
-            // Busca commits do arquivo CSV do ano mais recente disponível
-            const latestYear = Object.keys(CSV_FILES_BY_YEAR).sort().reverse()[0];
-	    currentYear = latestYear;
-	    await loadYearData(latestYear);
-            const arq = CSV_FILES_BY_YEAR[latestYear];
-            const url = `https://api.github.com/repos/transparencia-mg/estagiarios/commits?path=dataset/data/${arq}&per_page=1`;
-            const response = await fetch(url);
-            const data = await response.json();
-            if (data && data.length > 0) {
-                const dataFormatada = new Date(data[0].commit.committer.date)
-                    .toLocaleDateString('pt-BR');
-                elementoData.textContent = dataFormatada;
-            } else {
-                elementoData.textContent = 'Não disponível';
-            }
-        } catch (erro) {
-            console.error('Erro ao buscar data do GitHub:', erro);
-            elementoData.textContent = 'Erro ao carregar';
-        }
-    }
+// ============================================================
+// APLICAR FILTROS  ← FUNÇÃO PRINCIPAL QUE FALTAVA
+// ============================================================
+function applyFilters(dashboard) {
+    const dados = allData[currentYear] || [];
+    if (dados.length === 0) return;
 
+    if (dashboard === 'dashboard1') {
+        const mes      = document.getElementById('mesDashboard1').value;
+        const situacao = document.getElementById('situacaoDashboard1').value;
+        const orgao    = (document.getElementById('orgaoDashboard1').value || '').trim();
 
-    // ============================================================
-    // 5. EVENT LISTENERS
-    // ============================================================
-    function setupEventListeners() {
-        document.getElementById('aplicarFiltros').addEventListener('click', () => applyFilters('dashboard1'));
-        document.getElementById('limparFiltros').addEventListener('click', clearAllFilters);
-        document.getElementById('pesquisarEstagiarios').addEventListener('click', () => applyFilters('dashboard2'));
-        document.getElementById('limparFiltrosDashboard2').addEventListener('click', clearDashboard2Filters);
-        document.getElementById('exportCSVDashboard1').addEventListener('click', () => exportToCSV('dashboard1'));
-        document.getElementById('printDashboard1').addEventListener('click', () => exportToPDF('dashboard1'));
-        document.getElementById('exportCSVDashboard2').addEventListener('click', () => exportToCSV('dashboard2'));
-        document.getElementById('printDashboard2').addEventListener('click', () => exportToPDF('dashboard2'));
-        document.getElementById('downloadAnoCSV').addEventListener('click', downloadYearCSV);
-
-        document.getElementById('searchEstagiarios').addEventListener('input', function(e) {
-            filterEstagiariosTable(e.target.value.toLowerCase());
+        filteredData = dados.filter(e => {
+            if (mes && String(e.MES).padStart(2,'0') !== String(mes).padStart(2,'0')) return false;
+            if (situacao === 'em_andamento' && e.data_fim && e.data_fim.trim()) return false;
+            if (situacao === 'concluido'    && (!e.data_fim || !e.data_fim.trim())) return false;
+            if (orgao && e.orgao !== orgao) return false;
+            return true;
         });
 
-        document.getElementById('searchResumo').addEventListener('input', function(e) {
-            filterResumoTable(e.target.value.toLowerCase());
-        });
+        // Atualiza mês atual para exportações e cards
+        if (mes) currentMonth = String(mes).padStart(2,'0');
 
-        document.getElementById('itemsPerPageDashboard1').addEventListener('change', function() {
-            itemsPerPageDashboard1 = parseInt(this.value);
-            currentPageDashboard1 = 1;
-            updateResumoTable();
-        });
-
-        document.getElementById('itemsPerPageDashboard2').addEventListener('change', function() {
-            itemsPerPageDashboard2 = parseInt(this.value);
-            currentPageDashboard2 = 1;
-            updateEstagiariosTable();
-        });
-
-        document.getElementById('anoDashboard1').addEventListener('change', async function() {
-            await switchYearData(this.value);
-        });
-
-        document.getElementById('anoDashboard2').addEventListener('change', async function() {
-            await switchYearData(this.value);
-        });
-
-        // Modal export buttons
-        document.getElementById('modalBtnPDF').addEventListener('click', () => {
-            if (window._modalHistorico) exportarHistoricoPDF();
-        });
-        document.getElementById('modalBtnCSV').addEventListener('click', () => {
-            if (window._modalHistorico) exportarHistoricoCSV();
-        });
-    }
-
-
-    // ============================================================
-    // 6. CARREGAMENTO DE DADOS
-    // ============================================================
-    async function initApp() {
-        showLoading(true);
-        try {
-            const latestYear = Object.keys(CSV_FILES_BY_YEAR).sort().reverse()[0];
-            await loadYearData(latestYear);
-            await determineLatestMonth();
-            updateFilterOptions();
-            // Garantir que os selects reflitam o mês/ano mais atual
-            ['anoDashboard1','anoDashboard2'].forEach(id => {
-                const el = document.getElementById(id);
-                if (el) el.value = currentYear;
-            });
-            ['mesDashboard1','mesDashboard2'].forEach(id => {
-                const el = document.getElementById(id);
-                if (el && currentMonth) {
-        	    el.value = currentMonth;
-    		}
-            });
-            updateDashboard1();
-            updateDashboard2();
-        } catch(e) {
-            console.error('Erro ao inicializar:', e);
-        } finally {
-            showLoading(false);
-            setTimeout(iframeUpdateHeight, 300);
-        }
-    }
-
-    async function loadYearData(year) {
-        return new Promise((resolve, reject) => {
-            const url = `${GITHUB_BASE_URL}${CSV_FILES_BY_YEAR[year]}`;
-            Papa.parse(url, {
-                download: true,
-                header: true,
-                skipEmptyLines: true,
-                encoding: 'UTF-8',
-                delimiter: ';',
-                complete: function(results) {
-                    const data = results.data.map((row, index) => {
-                        try {
-                            const rowNormalized = {};
-                            Object.keys(row).forEach(k => { rowNormalized[k.toLowerCase().trim()] = row[k]; });
-
-                            const ano_mesreferencia = 
-				rowNormalized['ano_mesreferencia'] ||
-    				rowNormalized['ano_mes'] ||
-    				rowNormalized['mes_referencia'] ||
-    				'';
-                            let ANO = '', MES = '';
-                            if (ano_mesreferencia.includes('-')) {
-                                [ANO, MES] = ano_mesreferencia.split('-');
-                                MES = MES.padStart(2, '0');
-                            }
-
-                            let orgao = (rowNormalized['orgao'] || '').trim();
-                            let sigla_orgao = (rowNormalized['sigla_orgao'] || '').trim();
-                            let valorRemuneracao = parseFloat((rowNormalized['valor_remuneracao'] || '0').replace(',', '.')) || 0;
-
-                            return {
-                                ano_mesreferencia,
-                                nome_estagiario: (rowNormalized['nome_estagiario'] || '').trim(),
-                                masp: (rowNormalized['masp'] || '').toString().trim(),
-                                codigo_situacao_funcional: rowNormalized['codigo_situacao_funcional'] || '',
-                                situacao_funcional: rowNormalized['situacao_funcional'] || '',
-                                data_inicio: (rowNormalized['data_inicio'] || '').trim(),
-                                data_fim: (rowNormalized['data_fim'] || '').trim(),
-                                codigo_orgao: rowNormalized['codigo_orgao'] || '',
-                                orgao, sigla_orgao,
-                                valor_remuneracao: valorRemuneracao,
-                                ANO, MES
-                            };
-                        } catch(err) { return null; }
-                    }).filter(Boolean);
-
-                    allData[year] = data;
-                    estagiariosData = data;
-                    resolve();
-                },
-                error: reject
-            });
-        });
-    }
-
-    async function determineLatestMonth() {
-        if (!estagiariosData || estagiariosData.length === 0) { filteredData = []; return; }
-
-        const mesesComData = estagiariosData
-            .filter(e => e.ANO && e.MES)
-            .map(e => ({ ano: e.ANO, mes: e.MES }));
-
-        if (mesesComData.length === 0) { filteredData = estagiariosData; return; }
-
-        let ultimoMes = mesesComData[0];
-        mesesComData.forEach(m => {
-            if (parseInt(m.ano) > parseInt(ultimoMes.ano) ||
-               (parseInt(m.ano) === parseInt(ultimoMes.ano) && 
-		parseInt(m.mes) > parseInt(ultimoMes.mes))) {
-                ultimoMes = m;
-            }
-        });
-
-        currentMonth = ultimoMes.mes;
-        filteredData = estagiariosData.filter(e => e.ANO === currentYear && e.MES === currentMonth);
-    }
-
-    async function switchYearData(year) {
-        if (year === currentYear) return;
-        showLoading(true);
-        try {
-            if (!allData[year]) await loadYearData(year);
-            currentYear = year;
-            estagiariosData = allData[year];
-            await determineLatestMonth();
-            updateFilterOptions();
-            // Sincronizar os selects de ano dos dois dashboards
-            ['anoDashboard1','anoDashboard2'].forEach(id => {
-                const el = document.getElementById(id);
-                if (el) el.value = currentYear;
-            });
-            ['mesDashboard1','mesDashboard2'].forEach(id => {
-                const el = document.getElementById(id);
-                if (el) el.value = currentMonth;
-            });
-            updateDashboard1();
-            updateDashboard2();
-        } finally {
-            showLoading(false);
-        }
-    }
-
-
-    // ============================================================
-    // 7. OPÇÕES DE FILTRO
-    // ============================================================
-    function updateFilterOptions() {
-	if (!allData[currentYear] || allData[currentYear].length === 0) {
-            console.warn('Dados ainda não carregados');
-            return;
-    	}
-        const anos = Object.keys(CSV_FILES_BY_YEAR).sort((a, b) => b - a);
-
-        ['anoDashboard1', 'anoDashboard2'].forEach(id => {
-            const sel = document.getElementById(id);
-            if (!sel) return;
-            sel.innerHTML = '';
-            anos.forEach(ano => {
-                const opt = document.createElement('option');
-                opt.value = ano;
-                opt.textContent = ano;
-                if (ano === currentYear) opt.selected = true;
-                sel.appendChild(opt);
-            });
-        });
-
-        const mesesDisponiveis = [...new Set(
-            (allData[currentYear] || [])
-                .filter(e => e.MES && String(e.ANO) === String(currentYear))
-                .map(e => e.MES)
-        )].sort((a, b) => parseInt(b) - parseInt(a));
-
-        ['mesDashboard1', 'mesDashboard2'].forEach(id => {
-            const sel = document.getElementById(id);
-            if (!sel) return;
-            sel.innerHTML = '';
-            mesesDisponiveis.forEach(m => {
-                const opt = document.createElement('option');
-                opt.value = m;
-                opt.textContent = monthNames[m] || m;
-                if (m === currentMonth) opt.selected = true;
-                sel.appendChild(opt);
-            });
-        });
-
-        const orgaosUnicos = [...new Set(
-            (allData[currentYear] || [])
-                .map(e => e.orgao)
-                .filter(Boolean)
-        )].sort();
-
-        ['orgaosListDashboard1', 'orgaosListDashboard2'].forEach(id => {
-            const dl = document.getElementById(id);
-            if (!dl) return;
-            dl.innerHTML = '';
-            orgaosUnicos.forEach(o => {
-                const opt = document.createElement('option');
-                opt.value = o;
-                dl.appendChild(opt);
-            });
-        });
-    }
-
-
-    // ============================================================
-    // 8. FILTROS
-    // ============================================================
-    function applyFilters(dashboard) {
-        showLoading(true);
-        try {
-            if (dashboard === 'dashboard1') {
-                const ano      = document.getElementById('anoDashboard1').value;
-                const mes      = document.getElementById('mesDashboard1').value;
-                const situacao = document.getElementById('situacaoDashboard1').value;
-                const orgao    = document.getElementById('orgaoDashboard1').value;
-
-                if (ano !== currentYear) {
-                    switchYearData(ano).then(() => {
-                        // Após trocar o ano, atualizar o select de mês e reaplicar
-                        const mesSel = document.getElementById('mesDashboard1');
-                        if (mes && mesSel) mesSel.value = mes;
-                        applyFiltersCore('dashboard1', mes || currentMonth, situacao, orgao);
-                    });
-                    return;
-                }
-                if (mes) currentMonth = mes;
-                filteredData = (allData[currentYear] || []).filter(e => {
-                    if (!e.ano_mesreferencia || !e.ano_mesreferencia.includes('-')) return false;
-                    const [eA, eM] = e.ano_mesreferencia.split('-');
-                    if (eA !== currentYear || eM !== currentMonth) return false;
-                    if (situacao === 'em_andamento' && e.data_fim?.trim()) return false;
-                    if (situacao === 'concluido' && !e.data_fim?.trim()) return false;
-                    if (orgao && e.orgao !== orgao) return false;
-                    return true;
-                });
-                currentPageDashboard1 = 1;
-                updateDashboard1();
-
-            } else if (dashboard === 'dashboard2') {
-                const ano      = document.getElementById('anoDashboard2').value;
-                const mes      = document.getElementById('mesDashboard2').value;
-                const nome     = document.getElementById('nomeEstagiario').value.toLowerCase();
-                const situacao = document.getElementById('situacaoDashboard2').value;
-                const orgao    = document.getElementById('orgaoDashboard2').value;
-                const masp     = document.getElementById('maspDashboard2').value;
-                const valMin   = parseFloat(document.getElementById('valorRemuneracao').value) || 0;
-
-                if (ano !== currentYear) {
-                    switchYearData(ano).then(() => {
-                        const mesSel = document.getElementById('mesDashboard2');
-                        if (mes && mesSel) mesSel.value = mes;
-                        applyFiltersCore('dashboard2', mes || currentMonth, nome, situacao, orgao, masp, valMin);
-                    });
-                    return;
-                }
-                if (mes) currentMonth = mes;
-                filteredData = (allData[currentYear] || []).filter(e => {
-                    if (!e.ano_mesreferencia) return false;
-                    const [eA, eM] = e.ano_mesreferencia.split('-');
-                    if (eA !== currentYear || eM !== currentMonth) return false;
-                    if (nome && !e.nome_estagiario.toLowerCase().includes(nome)) return false;
-                    if (situacao === 'em_andamento' && e.data_fim?.trim()) return false;
-                    if (situacao === 'concluido' && !e.data_fim?.trim()) return false;
-                    if (orgao && e.orgao !== orgao) return false;
-                    if (masp && !e.masp.toString().includes(masp)) return false;
-                    if (valMin > 0 && e.valor_remuneracao < valMin) return false;
-                    return true;
-                });
-                currentPageDashboard2 = 1;
-                updateDashboard2();
-            }
-        } catch(err) {
-            console.error('Erro ao filtrar:', err);
-        } finally {
-            showLoading(false);
-            setTimeout(iframeUpdateHeight, 100);
-        }
-    }
-
-    function applyFiltersCore(dashboard, ...args) {
-        // Re-apply after year switch
-        document.getElementById(dashboard === 'dashboard1' ? 'mesDashboard1' : 'mesDashboard2').value = args[0];
-        applyFilters(dashboard);
-    }
-
-    function clearAllFilters() {
-        document.getElementById('situacaoDashboard1').value = '';
-        document.getElementById('orgaoDashboard1').value = '';
-        document.getElementById('searchResumo').value = '';
-        reloadCurrentMonth();
-        // Sincronizar selects com o mês/ano atual
-        const anoSel1 = document.getElementById('anoDashboard1');
-        if (anoSel1) anoSel1.value = currentYear;
-        const mesSel1 = document.getElementById('mesDashboard1');
-        if (mesSel1) mesSel1.value = currentMonth;
         currentPageDashboard1 = 1;
-        updateFilterOptions();
         updateDashboard1();
-    }
 
-    function clearDashboard2Filters() {
-        document.getElementById('nomeEstagiario').value = '';
-        document.getElementById('situacaoDashboard2').value = '';
-        document.getElementById('orgaoDashboard2').value = '';
-        document.getElementById('maspDashboard2').value = '';
-        document.getElementById('valorRemuneracao').value = '';
-        document.getElementById('searchEstagiarios').value = '';
-        reloadCurrentMonth();
-        // Sincronizar selects com o mês/ano atual
-        const anoSel2 = document.getElementById('anoDashboard2');
-        if (anoSel2) anoSel2.value = currentYear;
-        const mesSel2 = document.getElementById('mesDashboard2');
-        if (mesSel2) mesSel2.value = currentMonth;
+    } else if (dashboard === 'dashboard2') {
+        const mes      = document.getElementById('mesDashboard2').value;
+        const nome     = (document.getElementById('nomeEstagiario').value || '').trim().toLowerCase();
+        const situacao = document.getElementById('situacaoDashboard2').value;
+        const orgao    = (document.getElementById('orgaoDashboard2').value || '').trim();
+        const masp     = (document.getElementById('maspDashboard2').value || '').trim();
+        const valMin   = parseFloat(document.getElementById('valorRemuneracao').value) || 0;
+
+        filteredData = dados.filter(e => {
+            if (mes && String(e.MES).padStart(2,'0') !== String(mes).padStart(2,'0')) return false;
+            if (nome && !e.nome_estagiario.toLowerCase().includes(nome)) return false;
+            if (situacao === 'em_andamento' && e.data_fim && e.data_fim.trim()) return false;
+            if (situacao === 'concluido'    && (!e.data_fim || !e.data_fim.trim())) return false;
+            if (orgao && e.orgao !== orgao) return false;
+            if (masp && !e.masp.toString().includes(masp)) return false;
+            if (valMin > 0 && e.valor_remuneracao < valMin) return false;
+            return true;
+        });
+
+        if (mes) currentMonth = String(mes).padStart(2,'0');
+
         currentPageDashboard2 = 1;
-        updateFilterOptions();
         updateDashboard2();
     }
+}
 
-    function reloadCurrentMonth() {
-        const meses = [...new Set((allData[currentYear]||[]).filter(e=>e.MES && e.ANO===currentYear).map(e=>e.MES))].sort((a,b)=>parseInt(b)-parseInt(a));
-        if (meses.length > 0) currentMonth = meses[0];
-        filteredData = (allData[currentYear]||[]).filter(e => {
-            if (!e.ano_mesreferencia) return false;
-            const [eA, eM] = e.ano_mesreferencia.split('-');
-            return eA === currentYear && eM === currentMonth;
+
+// ============================================================
+// LIMPAR FILTROS
+// ============================================================
+function clearAllFilters() {
+    document.getElementById('situacaoDashboard1').value = '';
+    document.getElementById('orgaoDashboard1').value    = '';
+    document.getElementById('searchResumo').value       = '';
+    // Restaura mês mais recente
+    const meses = [...new Set((allData[currentYear]||[]).map(e => e.MES).filter(Boolean))].sort().reverse();
+    currentMonth = meses.length > 0 ? meses[0] : '01';
+    document.getElementById('mesDashboard1').value = currentMonth;
+
+    filteredData = (allData[currentYear]||[]).filter(e =>
+        String(e.ANO) === String(currentYear) &&
+        String(e.MES).padStart(2,'0') === String(currentMonth).padStart(2,'0')
+    );
+    currentPageDashboard1 = 1;
+    updateDashboard1();
+}
+
+function clearDashboard2Filters() {
+    document.getElementById('nomeEstagiario').value       = '';
+    document.getElementById('situacaoDashboard2').value   = '';
+    document.getElementById('orgaoDashboard2').value      = '';
+    document.getElementById('maspDashboard2').value       = '';
+    document.getElementById('valorRemuneracao').value     = '';
+    document.getElementById('searchEstagiarios').value    = '';
+    const meses = [...new Set((allData[currentYear]||[]).map(e => e.MES).filter(Boolean))].sort().reverse();
+    currentMonth = meses.length > 0 ? meses[0] : '01';
+    document.getElementById('mesDashboard2').value = currentMonth;
+
+    filteredData = (allData[currentYear]||[]).filter(e =>
+        String(e.ANO) === String(currentYear) &&
+        String(e.MES).padStart(2,'0') === String(currentMonth).padStart(2,'0')
+    );
+    currentPageDashboard2 = 1;
+    updateDashboard2();
+}
+
+
+// ============================================================
+// FORMATAÇÃO
+// ============================================================
+function formatCurrency(v) {
+    return new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'}).format(v);
+}
+function formatDate(d) {
+    if (!d || !d.trim()) return '-';
+    try {
+        let date;
+        if (d.includes('/')) { const p=d.split('/'); date=p.length===3?new Date(p[2],p[1]-1,p[0]):new Date(p[1],p[0]-1,1); }
+        else if (d.includes('-')) { const p=d.split('-'); date=p.length===3?new Date(p[0],p[1]-1,p[2]):new Date(p[0],p[1]-1,1); }
+        else { date=new Date(d); }
+        return isNaN(date.getTime()) ? d : date.toLocaleDateString('pt-BR');
+    } catch(e) { return d; }
+}
+function formatMonthRef(anoMes) {
+    if (!anoMes) return '-';
+    const sep = anoMes.includes('-') ? '-' : anoMes.includes('/') ? '/' : null;
+    if (!sep) return anoMes;
+    const [a,m] = anoMes.split(sep);
+    return a.length===4 ? `${m}/${a}` : `${a}/${m}`;
+}
+
+
+// ============================================================
+// DASHBOARD 1 — VISÃO GERAL
+// ============================================================
+function updateDashboard1() {
+    updateSummaryCards();
+    updateResumoTable();
+    updateCharts1();
+}
+
+function updateSummaryCards() {
+    const container = document.getElementById('summaryCards');
+    if (!container) return;
+    if (filteredData.length === 0) {
+        container.innerHTML = '<div class="col-12 text-center text-muted p-3">Nenhum dado encontrado.</div>';
+        return;
+    }
+    const total      = filteredData.length;
+    const emAndamento= filteredData.filter(e => !e.data_fim || !e.data_fim.trim()).length;
+    const valorTotal = filteredData.reduce((s,e) => s+(e.valor_remuneracao||0), 0);
+    const valorMedio = total > 0 ? valorTotal/total : 0;
+    const orgaos     = new Set(filteredData.map(e=>e.orgao)).size;
+    const periodo    = `${monthNames[currentMonth]||currentMonth}/${currentYear}`;
+
+    container.innerHTML = `
+        <div class="col-md-3 col-6 mb-3"><div class="metric-card">
+            <div class="metric-header">Total de Estagiários <i class="material-icons">info_outline</i></div>
+            <div class="metric-body"><div class="metric-value">${total.toLocaleString('pt-BR')}</div><div class="metric-sub">${periodo}</div></div>
+        </div></div>
+        <div class="col-md-3 col-6 mb-3"><div class="metric-card">
+            <div class="metric-header success">Em Andamento <i class="material-icons">info_outline</i></div>
+            <div class="metric-body"><div class="metric-value">${emAndamento.toLocaleString('pt-BR')}</div><div class="metric-sub">${total>0?((emAndamento/total)*100).toFixed(1):0}% do total</div></div>
+        </div></div>
+        <div class="col-md-3 col-6 mb-3"><div class="metric-card">
+            <div class="metric-header warning">Valor Médio <i class="material-icons">info_outline</i></div>
+            <div class="metric-body"><div class="metric-value" style="font-size:16px;">${formatCurrency(valorMedio)}</div><div class="metric-sub">Remuneração média</div></div>
+        </div></div>
+        <div class="col-md-3 col-6 mb-3"><div class="metric-card">
+            <div class="metric-header info">Órgãos com Estagiários <i class="material-icons">info_outline</i></div>
+            <div class="metric-body"><div class="metric-value">${orgaos.toLocaleString('pt-BR')}</div><div class="metric-sub">Órgãos com estagiários</div></div>
+        </div></div>`;
+}
+
+function updateResumoTable() {
+    const tbody  = document.getElementById('resumoTableBody');
+    const tfoot  = document.getElementById('resumoTableFooter');
+    const count  = document.getElementById('resumoCountDashboard1');
+    const pgInfo = document.getElementById('paginationInfoDashboard1');
+    if (!tbody) return;
+
+    if (filteredData.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted p-4">Nenhum dado encontrado.</td></tr>';
+        if (tfoot) tfoot.innerHTML = '';
+        if (count) count.textContent = '0 órgãos';
+        if (pgInfo) pgInfo.textContent = 'Mostrando 0-0 de 0 registros';
+        updatePaginationDashboard1(1,1); return;
+    }
+
+    const grupos = {};
+    filteredData.forEach(e => {
+        const o = e.orgao || 'Não informado';
+        const s = e.sigla_orgao || o.substring(0,10);
+        if (!grupos[o]) grupos[o] = { orgao:o, sigla:s, total_estagiarios:0, em_andamento:0, concluido:0 };
+        grupos[o].total_estagiarios++;
+        if (!e.data_fim || !e.data_fim.trim()) grupos[o].em_andamento++;
+        else grupos[o].concluido++;
+    });
+
+    let arr = Object.values(grupos);
+    const col = currentSortDashboard1.column;
+    const ord = currentSortDashboard1.order === 'asc' ? 1 : -1;
+    arr.sort((a,b) => {
+        if (col==='orgao') return ord*a.orgao.localeCompare(b.orgao);
+        if (col==='sigla') return ord*(a.sigla||'').localeCompare(b.sigla||'');
+        return ord*(a[col]-b[col]);
+    });
+
+    const totais = arr.reduce((s,i) => ({t:s.t+i.total_estagiarios,ea:s.ea+i.em_andamento,c:s.c+i.concluido}),{t:0,ea:0,c:0});
+    const ip     = itemsPerPageDashboard1;
+    const total  = arr.length;
+    const totalP = Math.ceil(total/ip);
+    const si     = (currentPageDashboard1-1)*ip;
+    const ei     = Math.min(si+ip, total);
+
+    tbody.innerHTML = arr.slice(si,ei).map(item => `
+        <tr>
+            <td><a href="#" class="orgao-link" onclick="filtrarPorOrgao('${item.orgao.replace(/'/g,"\\'")}');return false;">${item.orgao}</a></td>
+            <td>${item.sigla}</td>
+            <td class="text-center">${item.total_estagiarios.toLocaleString('pt-BR')}</td>
+            <td class="text-center">${item.em_andamento.toLocaleString('pt-BR')}</td>
+            <td class="text-center">${item.concluido.toLocaleString('pt-BR')}</td>
+        </tr>`).join('');
+
+    if (tfoot) tfoot.innerHTML = `
+        <tr><td colspan="2">Total Geral</td>
+        <td class="text-center">${totais.t.toLocaleString('pt-BR')}</td>
+        <td class="text-center">${totais.ea.toLocaleString('pt-BR')}</td>
+        <td class="text-center">${totais.c.toLocaleString('pt-BR')}</td></tr>`;
+
+    if (count) count.textContent = `${total.toLocaleString('pt-BR')} órgãos`;
+    if (pgInfo) pgInfo.textContent = `Mostrando ${si+1}-${ei} de ${total.toLocaleString('pt-BR')} registros`;
+    updatePaginationDashboard1(totalP, currentPageDashboard1);
+    updateSortIconsDashboard1();
+    setTimeout(iframeUpdateHeight,100);
+}
+
+function updateSortIconsDashboard1() {
+    document.querySelectorAll('#visaoGeralTable thead th.sortable-header').forEach(th => {
+        const col  = th.getAttribute('data-sort');
+        const icon = th.querySelector('i');
+        if (!icon) return;
+        icon.textContent = col===currentSortDashboard1.column
+            ? (currentSortDashboard1.order==='asc'?'arrow_upward':'arrow_downward')
+            : 'unfold_more';
+    });
+}
+
+function updatePaginationDashboard1(totalPages, currentPage) {
+    const pg = document.getElementById('paginationDashboard1');
+    if (pg) pg.innerHTML = buildPaginationHTML(totalPages, currentPage, 'changePageDashboard1');
+}
+window.changePageDashboard1 = function(page) {
+    const grupos = {};
+    filteredData.forEach(e => { const o=e.orgao; if(!grupos[o]) grupos[o]=1; });
+    const totalP = Math.ceil(Object.keys(grupos).length/itemsPerPageDashboard1);
+    if (page<1||page>totalP) return;
+    currentPageDashboard1=page; updateResumoTable();
+};
+
+
+// ============================================================
+// GRÁFICOS
+// ============================================================
+function updateCharts1() {
+    if (filteredData.length===0) return;
+    updateOrgaoChart(); updateSituacaoChart(); updateRemuneracaoChart();
+}
+function destroyChart(c) { if(c) c.destroy(); }
+function getTotal(ds) { return ds._total||(ds._total=ds.data.reduce((a,b)=>a+b,0)); }
+
+function updateOrgaoChart() {
+    const ctx = document.getElementById('chartOrgao')?.getContext('2d');
+    if (!ctx) return;
+    const g={};
+    filteredData.forEach(e=>{ const o=e.sigla_orgao||e.orgao||'N/D'; g[o]=(g[o]||0)+1; });
+    const top=Object.entries(g).map(([k,v])=>({label:k,val:v})).sort((a,b)=>b.val-a.val).slice(0,6);
+    destroyChart(charts.orgao);
+    charts.orgao=new Chart(ctx,{type:'doughnut',data:{labels:top.map(i=>i.label),datasets:[{data:top.map(i=>i.val),backgroundColor:chartPalette}]},options:{responsive:true,maintainAspectRatio:false,cutout:'60%',radius:'90%',plugins:{legend:{display:false}}}});
+    document.getElementById('legendOrgao').innerHTML=top.map((i,idx)=>`<div class="legend-item"><span class="legend-color" style="background:${chartPalette[idx]}"></span><span>${i.label}</span></div>`).join('');
+}
+function updateSituacaoChart() {
+    const ctx=document.getElementById('chartSituacao')?.getContext('2d');
+    if(!ctx) return;
+    let ea=0,c=0;
+    filteredData.forEach(e=>{ if(!e.data_fim||!e.data_fim.trim()) ea++; else c++; });
+    destroyChart(charts.situacao);
+    charts.situacao=new Chart(ctx,{type:'doughnut',data:{labels:['Em Andamento','Concluído'],datasets:[{data:[ea,c],backgroundColor:['#2f4b63','#39a585'],borderWidth:1,borderColor:'#fff'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{usePointStyle:true,font:{size:10}}},tooltip:{callbacks:{label(ctx){const t=getTotal(ctx.dataset);return `${ctx.label}: ${ctx.raw} (${Math.round((ctx.raw/t)*100)}%)`;}}}}}}); 
+}
+function updateRemuneracaoChart() {
+    const ctx=document.getElementById('chartRemuneracao')?.getContext('2d');
+    if(!ctx) return;
+    const f=[0,0,0,0,0];
+    filteredData.forEach(e=>{ const v=e.valor_remuneracao||0; if(v<=500)f[0]++;else if(v<=1000)f[1]++;else if(v<=1500)f[2]++;else if(v<=2000)f[3]++;else f[4]++; });
+    destroyChart(charts.remuneracao);
+    charts.remuneracao=new Chart(ctx,{type:'bar',data:{labels:['Até 500','500-1000','1000-1500','1500-2000','2000+'],datasets:[{data:f,backgroundColor:chartPalette,borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false},ticks:{font:{size:9}}},y:{beginAtZero:true,grid:{display:false}}}}});
+}
+
+
+// ============================================================
+// DASHBOARD 2 — CONSULTA INDIVIDUAL
+// ============================================================
+function updateDashboard2() { updateEstagiariosTable(); }
+
+function updateEstagiariosTable() {
+    const tbody  = document.getElementById('estagiariosTableBody');
+    const tfoot  = document.getElementById('estagiariosTableFooter');
+    const count  = document.getElementById('resumoCountDashboard2');
+    const pgInfo = document.getElementById('paginationInfoDashboard2');
+    if (!tbody) return;
+
+    if (filteredData.length===0) {
+        tbody.innerHTML='<tr><td colspan="8" class="text-center text-muted p-4">Nenhum estagiário encontrado.</td></tr>';
+        if(tfoot) tfoot.innerHTML='';
+        if(count) count.textContent='0 estagiários';
+        if(pgInfo) pgInfo.textContent='Mostrando 0-0 de 0 registros';
+        updatePaginationDashboard2(1,1); return;
+    }
+
+    let arr=[...filteredData];
+    const col=currentSortDashboard2.column, ord=currentSortDashboard2.order==='asc'?1:-1;
+    arr.sort((a,b)=>{
+        if(col==='nome_estagiario') return ord*(a.nome_estagiario||'').localeCompare(b.nome_estagiario||'');
+        if(col==='masp')            return ord*(a.masp||'').localeCompare(b.masp||'');
+        if(col==='sigla_orgao')     return ord*(a.sigla_orgao||'').localeCompare(b.sigla_orgao||'');
+        if(col==='data_inicio')     return ord*(new Date(a.data_inicio||0)-new Date(b.data_inicio||0));
+        if(col==='data_fim')        return ord*(new Date(a.data_fim||0)-new Date(b.data_fim||0));
+        if(col==='valor_remuneracao') return ord*((a.valor_remuneracao||0)-(b.valor_remuneracao||0));
+        if(col==='situacao'){
+            const sa=(!a.data_fim||!a.data_fim.trim())?'Em Andamento':'Concluído';
+            const sb=(!b.data_fim||!b.data_fim.trim())?'Em Andamento':'Concluído';
+            return ord*sa.localeCompare(sb);
+        }
+        return 0;
+    });
+
+    const valorTotal = arr.reduce((s,e)=>s+(e.valor_remuneracao||0),0);
+    const orgaosU    = new Set(arr.map(e=>e.orgao)).size;
+    const ip=itemsPerPageDashboard2, total=arr.length, totalP=Math.ceil(total/ip);
+    const si=(currentPageDashboard2-1)*ip, ei=Math.min(si+ip,total);
+
+    tbody.innerHTML=arr.slice(si,ei).map(e=>{
+        const sit=(!e.data_fim||!e.data_fim.trim())?'Em Andamento':'Concluído';
+        const sc=sit==='Em Andamento'?'badge-em-andamento':'badge-concluido';
+        const mE=(e.masp||'').replace(/'/g,"\\'"), nE=(e.nome_estagiario||'').replace(/'/g,"\\'");
+        return `<tr>
+            <td>${e.nome_estagiario||'-'}</td>
+            <td>${e.masp||'-'}</td>
+            <td>${e.sigla_orgao||e.orgao||'-'}</td>
+            <td class="text-center">${formatDate(e.data_inicio)}</td>
+            <td class="text-center">${formatDate(e.data_fim)}</td>
+            <td class="text-end">${formatCurrency(e.valor_remuneracao||0)}</td>
+            <td><span class="badge-situacao ${sc}">${sit}</span></td>
+            <td class="text-center">
+                <button class="btn-action" onclick="showEstagiarioHistory('${mE}','${nE}')" title="Ver Histórico">
+                    <i class="material-icons">visibility</i>
+                </button>
+            </td>
+        </tr>`;
+    }).join('');
+
+    if(tfoot) tfoot.innerHTML=`<tr><td>Total Geral</td><td></td><td>${orgaosU.toLocaleString('pt-BR')} órgãos</td><td></td><td></td><td class="text-end">${formatCurrency(valorTotal)}</td><td></td><td></td></tr>`;
+    if(count) count.textContent=`${total.toLocaleString('pt-BR')} estagiários`;
+    if(pgInfo) pgInfo.textContent=`Mostrando ${si+1}-${ei} de ${total.toLocaleString('pt-BR')} registros`;
+    updatePaginationDashboard2(totalP,currentPageDashboard2);
+    updateSortIconsDashboard2();
+    setTimeout(iframeUpdateHeight,100);
+}
+
+function updateSortIconsDashboard2() {
+    document.querySelectorAll('#empregadosTable thead th.sortable-header').forEach(th=>{
+        const col=th.getAttribute('data-sort'),icon=th.querySelector('i');
+        if(!icon) return;
+        icon.textContent=col===currentSortDashboard2.column?(currentSortDashboard2.order==='asc'?'arrow_upward':'arrow_downward'):'unfold_more';
+    });
+}
+function updatePaginationDashboard2(totalPages,currentPage) {
+    const pg=document.getElementById('paginationDashboard2');
+    if(pg) pg.innerHTML=buildPaginationHTML(totalPages,currentPage,'changePageDashboard2');
+}
+window.changePageDashboard2=function(page){
+    const totalP=Math.ceil(filteredData.length/itemsPerPageDashboard2);
+    if(page<1||page>totalP) return;
+    currentPageDashboard2=page; updateEstagiariosTable();
+};
+
+
+// ============================================================
+// BUSCA NAS TABELAS
+// ============================================================
+function filterEstagiariosTable(term) {
+    if(!term.trim()){currentPageDashboard2=1;updateEstagiariosTable();return;}
+    const bkp=filteredData;
+    filteredData=bkp.filter(e=>(e.nome_estagiario||'').toLowerCase().includes(term)||(e.masp||'').toLowerCase().includes(term)||(e.orgao||'').toLowerCase().includes(term)||(e.sigla_orgao||'').toLowerCase().includes(term));
+    currentPageDashboard2=1; updateEstagiariosTable(); filteredData=bkp;
+}
+function filterResumoTable(term) {
+    if(!term.trim()){document.querySelectorAll('#visaoGeralTable tbody tr').forEach(tr=>tr.style.display='');return;}
+    document.querySelectorAll('#visaoGeralTable tbody tr').forEach(tr=>{tr.style.display=tr.innerText.toLowerCase().includes(term)?'':'none';});
+}
+
+
+// ============================================================
+// ORDENAÇÃO
+// ============================================================
+window.sortTable=function(tableType,column){
+    if(tableType==='visaoGeral'){
+        if(currentSortDashboard1.column===column) currentSortDashboard1.order=currentSortDashboard1.order==='asc'?'desc':'asc';
+        else{currentSortDashboard1.column=column;currentSortDashboard1.order='asc';}
+        currentPageDashboard1=1; updateResumoTable();
+    } else if(tableType==='estagiarios'){
+        if(currentSortDashboard2.column===column) currentSortDashboard2.order=currentSortDashboard2.order==='asc'?'desc':'asc';
+        else{currentSortDashboard2.column=column;currentSortDashboard2.order='asc';}
+        currentPageDashboard2=1; updateEstagiariosTable();
+    }
+};
+
+
+// ============================================================
+// NAVEGAÇÃO — clicar em órgão redireciona para Dashboard 2
+// ============================================================
+window.filtrarPorOrgao=function(orgao){
+    try {
+        const tabEl=document.getElementById('dashboard2-tab');
+        if(!tabEl) return;
+        new bootstrap.Tab(tabEl).show();
+        setTimeout(()=>{
+            document.getElementById('anoDashboard2').value     = currentYear;
+            document.getElementById('mesDashboard2').value     = currentMonth;
+            document.getElementById('orgaoDashboard2').value   = orgao;
+            document.getElementById('nomeEstagiario').value    = '';
+            document.getElementById('situacaoDashboard2').value= '';
+            document.getElementById('maspDashboard2').value    = '';
+            document.getElementById('valorRemuneracao').value  = '';
+            document.getElementById('searchEstagiarios').value = '';
+            applyFilters('dashboard2');
+        },350);
+    } catch(e){console.error(e);}
+};
+
+
+// ============================================================
+// MODAL — HISTÓRICO
+// ============================================================
+window.showEstagiarioHistory=function(masp,nome){
+    const modalEl=document.getElementById('historicModal');
+    document.getElementById('historicModalBody').innerHTML=`<div class="d-flex justify-content-center align-items-center py-5"><div class="spinner-border text-secondary me-3" role="status"></div><span style="color:#1a3a5c;font-weight:600;">Carregando histórico...</span></div>`;
+    document.getElementById('historicModalLabel').innerHTML=`<i class="material-icons">history</i> ${nome||'Estagiário'}`;
+    const ex=bootstrap.Modal.getInstance(modalEl);
+    if(ex) ex.dispose();
+    new bootstrap.Modal(modalEl).show();
+    try {
+        const historico=[];
+        Object.keys(allData).forEach(ano=>{
+            (allData[ano]||[]).filter(e=>e.masp===masp||e.nome_estagiario===nome).forEach(r=>historico.push(r));
         });
-    }
-
-
-    // ============================================================
-    // 9. FUNÇÕES DE FORMATAÇÃO
-    // ============================================================
-    function formatCurrency(value) {
-        return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
-    }
-
-    function formatDate(d) {
-        if (!d || d.trim() === '') return '-';
-        try {
-            let date;
-            if (d.includes('/')) {
-                const p = d.split('/');
-                date = p.length === 3 ? new Date(p[2], p[1]-1, p[0]) : new Date(p[1], p[0]-1, 1);
-            } else if (d.includes('-')) {
-                const p = d.split('-');
-                date = p.length === 3 ? new Date(p[0], p[1]-1, p[2]) : new Date(p[0], p[1]-1, 1);
-            } else { date = new Date(d); }
-            return isNaN(date.getTime()) ? d : date.toLocaleDateString('pt-BR');
-        } catch(e) { return d; }
-    }
-
-    function formatMonthRef(anoMes) {
-        if (!anoMes) return '-';
-        if (anoMes.includes('-')) { const [a, m] = anoMes.split('-'); return `${m}/${a}`; }
-        if (anoMes.includes('/')) { const [a, m] = anoMes.split('/'); return `${m}/${a}`; }
-        return anoMes;
-    }
-
-    function showLoading(show) {
-        // Mantemos sem overlay para não bloquear UI
-    }
-
-
-    // ============================================================
-    // 10. DASHBOARD 1 — VISÃO GERAL
-    // ============================================================
-    function updateDashboard1() {
-        updateSummaryCards();
-        updateResumoTable();
-        updateCharts1();
-    }
-
-    function updateSummaryCards() {
-        const container = document.getElementById('summaryCards');
-        if (!container) return;
-
-        if (filteredData.length === 0) {
-            container.innerHTML = '<div class="col-12 text-center text-muted p-3">Nenhum dado encontrado.</div>';
+        historico.sort((a,b)=>(b.ano_mesreferencia||'').localeCompare(a.ano_mesreferencia||''));
+        if(historico.length===0){
+            document.getElementById('historicModalBody').innerHTML=`<div class="alert alert-warning m-3"><i class="material-icons me-2" style="vertical-align:middle;">warning</i>Histórico não encontrado para este estagiário.</div>`;
             return;
         }
-
-        const total = filteredData.length;
-        const emAndamento = filteredData.filter(e => !e.data_fim?.trim()).length;
-        const concluidos  = filteredData.filter(e => e.data_fim?.trim()).length;
-        const valorTotal  = filteredData.reduce((s, e) => s + (e.valor_remuneracao || 0), 0);
-        const valorMedio  = total > 0 ? valorTotal / total : 0;
-        const orgaosUnicos = new Set(filteredData.map(e => e.orgao)).size;
-        const periodo = `${monthNames[currentMonth] || currentMonth}/${currentYear}`;
-
-        container.innerHTML = `
-            <div class="col-md-3 col-6 mb-3">
-                <div class="metric-card">
-                    <div class="metric-header">
-                        Total de Estagiários
-                        <i class="material-icons" data-bs-toggle="tooltip" title="Total no período">info_outline</i>
-                    </div>
-                    <div class="metric-body">
-                        <div class="metric-value">${total.toLocaleString('pt-BR')}</div>
-                        <div class="metric-sub">${periodo}Estagiários</div>
-                    </div>
-                </div>
+        const emp=historico[0];
+        const sit=(!emp.data_fim||!emp.data_fim.trim())?'Em Andamento':'Concluído';
+        document.getElementById('historicModalBody').innerHTML=`
+            <div class="mb-3"><div style="font-size:14px;font-weight:600;">${emp.nome_estagiario}</div></div>
+            <div class="row g-2 mb-3">
+                <div class="col-md-3"><div class="info-card"><div class="info-label">MASP</div><div class="info-value">${emp.masp||'-'}</div></div></div>
+                <div class="col-md-3"><div class="info-card"><div class="info-label">Órgão</div><div class="info-value">${emp.orgao||'-'}</div></div></div>
+                <div class="col-md-3"><div class="info-card"><div class="info-label">Situação Atual</div><div class="info-value">${sit}</div></div></div>
+                <div class="col-md-3"><div class="info-card"><div class="info-label">Remuneração</div><div class="info-value">${formatCurrency(emp.valor_remuneracao||0)}</div></div></div>
+                <div class="col-md-3"><div class="info-card"><div class="info-label">Data Início</div><div class="info-value">${formatDate(emp.data_inicio)}</div></div></div>
+                <div class="col-md-3"><div class="info-card"><div class="info-label">Data Fim</div><div class="info-value">${formatDate(emp.data_fim)||'-'}</div></div></div>
+                <div class="col-md-3"><div class="info-card"><div class="info-label">Total de Registros</div><div class="info-value">${historico.length} meses</div></div></div>
             </div>
-            <div class="col-md-3 col-6 mb-3">
-                <div class="metric-card">
-                    <div class="metric-header success">
-                        Em Andamento
-                        <i class="material-icons" data-bs-toggle="tooltip" title="Estágios sem data fim">info_outline</i>
-                    </div>
-                    <div class="metric-body">
-                        <div class="metric-value">${emAndamento.toLocaleString('pt-BR')}</div>
-                        <div class="metric-sub">${total > 0 ? ((emAndamento/total)*100).toFixed(1) : 0}% do total</div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-3 col-6 mb-3">
-                <div class="metric-card">
-                    <div class="metric-header warning">
-                        Valor Médio
-                        <i class="material-icons" data-bs-toggle="tooltip" title="Remuneração média">info_outline</i>
-                    </div>
-                    <div class="metric-body">
-                        <div class="metric-value" style="font-size:16px;">${formatCurrency(valorMedio)}</div>
-                        <div class="metric-sub">Remuneração média</div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-3 col-6 mb-3">
-                <div class="metric-card">
-                    <div class="metric-header info">
-                        Órgãos com Estagiários
-                        <i class="material-icons" data-bs-toggle="tooltip" title="Órgãos com pelo menos 1 estagiário">info_outline</i>
-                    </div>
-                    <div class="metric-body">
-                        <div class="metric-value">${orgaosUnicos.toLocaleString('pt-BR')}</div>
-                        <div class="metric-sub">Órgãos com estagiários</div>
-                    </div>
-                </div>
-            </div>
-        `;
-
-        document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(el => new bootstrap.Tooltip(el));
-    }
-
-    function updateResumoTable() {
-        const tbody   = document.getElementById('resumoTableBody');
-        const tfoot   = document.getElementById('resumoTableFooter');
-        const count   = document.getElementById('resumoCountDashboard1');
-        const pgInfo  = document.getElementById('paginationInfoDashboard1');
-        if (!tbody) return;
-
-        if (filteredData.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted p-4">Nenhum dado encontrado.</td></tr>';
-            if (tfoot) tfoot.innerHTML = '';
-            if (count) count.textContent = '0 órgãos';
-            if (pgInfo) pgInfo.textContent = 'Mostrando 0-0 de 0 registros';
-            updatePaginationDashboard1(1, 1);
-            return;
-        }
-
-        // Agrupar por órgão
-        const grupos = {};
-        filteredData.forEach(e => {
-            const orgao = e.orgao || 'Não informado';
-            const sigla = e.sigla_orgao || orgao.substring(0, 10);
-            if (!grupos[orgao]) grupos[orgao] = { orgao, sigla, total_estagiarios: 0, em_andamento: 0, concluido: 0 };
-            grupos[orgao].total_estagiarios++;
-            if (!e.data_fim?.trim()) grupos[orgao].em_andamento++;
-            else grupos[orgao].concluido++;
-        });
-
-        let arr = Object.values(grupos);
-        arr.sort((a, b) => {
-            const order = currentSortDashboard1.order === 'asc' ? 1 : -1;
-            const col = currentSortDashboard1.column;
-            if (col === 'orgao') return order * a.orgao.localeCompare(b.orgao);
-            if (col === 'sigla') return order * (a.sigla||'').localeCompare(b.sigla||'');
-            return order * (a[col] - b[col]);
-        });
-
-        const totalOrgaos = arr.length;
-        const totais = arr.reduce((s, i) => ({ t: s.t + i.total_estagiarios, ea: s.ea + i.em_andamento, c: s.c + i.concluido }), { t: 0, ea: 0, c: 0 });
-
-        const ip = itemsPerPageDashboard1;
-        const totalPag = Math.ceil(arr.length / ip);
-        const si = (currentPageDashboard1 - 1) * ip;
-        const ei = Math.min(si + ip, arr.length);
-        const pagData = arr.slice(si, ei);
-
-        tbody.innerHTML = pagData.map(item => `
-            <tr>
-                <td>
-                    <a href="#" class="orgao-link" onclick="filtrarPorOrgao('${item.orgao.replace(/'/g,"\\'")}'); return false;">
-                        ${item.orgao}
-                    </a>
-                </td>
-                <td>${item.sigla}</td>
-                <td class="text-center">${item.total_estagiarios.toLocaleString('pt-BR')}</td>
-                <td class="text-center">${item.em_andamento.toLocaleString('pt-BR')}</td>
-                <td class="text-center">${item.concluido.toLocaleString('pt-BR')}</td>
-            </tr>
-        `).join('');
-
-        if (tfoot) tfoot.innerHTML = `
-            <tr>
-                <td colspan="2">Total Geral</td>
-                <td class="text-center">${totais.t.toLocaleString('pt-BR')}</td>
-                <td class="text-center">${totais.ea.toLocaleString('pt-BR')}</td>
-                <td class="text-center">${totais.c.toLocaleString('pt-BR')}</td>
-            </tr>
-        `;
-
-        if (count) count.textContent = `${totalOrgaos.toLocaleString('pt-BR')} órgãos`;
-        if (pgInfo) pgInfo.textContent = `Mostrando ${si+1}-${ei} de ${arr.length.toLocaleString('pt-BR')} registros`;
-
-        updatePaginationDashboard1(totalPag, currentPageDashboard1);
-        updateSortIconsDashboard1();
-        setTimeout(iframeUpdateHeight, 100);
-    }
-
-    function updateSortIconsDashboard1() {
-        document.querySelectorAll('#visaoGeralTable thead th.sortable-header').forEach(th => {
-            const col = th.getAttribute('data-sort');
-            const icon = th.querySelector('i');
-            if (!icon) return;
-            if (col === currentSortDashboard1.column) {
-                icon.textContent = currentSortDashboard1.order === 'asc' ? 'arrow_upward' : 'arrow_downward';
-            } else {
-                icon.textContent = 'unfold_more';
-            }
-        });
-    }
-
-    function updatePaginationDashboard1(totalPages, currentPage) {
-        const pg = document.getElementById('paginationDashboard1');
-        if (!pg) return;
-        pg.innerHTML = buildPaginationHTML(totalPages, currentPage, 'changePageDashboard1');
-    }
-
-    window.changePageDashboard1 = function(page) {
-        const grupos = {};
-        filteredData.forEach(e => { const o = e.orgao; if(!grupos[o]) grupos[o]=1; });
-        const total = Object.keys(grupos).length;
-        const totalPag = Math.ceil(total / itemsPerPageDashboard1);
-        if (page < 1 || page > totalPag) return;
-        currentPageDashboard1 = page;
-        updateResumoTable();
-    };
-
-
-    // ============================================================
-    // 11. GRÁFICOS
-    // ============================================================
-    function updateCharts1() {
-        if (filteredData.length === 0) return;
-        updateOrgaoChart();
-        updateSituacaoChart();
-        updateRemuneracaoChart();
-    }
-
-    function destroyChart(c) { if (c) c.destroy(); }
-
-    function getTotal(ds) { return ds._total || (ds._total = ds.data.reduce((a,b)=>a+b,0)); }
-
-    function updateOrgaoChart() {
-        const ctx = document.getElementById('chartOrgao')?.getContext('2d');
-        if (!ctx) return;
-        const grupos = {};
-        filteredData.forEach(e => { const o = e.sigla_orgao || e.orgao || 'N/D'; grupos[o] = (grupos[o]||0)+1; });
-        const top = Object.entries(grupos).map(([k,v])=>({label:k,val:v})).sort((a,b)=>b.val-a.val).slice(0,6);
-
-        destroyChart(charts.orgao);
-        charts.orgao = new Chart(ctx, {
-            type: 'doughnut',
-            data: { labels: top.map(i=>i.label), datasets: [{ data: top.map(i=>i.val), backgroundColor: chartPalette }] },
-            options: { responsive:true, maintainAspectRatio:false, cutout:'60%', radius:'90%', plugins: { legend: { display:false } } }
-        });
-
-        document.getElementById('legendOrgao').innerHTML = top.map((item,idx) => `
-            <div class="legend-item">
-                <span class="legend-color" style="background:${chartPalette[idx]}"></span>
-                <span>${item.label}</span>
-            </div>
-        `).join('');
-    }
-
-    function updateSituacaoChart() {
-        const ctx = document.getElementById('chartSituacao')?.getContext('2d');
-        if (!ctx) return;
-        let ea = 0, c = 0;
-        filteredData.forEach(e => { if (!e.data_fim?.trim()) ea++; else c++; });
-        destroyChart(charts.situacao);
-        charts.situacao = new Chart(ctx, {
-            type: 'doughnut',
-            data: { labels: ['Em Andamento','Concluído'], datasets: [{ data:[ea,c], backgroundColor:['#2f4b63','#39a585'], borderWidth:1, borderColor:'#fff' }] },
-            options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{ position:'bottom', labels:{ usePointStyle:true, font:{size:10} } }, tooltip:{ callbacks:{ label(ctx){ const t=getTotal(ctx.dataset); return `${ctx.label}: ${ctx.raw} (${Math.round((ctx.raw/t)*100)}%)`; } } } } }
-        });
-    }
-
-    function updateRemuneracaoChart() {
-        const ctx = document.getElementById('chartRemuneracao')?.getContext('2d');
-        if (!ctx) return;
-        const faixas = [0,0,0,0,0];
-        filteredData.forEach(e => {
-            const v = e.valor_remuneracao || 0;
-            if (v <= 500) faixas[0]++;
-            else if (v <= 1000) faixas[1]++;
-            else if (v <= 1500) faixas[2]++;
-            else if (v <= 2000) faixas[3]++;
-            else faixas[4]++;
-        });
-        destroyChart(charts.remuneracao);
-        charts.remuneracao = new Chart(ctx, {
-            type: 'bar',
-            data: { labels: ['Até 500','500-1000','1000-1500','1500-2000','2000+'], datasets: [{ data: faixas, backgroundColor: chartPalette, borderRadius:4 }] },
-            options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{display:false} }, scales:{ x:{grid:{display:false}, ticks:{font:{size:9}}}, y:{beginAtZero:true, grid:{display:false}} } }
-        });
-    }
-
-
-    // ============================================================
-    // 12. DASHBOARD 2 — CONSULTA INDIVIDUAL
-    // ============================================================
-    function updateDashboard2() {
-        updateEstagiariosTable();
-    }
-
-    function updateEstagiariosTable() {
-        const tbody  = document.getElementById('estagiariosTableBody');
-        const tfoot  = document.getElementById('estagiariosTableFooter');
-        const count  = document.getElementById('resumoCountDashboard2');
-        const pgInfo = document.getElementById('paginationInfoDashboard2');
-        if (!tbody) return;
-
-        if (filteredData.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="8" class="text-center text-muted p-4">Nenhum estagiário encontrado.</td></tr>';
-            if (tfoot) tfoot.innerHTML = '';
-            if (count) count.textContent = '0 estagiários';
-            if (pgInfo) pgInfo.textContent = 'Mostrando 0-0 de 0 registros';
-            updatePaginationDashboard2(1, 1);
-            return;
-        }
-
-        let arr = [...filteredData];
-        arr.sort((a, b) => {
-            const order = currentSortDashboard2.order === 'asc' ? 1 : -1;
-            const col = currentSortDashboard2.column;
-            if (col === 'nome_estagiario') return order * (a.nome_estagiario||'').localeCompare(b.nome_estagiario||'');
-            if (col === 'masp')            return order * (a.masp||'').localeCompare(b.masp||'');
-            if (col === 'sigla_orgao')     return order * (a.sigla_orgao||'').localeCompare(b.sigla_orgao||'');
-            if (col === 'data_inicio')     return order * (new Date(a.data_inicio||0) - new Date(b.data_inicio||0));
-            if (col === 'data_fim')        return order * (new Date(a.data_fim||0) - new Date(b.data_fim||0));
-            if (col === 'valor_remuneracao') return order * ((a.valor_remuneracao||0) - (b.valor_remuneracao||0));
-            if (col === 'situacao') {
-                const sa = !a.data_fim?.trim() ? 'Em Andamento' : 'Concluído';
-                const sb = !b.data_fim?.trim() ? 'Em Andamento' : 'Concluído';
-                return order * sa.localeCompare(sb);
-            }
-            return 0;
-        });
-
-        const totalEst   = arr.length;
-        const valorTotal = arr.reduce((s, e) => s + (e.valor_remuneracao||0), 0);
-        const orgaosU    = new Set(arr.map(e=>e.orgao)).size;
-
-        const ip = itemsPerPageDashboard2;
-        const totalPag = Math.ceil(arr.length / ip);
-        const si = (currentPageDashboard2 - 1) * ip;
-        const ei = Math.min(si + ip, arr.length);
-        const pagData = arr.slice(si, ei);
-
-        tbody.innerHTML = pagData.map(e => {
-            const sit      = !e.data_fim?.trim() ? 'Em Andamento' : 'Concluído';
-            const sitClass = sit === 'Em Andamento' ? 'badge-em-andamento' : 'badge-concluido';
-            const maspEsc  = (e.masp||'').replace(/'/g,"\\'");
-            const nomeEsc  = (e.nome_estagiario||'').replace(/'/g,"\\'");
-            return `
-                <tr>
-                    <td>${e.nome_estagiario || '-'}</td>
-                    <td>${e.masp || '-'}</td>
-                    <td>${e.sigla_orgao || e.orgao || '-'}</td>
-                    <td class="text-center">${formatDate(e.data_inicio)}</td>
-                    <td class="text-center">${formatDate(e.data_fim)}</td>
-                    <td class="text-end">${formatCurrency(e.valor_remuneracao||0)}</td>
-                    <td><span class="badge-situacao ${sitClass}">${sit}</span></td>
-                    <td class="text-center">
-                        <button class="btn-action" onclick="showEstagiarioHistory('${maspEsc}','${nomeEsc}')" title="Ver Histórico">
-                            <i class="material-icons">visibility</i>
-                        </button>
-                    </td>
-                </tr>
-            `;
-        }).join('');
-
-        if (tfoot) tfoot.innerHTML = `
-            <tr>
-                <td>Total Geral</td>
-                <td></td>
-                <td>${orgaosU.toLocaleString('pt-BR')} órgãos</td>
-                <td></td><td></td>
-                <td class="text-end">${formatCurrency(valorTotal)}</td>
-                <td></td><td></td>
-            </tr>
-        `;
-
-        if (count) count.textContent = `${totalEst.toLocaleString('pt-BR')} estagiários`;
-        if (pgInfo) pgInfo.textContent = `Mostrando ${si+1}-${ei} de ${arr.length.toLocaleString('pt-BR')} registros`;
-
-        updatePaginationDashboard2(totalPag, currentPageDashboard2);
-        updateSortIconsDashboard2();
-        setTimeout(iframeUpdateHeight, 100);
-    }
-
-    function updateSortIconsDashboard2() {
-        document.querySelectorAll('#empregadosTable thead th.sortable-header').forEach(th => {
-            const col = th.getAttribute('data-sort');
-            const icon = th.querySelector('i');
-            if (!icon) return;
-            if (col === currentSortDashboard2.column) {
-                icon.textContent = currentSortDashboard2.order === 'asc' ? 'arrow_upward' : 'arrow_downward';
-            } else {
-                icon.textContent = 'unfold_more';
-            }
-        });
-    }
-
-    function updatePaginationDashboard2(totalPages, currentPage) {
-        const pg = document.getElementById('paginationDashboard2');
-        if (!pg) return;
-        pg.innerHTML = buildPaginationHTML(totalPages, currentPage, 'changePageDashboard2');
-    }
-
-    window.changePageDashboard2 = function(page) {
-        const totalPag = Math.ceil(filteredData.length / itemsPerPageDashboard2);
-        if (page < 1 || page > totalPag) return;
-        currentPageDashboard2 = page;
-        updateEstagiariosTable();
-    };
-
-
-    // ============================================================
-    // 13. BUSCA NAS TABELAS
-    // ============================================================
-    function filterEstagiariosTable(term) {
-        if (!term.trim()) { currentPageDashboard2 = 1; updateEstagiariosTable(); return; }
-        const orig = filteredData;
-        filteredData = orig.filter(e =>
-            (e.nome_estagiario||'').toLowerCase().includes(term) ||
-            (e.masp||'').toLowerCase().includes(term) ||
-            (e.orgao||'').toLowerCase().includes(term) ||
-            (e.sigla_orgao||'').toLowerCase().includes(term)
-        );
-        currentPageDashboard2 = 1;
-        updateEstagiariosTable();
-        filteredData = orig;
-    }
-
-    function filterResumoTable(term) {
-        if (!term.trim()) { currentPageDashboard1 = 1; updateResumoTable(); return; }
-        // filter on rendered rows (simple approach)
-        document.querySelectorAll('#visaoGeralTable tbody tr').forEach(tr => {
-            tr.style.display = tr.innerText.toLowerCase().includes(term) ? '' : 'none';
-        });
-    }
-
-
-    // ============================================================
-    // 14. ORDENAÇÃO
-    // ============================================================
-    window.sortTable = function(tableType, column) {
-        if (tableType === 'visaoGeral') {
-            if (currentSortDashboard1.column === column) {
-                currentSortDashboard1.order = currentSortDashboard1.order === 'asc' ? 'desc' : 'asc';
-            } else {
-                currentSortDashboard1.column = column;
-                currentSortDashboard1.order = 'asc';
-            }
-            currentPageDashboard1 = 1;
-            updateResumoTable();
-        } else if (tableType === 'estagiarios') {
-            if (currentSortDashboard2.column === column) {
-                currentSortDashboard2.order = currentSortDashboard2.order === 'asc' ? 'desc' : 'asc';
-            } else {
-                currentSortDashboard2.column = column;
-                currentSortDashboard2.order = 'asc';
-            }
-            currentPageDashboard2 = 1;
-            updateEstagiariosTable();
-        }
-    };
-
-
-    // ============================================================
-    // 15. NAVEGAÇÃO ENTRE ABAS
-    // ============================================================
-    window.filtrarPorOrgao = function(orgao) {
-        try {
-            const tabEl = document.getElementById('dashboard2-tab');
-            if (tabEl) {
-                new bootstrap.Tab(tabEl).show();
-                setTimeout(() => {
-                    // Garantir que o select de mês/ano do dashboard2 reflita o período atual
-                    const anoSel = document.getElementById('anoDashboard2');
-                    if (anoSel) anoSel.value = currentYear;
-
-                    const mesSel = document.getElementById('mesDashboard2');
-                    if (mesSel) mesSel.value = currentMonth;
-
-                    const el = document.getElementById('orgaoDashboard2');
-                    if (el) el.value = orgao;
-                    document.getElementById('nomeEstagiario').value = '';
-                    document.getElementById('situacaoDashboard2').value = '';
-                    document.getElementById('maspDashboard2').value = '';
-                    document.getElementById('valorRemuneracao').value = '';
-                    document.getElementById('searchEstagiarios').value = '';
-
-                    // Filtrar direto sem passar pelo switchYearData (ano já é o atual)
-                    filteredData = (allData[currentYear] || []).filter(e => {
-                        if (!e.ano_mesreferencia) return false;
-                        const [eA, eM] = e.ano_mesreferencia.split('-');
-                        if (eA !== currentYear || eM !== currentMonth) return false;
-                        if (orgao && e.orgao !== orgao) return false;
-                        return true;
-                    });
-                    currentPageDashboard2 = 1;
-                    updateDashboard2();
-                }, 350);
-            }
-        } catch(e) { console.error(e); }
-    };
-
-
-    // ============================================================
-    // 16. MODAL — HISTÓRICO DO ESTAGIÁRIO
-    // ============================================================
-    window.showEstagiarioHistory = function(masp, nome) {
-        const modalEl = document.getElementById('historicModal');
-        document.getElementById('historicModalBody').innerHTML = `
-            <div class="d-flex justify-content-center align-items-center py-5">
-                <div class="spinner-border text-secondary me-3" role="status"></div>
-                <span style="color:#1a3a5c;font-weight:600;">Carregando histórico...</span>
+            <div class="table-fixed-header-container">
+                <table class="table"><thead><tr><th>MÊS/ANO</th><th>ÓRGÃO</th><th>SITUAÇÃO</th><th>DATA INÍCIO</th><th>DATA FIM</th><th>VALOR (R$)</th></tr></thead>
+                <tbody>${historico.map(h=>{
+                    const s=(!h.data_fim||!h.data_fim.trim())?'Em Andamento':'Concluído';
+                    const sc=s==='Em Andamento'?'badge-em-andamento':'badge-concluido';
+                    return `<tr><td>${formatMonthRef(h.ano_mesreferencia)}</td><td>${h.orgao||'-'}<br><small style="color:#6c757d;">${h.sigla_orgao||''}</small></td><td><span class="badge-situacao ${sc}">${s}</span></td><td>${formatDate(h.data_inicio)}</td><td>${formatDate(h.data_fim)||'-'}</td><td class="text-end">${formatCurrency(h.valor_remuneracao||0)}</td></tr>`;
+                }).join('')}</tbody></table>
             </div>`;
-        document.getElementById('historicModalLabel').innerHTML = `<i class="material-icons">history</i> ${nome || 'Estagiário'}`;
-
-        const existingModal = bootstrap.Modal.getInstance(modalEl);
-        if (existingModal) existingModal.dispose();
-        new bootstrap.Modal(modalEl).show();
-
-        try {
-            const historico = [];
-            Object.keys(allData).forEach(ano => {
-                const registros = (allData[ano]||[]).filter(e => e.masp === masp || e.nome_estagiario === nome);
-                historico.push(...registros);
-            });
-            historico.sort((a,b) => (b.ano_mesreferencia||'').localeCompare(a.ano_mesreferencia||''));
-
-            if (historico.length === 0) {
-                document.getElementById('historicModalBody').innerHTML = `
-                    <div class="alert alert-warning m-3">
-                        <i class="material-icons me-2" style="vertical-align:middle;">warning</i>
-                        Histórico não encontrado para este estagiário.
-                    </div>`;
-                return;
-            }
-
-            const emp = historico[0];
-            const sit = !emp.data_fim?.trim() ? 'Em Andamento' : 'Concluído';
-
-            document.getElementById('historicModalBody').innerHTML = `
-                <div class="mb-3">
-                    <div style="font-size:14px;font-weight:600;">${emp.nome_estagiario}</div>
-                </div>
-                <div class="row g-2 mb-3">
-                    <div class="col-md-3"><div class="info-card"><div class="info-label">MASP</div><div class="info-value">${emp.masp||'-'}</div></div></div>
-                    <div class="col-md-3"><div class="info-card"><div class="info-label">Órgão</div><div class="info-value">${emp.orgao||'-'}</div></div></div>
-                    <div class="col-md-3"><div class="info-card"><div class="info-label">Situação Atual</div><div class="info-value">${sit}</div></div></div>
-                    <div class="col-md-3"><div class="info-card"><div class="info-label">Remuneração Atual</div><div class="info-value">${formatCurrency(emp.valor_remuneracao||0)}</div></div></div>
-                    <div class="col-md-3"><div class="info-card"><div class="info-label">Data Início</div><div class="info-value">${formatDate(emp.data_inicio)}</div></div></div>
-                    <div class="col-md-3"><div class="info-card"><div class="info-label">Data Fim</div><div class="info-value">${formatDate(emp.data_fim)||'-'}</div></div></div>
-                    <div class="col-md-3"><div class="info-card"><div class="info-label">Total de Registros</div><div class="info-value">${historico.length} meses</div></div></div>
-                </div>
-                <div class="table-fixed-header-container">
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th>MÊS/ANO</th>
-                                <th>ÓRGÃO</th>
-                                <th>SITUAÇÃO</th>
-                                <th>DATA INÍCIO</th>
-                                <th>DATA FIM</th>
-                                <th>VALOR (R$)</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${historico.map(h => {
-                                const s = !h.data_fim?.trim() ? 'Em Andamento' : 'Concluído';
-                                const sc = s === 'Em Andamento' ? 'badge-em-andamento' : 'badge-concluido';
-                                return `<tr>
-                                    <td>${formatMonthRef(h.ano_mesreferencia)}</td>
-                                    <td>${h.orgao||'-'}<br><small style="color:#6c757d;">${h.sigla_orgao||''}</small></td>
-                                    <td><span class="badge-situacao ${sc}">${s}</span></td>
-                                    <td>${formatDate(h.data_inicio)}</td>
-                                    <td>${formatDate(h.data_fim)||'-'}</td>
-                                    <td class="text-end">${formatCurrency(h.valor_remuneracao||0)}</td>
-                                </tr>`;
-                            }).join('')}
-                        </tbody>
-                    </table>
-                </div>
-            `;
-
-            window._modalHistorico = historico;
-            window._modalEmp = emp;
-
-        } catch(err) {
-            document.getElementById('historicModalBody').innerHTML = `
-                <div class="alert alert-danger m-3">
-                    <i class="material-icons me-2" style="vertical-align:middle;">error</i>
-                    Erro ao carregar dados. Tente novamente.
-                </div>`;
-        }
-    };
-
-
-    // ============================================================
-    // 17. EXPORTAÇÃO — MODAL (PDF e CSV)
-    // ============================================================
-    function exportarHistoricoPDF() {
-        const historico = window._modalHistorico;
-        const emp = window._modalEmp;
-        if (!historico || !historico.length) return;
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF({ orientation: 'landscape' });
-        doc.setFontSize(11);
-        doc.text(`Histórico do Estagiário: ${emp.nome_estagiario} (MASP: ${emp.masp})`, 14, 10);
-        doc.autoTable({
-            startY: 18,
-            head: [['Mês/Ano','Órgão','Situação','Data Início','Data Fim','Valor (R$)']],
-            body: historico.map(h => [
-                formatMonthRef(h.ano_mesreferencia),
-                h.orgao||'-',
-                !h.data_fim?.trim() ? 'Em Andamento' : 'Concluído',
-                formatDate(h.data_inicio),
-                formatDate(h.data_fim)||'-',
-                formatCurrency(h.valor_remuneracao||0)
-            ]),
-            didDrawPage: (data) => {
-                doc.setFontSize(9);
-                doc.text(`Emitido em: ${new Date().toLocaleString('pt-BR')}`, 14, doc.internal.pageSize.height - 5);
-            }
-        });
-        doc.save(`historico_${emp.masp}.pdf`);
+        window._modalHistorico=historico;
+        window._modalEmp=emp;
+    } catch(err) {
+        document.getElementById('historicModalBody').innerHTML=`<div class="alert alert-danger m-3"><i class="material-icons me-2" style="vertical-align:middle;">error</i>Erro ao carregar dados.</div>`;
     }
-
-    function exportarHistoricoCSV() {
-        const historico = window._modalHistorico;
-        const emp = window._modalEmp;
-        if (!historico || !historico.length) return;
-        const cab = ['mes_ano','orgao','sigla','situacao','data_inicio','data_fim','valor_remuneracao'];
-        const linhas = historico.map(h =>
-            [
-                formatMonthRef(h.ano_mesreferencia),
-                h.orgao||'-',
-                h.sigla_orgao||'-',
-                !h.data_fim?.trim() ? 'Em Andamento' : 'Concluído',
-                formatDate(h.data_inicio),
-                formatDate(h.data_fim)||'-',
-                (h.valor_remuneracao||0).toFixed(2).replace('.',',')
-            ].map(c => `"${String(c||'').replace(/"/g,'""')}"`).join(';')
-        );
-        const csv = [cab.join(';'), ...linhas].join('\n');
-        const blob = new Blob(['\uFEFF'+csv], { type: 'text/csv;charset=utf-8;' });
-        const link = document.createElement('a');
-        link.href = URL.createObjectURL(blob);
-        link.download = `historico_${emp.masp}.csv`;
-        link.click();
-    }
+};
 
 
-    // ============================================================
-    // 18. EXPORTAÇÃO — VISÃO GERAL (CSV e PDF)
-    // ============================================================
-    function exportToCSV(source) {
-        if (source === 'dashboard1') exportResumoCSV();
-        else if (source === 'dashboard2') exportEstagiariosCSV();
-    }
-
-    function exportToPDF(source) {
-        if (source === 'dashboard1') exportResumoPDF();
-        else if (source === 'dashboard2') exportEstagiariosPDF();
-    }
-
-    function exportResumoCSV() {
-        if (filteredData.length === 0) { alert('Não há dados para exportar.'); return; }
-        const grupos = {};
-        filteredData.forEach(e => {
-            const o = e.orgao||'Não informado';
-            if (!grupos[o]) grupos[o] = { orgao:o, sigla:e.sigla_orgao||o.substring(0,10), total:0, ea:0, c:0 };
-            grupos[o].total++;
-            if (!e.data_fim?.trim()) grupos[o].ea++; else grupos[o].c++;
-        });
-        const arr = Object.values(grupos);
-        const lines = arr.map(i => [i.orgao, i.sigla, i.total, i.ea, i.c].map(c=>`"${c}"`).join(';'));
-        const csv = ['Órgão;Sigla;Total;Em Andamento;Concluído', ...lines].join('\n');
-        const blob = new Blob(['\uFEFF'+csv], { type: 'text/csv;charset=utf-8;' });
-        const link = document.createElement('a');
-        link.href = URL.createObjectURL(blob);
-        link.download = `visao_geral_estagiarios_${currentYear}_${currentMonth}.csv`;
-        link.click();
-    }
-
-    function exportResumoPDF() {
-        if (filteredData.length === 0) { alert('Não há dados para exportar.'); return; }
-        const grupos = {};
-        filteredData.forEach(e => {
-            const o = e.orgao||'Não informado';
-            if (!grupos[o]) grupos[o] = { orgao:o, sigla:e.sigla_orgao||o.substring(0,10), total:0, ea:0, c:0 };
-            grupos[o].total++;
-            if (!e.data_fim?.trim()) grupos[o].ea++; else grupos[o].c++;
-        });
-        const arr = Object.values(grupos).sort((a,b)=>b.total-a.total);
-        const totalEst = arr.reduce((s,i)=>s+i.total,0);
-        const totalEA  = arr.reduce((s,i)=>s+i.ea,0);
-        const totalC   = arr.reduce((s,i)=>s+i.c,0);
-
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF({ orientation: 'landscape' });
-        doc.setFontSize(14);
-        doc.setTextColor(41,67,90);
-        doc.text('Visão Geral — Estagiários por Órgão', 14, 14);
-        doc.setFontSize(10);
-        doc.setTextColor(100,100,100);
-        doc.text(`Período: ${monthNames[currentMonth]||currentMonth}/${currentYear} | Emitido em: ${new Date().toLocaleString('pt-BR')}`, 14, 20);
-
-        doc.autoTable({
-            startY: 26,
-            head: [['Órgão','Sigla','Total','Em Andamento','Concluído']],
-            body: arr.map(i=>[i.orgao,i.sigla,i.total,i.ea,i.c]),
-            foot: [['TOTAL GERAL','',totalEst,totalEA,totalC]],
-            headStyles: { fillColor:[41,67,90], textColor:[255,255,255], fontStyle:'bold' },
-            footStyles: { fillColor:[240,240,240], fontStyle:'bold' },
-            didDrawPage: (data) => {
-                doc.setFontSize(8);
-                doc.text(`Página ${data.pageNumber}`, doc.internal.pageSize.width/2, doc.internal.pageSize.height-5, {align:'center'});
-            }
-        });
-        doc.save(`visao_geral_estagiarios_${currentYear}_${currentMonth}.pdf`);
-    }
+// ============================================================
+// EXPORTAÇÕES — MODAL
+// ============================================================
+function exportarHistoricoPDF(){
+    const h=window._modalHistorico,emp=window._modalEmp;
+    if(!h||!h.length) return;
+    const {jsPDF}=window.jspdf;
+    const doc=new jsPDF({orientation:'landscape'});
+    doc.setFontSize(11);
+    doc.text(`Histórico do Estagiário: ${emp.nome_estagiario} (MASP: ${emp.masp})`,14,10);
+    doc.autoTable({startY:18,head:[['Mês/Ano','Órgão','Situação','Data Início','Data Fim','Valor (R$)']],body:h.map(r=>[formatMonthRef(r.ano_mesreferencia),r.orgao||'-',(!r.data_fim||!r.data_fim.trim())?'Em Andamento':'Concluído',formatDate(r.data_inicio),formatDate(r.data_fim)||'-',formatCurrency(r.valor_remuneracao||0)]),didDrawPage:d=>{doc.setFontSize(9);doc.text(`Emitido em: ${new Date().toLocaleString('pt-BR')}`,14,doc.internal.pageSize.height-5);}});
+    doc.save(`historico_${emp.masp}.pdf`);
+}
+function exportarHistoricoCSV(){
+    const h=window._modalHistorico,emp=window._modalEmp;
+    if(!h||!h.length) return;
+    const cab=['mes_ano','orgao','sigla','situacao','data_inicio','data_fim','valor_remuneracao'];
+    const linhas=h.map(r=>[formatMonthRef(r.ano_mesreferencia),r.orgao||'-',r.sigla_orgao||'-',(!r.data_fim||!r.data_fim.trim())?'Em Andamento':'Concluído',formatDate(r.data_inicio),formatDate(r.data_fim)||'-',(r.valor_remuneracao||0).toFixed(2).replace('.',',')].map(c=>`"${String(c||'').replace(/"/g,'""')}"`).join(';'));
+    const csv=[cab.join(';'),...linhas].join('\n');
+    const blob=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'});
+    const link=document.createElement('a'); link.href=URL.createObjectURL(blob); link.download=`historico_${emp.masp}.csv`; link.click();
+}
 
 
-    // ============================================================
-    // 19. EXPORTAÇÃO — CONSULTA INDIVIDUAL (CSV e PDF)
-    // ============================================================
-    function exportEstagiariosCSV() {
-        if (filteredData.length === 0) { alert('Não há dados para exportar.'); return; }
-        const headers = ['ano_mesreferencia','nome_estagiario','masp','situacao_funcional','data_inicio','data_fim','orgao','sigla_orgao','valor_remuneracao','situacao'];
-        const lines = filteredData.map(e => {
-            const sit = !e.data_fim?.trim() ? 'Em Andamento' : 'Concluído';
-            return [e.ano_mesreferencia||'',e.nome_estagiario||'',e.masp||'',e.situacao_funcional||'',e.data_inicio||'',e.data_fim||'',e.orgao||'',e.sigla_orgao||'',(e.valor_remuneracao||0).toFixed(2).replace('.',','),sit]
-                .map(c=>`"${String(c).replace(/"/g,'""')}"`).join(';');
-        });
-        const csv = [headers.join(';'), ...lines].join('\n');
-        const blob = new Blob(['\uFEFF'+csv], { type: 'text/csv;charset=utf-8;' });
-        const link = document.createElement('a');
-        link.href = URL.createObjectURL(blob);
-        link.download = `estagiarios_${currentYear}_${currentMonth}.csv`;
-        link.click();
-    }
+// ============================================================
+// EXPORTAÇÕES — DASHBOARDS
+// ============================================================
+function exportToCSV(s){ if(s==='dashboard1') exportResumoCSV(); else exportEstagiariosCSV(); }
+function exportToPDF(s){ if(s==='dashboard1') exportResumoPDF(); else exportEstagiariosPDF(); }
 
-    function exportEstagiariosPDF() {
-        if (filteredData.length === 0) { alert('Não há dados para exportar.'); return; }
-        const sorted = [...filteredData].sort((a,b)=>(a.nome_estagiario||'').localeCompare(b.nome_estagiario||''));
-        const valorTotal = filteredData.reduce((s,e)=>s+(e.valor_remuneracao||0),0);
-        const orgaosU = new Set(filteredData.map(e=>e.orgao)).size;
-
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF({ orientation:'landscape', unit:'mm', format:'a4' });
-        doc.setFontSize(14);
-        doc.setTextColor(41,67,90);
-        doc.text('Consulta de Estagiários', 14, 14);
-        doc.setFontSize(10);
-        doc.setTextColor(100,100,100);
-        const dt = new Date().toLocaleString('pt-BR');
-        doc.text(`Período: ${monthNames[currentMonth]||currentMonth}/${currentYear} | Emitido em: ${dt}`, 14, 20);
-
-        const tableData = sorted.map(e => {
-            const sit = !e.data_fim?.trim() ? 'Em Andamento' : 'Concluído';
-            return [e.nome_estagiario||'-',e.masp||'-',e.sigla_orgao||e.orgao||'-',formatDate(e.data_inicio),formatDate(e.data_fim),formatCurrency(e.valor_remuneracao||0),sit];
-        });
-
-        doc.autoTable({
-            head: [['Nome','MASP','Órgão','Data Início','Data Fim','Valor (R$)','Situação']],
-            body: tableData,
-            foot: [['TOTAL GERAL','',`${orgaosU} órgãos`,'','',formatCurrency(valorTotal),'']],
-            startY: 26,
-            headStyles: { fillColor:[41,67,90], textColor:[255,255,255], fontStyle:'bold' },
-            footStyles: { fillColor:[240,240,240], fontStyle:'bold' },
-            bodyStyles: { fontSize:8 },
-            columnStyles: { 0:{cellWidth:60}, 1:{cellWidth:20,halign:'center'}, 2:{cellWidth:35}, 3:{cellWidth:25,halign:'center'}, 4:{cellWidth:25,halign:'center'}, 5:{cellWidth:30,halign:'right'}, 6:{cellWidth:30,halign:'center'} },
-            didDrawPage: (data) => {
-                doc.setFontSize(8);
-                doc.text(`Página ${data.pageNumber} - ${dt}`, doc.internal.pageSize.width/2, doc.internal.pageSize.height-5, {align:'center'});
-            }
-        });
-        doc.save(`estagiarios_${currentYear}_${currentMonth}.pdf`);
-    }
+function exportResumoCSV(){
+    if(!filteredData.length){alert('Não há dados para exportar.');return;}
+    const g={};
+    filteredData.forEach(e=>{const o=e.orgao||'Não informado';if(!g[o])g[o]={orgao:o,sigla:e.sigla_orgao||o.substring(0,10),total:0,ea:0,c:0};g[o].total++;if(!e.data_fim||!e.data_fim.trim())g[o].ea++;else g[o].c++;});
+    const arr=Object.values(g);
+    const csv=['Órgão;Sigla;Total;Em Andamento;Concluído',...arr.map(i=>[i.orgao,i.sigla,i.total,i.ea,i.c].map(c=>`"${c}"`).join(';'))].join('\n');
+    const blob=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'});
+    const link=document.createElement('a');link.href=URL.createObjectURL(blob);link.download=`visao_geral_estagiarios_${currentYear}_${currentMonth}.csv`;link.click();
+}
+function exportResumoPDF(){
+    if(!filteredData.length){alert('Não há dados para exportar.');return;}
+    const g={};
+    filteredData.forEach(e=>{const o=e.orgao||'Não informado';if(!g[o])g[o]={orgao:o,sigla:e.sigla_orgao||o.substring(0,10),total:0,ea:0,c:0};g[o].total++;if(!e.data_fim||!e.data_fim.trim())g[o].ea++;else g[o].c++;});
+    const arr=Object.values(g).sort((a,b)=>b.total-a.total);
+    const tT=arr.reduce((s,i)=>s+i.total,0),tEA=arr.reduce((s,i)=>s+i.ea,0),tC=arr.reduce((s,i)=>s+i.c,0);
+    const {jsPDF}=window.jspdf;
+    const doc=new jsPDF({orientation:'landscape'});
+    doc.setFontSize(14);doc.setTextColor(41,67,90);doc.text('Visão Geral — Estagiários por Órgão',14,14);
+    doc.setFontSize(10);doc.setTextColor(100,100,100);doc.text(`Período: ${monthNames[currentMonth]||currentMonth}/${currentYear} | Emitido em: ${new Date().toLocaleString('pt-BR')}`,14,20);
+    doc.autoTable({startY:26,head:[['Órgão','Sigla','Total','Em Andamento','Concluído']],body:arr.map(i=>[i.orgao,i.sigla,i.total,i.ea,i.c]),foot:[['TOTAL GERAL','',tT,tEA,tC]],headStyles:{fillColor:[41,67,90],textColor:[255,255,255],fontStyle:'bold'},footStyles:{fillColor:[240,240,240],fontStyle:'bold'}});
+    doc.save(`visao_geral_estagiarios_${currentYear}_${currentMonth}.pdf`);
+}
+function exportEstagiariosCSV(){
+    if(!filteredData.length){alert('Não há dados para exportar.');return;}
+    const headers=['ano_mesreferencia','nome_estagiario','masp','situacao_funcional','data_inicio','data_fim','orgao','sigla_orgao','valor_remuneracao','situacao'];
+    const csv=[headers.join(';'),...filteredData.map(e=>{const sit=(!e.data_fim||!e.data_fim.trim())?'Em Andamento':'Concluído';return[e.ano_mesreferencia||'',e.nome_estagiario||'',e.masp||'',e.situacao_funcional||'',e.data_inicio||'',e.data_fim||'',e.orgao||'',e.sigla_orgao||'',(e.valor_remuneracao||0).toFixed(2).replace('.',','),sit].map(c=>`"${String(c).replace(/"/g,'""')}"`).join(';');})].join('\n');
+    const blob=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'});
+    const link=document.createElement('a');link.href=URL.createObjectURL(blob);link.download=`estagiarios_${currentYear}_${currentMonth}.csv`;link.click();
+}
+function exportEstagiariosPDF(){
+    if(!filteredData.length){alert('Não há dados para exportar.');return;}
+    const sorted=[...filteredData].sort((a,b)=>(a.nome_estagiario||'').localeCompare(b.nome_estagiario||''));
+    const vT=filteredData.reduce((s,e)=>s+(e.valor_remuneracao||0),0);
+    const oU=new Set(filteredData.map(e=>e.orgao)).size;
+    const {jsPDF}=window.jspdf;
+    const doc=new jsPDF({orientation:'landscape',unit:'mm',format:'a4'});
+    const dt=new Date().toLocaleString('pt-BR');
+    doc.setFontSize(14);doc.setTextColor(41,67,90);doc.text('Consulta de Estagiários',14,14);
+    doc.setFontSize(10);doc.setTextColor(100,100,100);doc.text(`Período: ${monthNames[currentMonth]||currentMonth}/${currentYear} | Emitido em: ${dt}`,14,20);
+    doc.autoTable({head:[['Nome','MASP','Órgão','Data Início','Data Fim','Valor (R$)','Situação']],body:sorted.map(e=>{const sit=(!e.data_fim||!e.data_fim.trim())?'Em Andamento':'Concluído';return[e.nome_estagiario||'-',e.masp||'-',e.sigla_orgao||e.orgao||'-',formatDate(e.data_inicio),formatDate(e.data_fim),formatCurrency(e.valor_remuneracao||0),sit];}),foot:[['TOTAL GERAL','',`${oU} órgãos`,'','',formatCurrency(vT),'']],startY:26,headStyles:{fillColor:[41,67,90],textColor:[255,255,255],fontStyle:'bold'},footStyles:{fillColor:[240,240,240],fontStyle:'bold'},bodyStyles:{fontSize:8},columnStyles:{0:{cellWidth:60},1:{cellWidth:20,halign:'center'},2:{cellWidth:35},3:{cellWidth:25,halign:'center'},4:{cellWidth:25,halign:'center'},5:{cellWidth:30,halign:'right'},6:{cellWidth:30,halign:'center'}}});
+    doc.save(`estagiarios_${currentYear}_${currentMonth}.pdf`);
+}
 
 
-    // ============================================================
-    // 20. DOWNLOADS
-    // ============================================================
-    async function downloadYearCSV() {
-        const year = document.getElementById('anoDownload').value;
-        if (!year) { alert('Selecione um ano para baixar.'); return; }
-        showLoading(true);
-        try {
-            if (!allData[year]) await loadYearData(year);
-            const data = allData[year];
-            if (!data || data.length === 0) { alert('Nenhum dado disponível.'); return; }
-            const headers = ['ano_mesreferencia','nome_estagiario','masp','codigo_situacao_funcional','situacao_funcional','data_inicio','data_fim','codigo_orgao','orgao','sigla_orgao','valor_remuneracao'];
-            const lines = data.map(e => headers.map(h => `"${(e[h]||'').toString().replace(/"/g,'""')}"`).join(';'));
-            const csv = [headers.join(';'), ...lines].join('\n');
-            const blob = new Blob(['\uFEFF'+csv], { type:'text/csv;charset=utf-8;' });
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(blob);
-            link.download = `estagiarios_${year}.csv`;
-            link.click();
-        } finally {
-            showLoading(false);
-        }
-    }
+// ============================================================
+// DOWNLOADS — ABA 3
+// ============================================================
+async function downloadYearCSV(){
+    const year=document.getElementById('anoDownload').value;
+    if(!year){alert('Selecione um ano para baixar.');return;}
+    if(!allData[year]) await loadYearData(year);
+    const data=allData[year];
+    if(!data||!data.length){alert('Nenhum dado disponível.');return;}
+    const headers=['ano_mesreferencia','nome_estagiario','masp','codigo_situacao_funcional','situacao_funcional','data_inicio','data_fim','codigo_orgao','orgao','sigla_orgao','valor_remuneracao'];
+    const csv=[headers.join(';'),...data.map(e=>headers.map(h=>`"${(e[h]||'').toString().replace(/"/g,'""')}"`).join(';'))].join('\n');
+    const blob=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'});
+    const link=document.createElement('a');link.href=URL.createObjectURL(blob);link.download=`estagiarios_${year}.csv`;link.click();
+}
 
-    window.baixarDicionarioCSV = function() {
-        const linhas = [
-            ['Campo','Descrição','Tipo'],
-            ['ano_mesreferencia','Ano e mês de referência (YYYY-MM)','Texto/Data'],
-            ['nome_estagiario','Nome completo do estagiário','Texto'],
-            ['masp','Matrícula do Servidor Público (MASP)','Texto/Número'],
-            ['codigo_situacao_funcional','Código da situação funcional','Número'],
-            ['situacao_funcional','Descrição da situação funcional','Texto'],
-            ['data_inicio','Data de início do estágio','Data'],
-            ['data_fim','Data de término do estágio','Data'],
-            ['codigo_orgao','Código do órgão','Número'],
-            ['orgao','Nome completo do órgão','Texto'],
-            ['sigla_orgao','Sigla do órgão','Texto'],
-            ['valor_remuneracao','Valor da remuneração (R$)','Número Decimal']
-        ];
-        const csv = linhas.map(l => l.join(';')).join('\n');
-        const blob = new Blob(['\uFEFF'+csv], { type:'text/csv;charset=utf-8;' });
-        const link = document.createElement('a');
-        link.href = URL.createObjectURL(blob);
-        link.download = 'dicionario_de_dados_estagiarios.csv';
-        link.click();
-    };
-
-    window.baixarDicionarioPDF = function() {
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF();
-        doc.setFontSize(14);
-        doc.text('Dicionário de Dados — Estagiários', 14, 15);
-        doc.autoTable({
-            startY: 25,
-            head: [['Campo','Descrição','Tipo']],
-            body: [
-                ['ano_mesreferencia','Ano e mês de referência (YYYY-MM)','Texto/Data'],
-                ['nome_estagiario','Nome completo do estagiário','Texto'],
-                ['masp','Matrícula do Servidor Público (MASP)','Texto/Número'],
-                ['codigo_situacao_funcional','Código da situação funcional','Número'],
-                ['situacao_funcional','Descrição da situação funcional','Texto'],
-                ['data_inicio','Data de início do estágio','Data'],
-                ['data_fim','Data de término do estágio','Data'],
-                ['codigo_orgao','Código do órgão','Número'],
-                ['orgao','Nome completo do órgão','Texto'],
-                ['sigla_orgao','Sigla do órgão','Texto'],
-                ['valor_remuneracao','Valor da remuneração (R$)','Número Decimal']
-            ]
-        });
-        doc.save('dicionario_de_dados_estagiarios.pdf');
-    };
+window.baixarDicionarioCSV=function(){
+    const linhas=[['Campo','Descrição','Tipo'],['ano_mesreferencia','Ano e mês de referência (YYYY-MM)','Texto/Data'],['nome_estagiario','Nome completo do estagiário','Texto'],['masp','Matrícula do Servidor Público (MASP)','Texto/Número'],['codigo_situacao_funcional','Código da situação funcional','Número'],['situacao_funcional','Descrição da situação funcional','Texto'],['data_inicio','Data de início do estágio','Data'],['data_fim','Data de término do estágio','Data'],['codigo_orgao','Código do órgão','Número'],['orgao','Nome completo do órgão','Texto'],['sigla_orgao','Sigla do órgão','Texto'],['valor_remuneracao','Valor da remuneração (R$)','Número Decimal']];
+    const csv=linhas.map(l=>l.join(';')).join('\n');
+    const blob=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'});
+    const link=document.createElement('a');link.href=URL.createObjectURL(blob);link.download='dicionario_de_dados_estagiarios.csv';link.click();
+};
+window.baixarDicionarioPDF=function(){
+    const {jsPDF}=window.jspdf;
+    const doc=new jsPDF();
+    doc.setFontSize(14);doc.text('Dicionário de Dados — Estagiários',14,15);
+    doc.autoTable({startY:25,head:[['Campo','Descrição','Tipo']],body:[['ano_mesreferencia','Ano e mês de referência (YYYY-MM)','Texto/Data'],['nome_estagiario','Nome completo do estagiário','Texto'],['masp','Matrícula do Servidor Público (MASP)','Texto/Número'],['codigo_situacao_funcional','Código da situação funcional','Número'],['situacao_funcional','Descrição da situação funcional','Texto'],['data_inicio','Data de início do estágio','Data'],['data_fim','Data de término do estágio','Data'],['codigo_orgao','Código do órgão','Número'],['orgao','Nome completo do órgão','Texto'],['sigla_orgao','Sigla do órgão','Texto'],['valor_remuneracao','Valor da remuneração (R$)','Número Decimal']]});
+    doc.save('dicionario_de_dados_estagiarios.pdf');
+};
 
 
-    // ============================================================
-    // 21. COMPARTILHAMENTO E TOAST
-    // ============================================================
-    function copiarLinkDireto() {
-        navigator.clipboard.writeText(window.location.href)
-            .then(() => mostrarToast())
-            .catch(() => alert('Erro ao copiar o link'));
-    }
-
-    function mostrarToast() {
-        const toast = document.getElementById('toastSucesso');
-        toast.style.display   = 'flex';
-        toast.style.animation = 'none';
-        toast.offsetHeight;
-        toast.style.animation = 'fadeInUp 0.3s ease';
-        setTimeout(() => { toast.style.display = 'none'; }, 3000);
-    }
-
-    function fecharToast() {
-        document.getElementById('toastSucesso').style.display = 'none';
-    }
+// ============================================================
+// COMPARTILHAMENTO E TOAST
+// ============================================================
+function copiarLinkDireto(){
+    navigator.clipboard.writeText(window.location.href).then(()=>mostrarToast()).catch(()=>alert('Erro ao copiar o link'));
+}
+function mostrarToast(){
+    const t=document.getElementById('toastSucesso');
+    t.style.display='flex'; t.style.animation='none'; t.offsetHeight;
+    t.style.animation='fadeInUp 0.3s ease'; setTimeout(()=>{t.style.display='none';},3000);
+}
+function fecharToast(){ document.getElementById('toastSucesso').style.display='none'; }
 
 
-    // ============================================================
-    // 22. UTILITÁRIOS
-    // ============================================================
-    function buildPaginationHTML(totalPages, currentPage, fnName) {
-        let html = `<li class="page-item ${currentPage===1?'disabled':''}">
-            <a class="page-link" href="#" onclick="${fnName}(${currentPage-1});return false;">«</a></li>`;
+// ============================================================
+// UTILITÁRIOS
+// ============================================================
+function buildPaginationHTML(totalPages,currentPage,fnName){
+    let html=`<li class="page-item ${currentPage===1?'disabled':''}"><a class="page-link" href="#" onclick="${fnName}(${currentPage-1});return false;">«</a></li>`;
+    let start=Math.max(1,currentPage-2),end=Math.min(totalPages,start+4);
+    if(start>1){html+=`<li class="page-item"><a class="page-link" href="#" onclick="${fnName}(1);return false;">1</a></li>`;if(start>2)html+=`<li class="page-item disabled"><span class="page-link">…</span></li>`;}
+    for(let i=start;i<=end;i++){html+=`<li class="page-item ${i===currentPage?'active':''}"><a class="page-link" href="#" onclick="${fnName}(${i});return false;">${i}</a></li>`;}
+    if(end<totalPages){if(end<totalPages-1)html+=`<li class="page-item disabled"><span class="page-link">…</span></li>`;html+=`<li class="page-item"><a class="page-link" href="#" onclick="${fnName}(${totalPages});return false;">${totalPages}</a></li>`;}
+    html+=`<li class="page-item ${currentPage===totalPages?'disabled':''}"><a class="page-link" href="#" onclick="${fnName}(${currentPage+1});return false;">»</a></li>`;
+    return html;
+}
 
-        let start = Math.max(1, currentPage - 2);
-        let end   = Math.min(totalPages, start + 4);
-
-        if (start > 1) {
-            html += `<li class="page-item"><a class="page-link" href="#" onclick="${fnName}(1);return false;">1</a></li>`;
-            if (start > 2) html += `<li class="page-item disabled"><span class="page-link">…</span></li>`;
-        }
-
-        for (let i = start; i <= end; i++) {
-            html += `<li class="page-item ${i===currentPage?'active':''}">
-                <a class="page-link" href="#" onclick="${fnName}(${i});return false;">${i}</a></li>`;
-        }
-
-        if (end < totalPages) {
-            if (end < totalPages - 1) html += `<li class="page-item disabled"><span class="page-link">…</span></li>`;
-            html += `<li class="page-item"><a class="page-link" href="#" onclick="${fnName}(${totalPages});return false;">${totalPages}</a></li>`;
-        }
-
-        html += `<li class="page-item ${currentPage===totalPages?'disabled':''}">
-            <a class="page-link" href="#" onclick="${fnName}(${currentPage+1});return false;">»</a></li>`;
-        return html;
-    }
-
-    window.voltarAoTopo = function() {
-        if (window.parent && window.parent !== window) {
-            window.parent.scrollTo({ top: 0, behavior: 'smooth' });
-        } else {
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-    };
+window.voltarAoTopo=function(){
+    if(window.parent&&window.parent!==window) window.parent.scrollTo({top:0,behavior:'smooth'});
+    else window.scrollTo({top:0,behavior:'smooth'});
+};
 
 </script>
 </body>
