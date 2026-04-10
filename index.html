@@ -552,12 +552,13 @@
            10. BADGES DE SITUAÇÃO
         ============================================================ */
         .badge-situacao {
-            padding: 4px 10px;
-            border-radius: 15px;
-            font-size: 10px;
-            font-weight: 600;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 9px;
+            font-weight: 500;
             text-transform: uppercase;
-            letter-spacing: 0.3px;
+            letter-spacing: 0.2px;
+	    white-space: nowrap;
         }
 
         .badge-em-andamento {
@@ -1028,11 +1029,19 @@
                     <div class="filters-row">
                         <div class="filter-group">
                             <label class="filter-label">ANO</label>
-                            <select class="form-select modern-select" id="anoDashboard1"></select>
+                            <select class="form-select modern-select" id="anoDashboard1">
+                                <option value="2026">2026</option>
+                                <option value="2025">2025</option>
+                                <option value="2024">2024</option>
+                                <option value="2023">2023</option>
+                                <option value="2022">2022</option>
+                            </select>
                         </div>
                         <div class="filter-group">
                             <label class="filter-label">MÊS</label>
-                            <select class="form-select modern-select" id="mesDashboard1"></select>
+                            <select class="form-select modern-select" id="mesDashboard1">
+                                <option value="">Carregando...</option>
+                            </select>
                         </div>
                         <div class="filter-group">
                             <label class="filter-label">SITUAÇÃO</label>
@@ -1180,11 +1189,19 @@
                     <div class="filters-row" style="flex-wrap:wrap;">
                         <div class="filter-group">
                             <label class="filter-label">ANO</label>
-                            <select class="form-select modern-select" id="anoDashboard2"></select>
+                            <select class="form-select modern-select" id="anoDashboard2">
+                                <option value="2026">2026</option>
+                                <option value="2025">2025</option>
+                                <option value="2024">2024</option>
+                                <option value="2023">2023</option>
+                                <option value="2022">2022</option>
+                            </select>
                         </div>
                         <div class="filter-group">
                             <label class="filter-label">MÊS</label>
-                            <select class="form-select modern-select" id="mesDashboard2"></select>
+                            <select class="form-select modern-select" id="mesDashboard2">
+                                <option value="">Carregando...</option>
+                            </select>
                         </div>
                         <div class="filter-group">
                             <label class="filter-label">NOME</label>
@@ -1504,17 +1521,24 @@
     // 4. DATA DE ATUALIZAÇÃO (GitHub API)
     // ============================================================
     async function setupAtualizacaoData() {
-        const el = document.getElementById('data-atualizacao-header');
+        const elementoData = document.getElementById('data-atualizacao-header');
         try {
-            const res = await fetch('https://api.github.com/repos/transparencia-mg/estagiarios/commits?path=dataset/data');
-            const data = await res.json();
+            // Busca commits do arquivo CSV do ano mais recente disponível
+            const latestYear = Object.keys(CSV_FILES_BY_YEAR).sort().reverse()[0];
+            const arq = CSV_FILES_BY_YEAR[latestYear];
+            const url = `https://api.github.com/repos/transparencia-mg/estagiarios/commits?path=dataset/data/${arq}&per_page=1`;
+            const response = await fetch(url);
+            const data = await response.json();
             if (data && data.length > 0) {
-                el.textContent = new Date(data[0].commit.committer.date).toLocaleDateString('pt-BR');
+                const dataFormatada = new Date(data[0].commit.committer.date)
+                    .toLocaleDateString('pt-BR');
+                elementoData.textContent = dataFormatada;
             } else {
-                el.textContent = 'Não disponível';
+                elementoData.textContent = 'Não disponível';
             }
-        } catch(e) {
-            el.textContent = 'Erro ao carregar';
+        } catch (erro) {
+            console.error('Erro ao buscar data do GitHub:', erro);
+            elementoData.textContent = 'Erro ao carregar';
         }
     }
 
@@ -1581,6 +1605,15 @@
             await loadYearData(latestYear);
             await determineLatestMonth();
             updateFilterOptions();
+            // Garantir que os selects reflitam o mês/ano mais atual
+            ['anoDashboard1','anoDashboard2'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.value = currentYear;
+            });
+            ['mesDashboard1','mesDashboard2'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.value = currentMonth;
+            });
             updateDashboard1();
             updateDashboard2();
         } catch(e) {
@@ -1673,6 +1706,15 @@
             estagiariosData = allData[year];
             await determineLatestMonth();
             updateFilterOptions();
+            // Sincronizar os selects de ano dos dois dashboards
+            ['anoDashboard1','anoDashboard2'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.value = currentYear;
+            });
+            ['mesDashboard1','mesDashboard2'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.value = currentMonth;
+            });
             updateDashboard1();
             updateDashboard2();
         } finally {
@@ -1751,10 +1793,15 @@
                 const orgao    = document.getElementById('orgaoDashboard1').value;
 
                 if (ano !== currentYear) {
-                    switchYearData(ano).then(() => applyFiltersCore('dashboard1', mes, situacao, orgao));
+                    switchYearData(ano).then(() => {
+                        // Após trocar o ano, atualizar o select de mês e reaplicar
+                        const mesSel = document.getElementById('mesDashboard1');
+                        if (mes && mesSel) mesSel.value = mes;
+                        applyFiltersCore('dashboard1', mes || currentMonth, situacao, orgao);
+                    });
                     return;
                 }
-                currentMonth = mes;
+                if (mes) currentMonth = mes;
                 filteredData = (allData[currentYear] || []).filter(e => {
                     if (!e.ano_mesreferencia) return false;
                     const [eA, eM] = e.ano_mesreferencia.split('-');
@@ -1764,6 +1811,7 @@
                     if (orgao && e.orgao !== orgao) return false;
                     return true;
                 });
+                currentPageDashboard1 = 1;
                 updateDashboard1();
 
             } else if (dashboard === 'dashboard2') {
@@ -1776,10 +1824,14 @@
                 const valMin   = parseFloat(document.getElementById('valorRemuneracao').value) || 0;
 
                 if (ano !== currentYear) {
-                    switchYearData(ano).then(() => applyFiltersCore('dashboard2', mes, nome, situacao, orgao, masp, valMin));
+                    switchYearData(ano).then(() => {
+                        const mesSel = document.getElementById('mesDashboard2');
+                        if (mes && mesSel) mesSel.value = mes;
+                        applyFiltersCore('dashboard2', mes || currentMonth, nome, situacao, orgao, masp, valMin);
+                    });
                     return;
                 }
-                currentMonth = mes;
+                if (mes) currentMonth = mes;
                 filteredData = (allData[currentYear] || []).filter(e => {
                     if (!e.ano_mesreferencia) return false;
                     const [eA, eM] = e.ano_mesreferencia.split('-');
@@ -1792,6 +1844,7 @@
                     if (valMin > 0 && e.valor_remuneracao < valMin) return false;
                     return true;
                 });
+                currentPageDashboard2 = 1;
                 updateDashboard2();
             }
         } catch(err) {
@@ -1813,6 +1866,11 @@
         document.getElementById('orgaoDashboard1').value = '';
         document.getElementById('searchResumo').value = '';
         reloadCurrentMonth();
+        // Sincronizar selects com o mês/ano atual
+        const anoSel1 = document.getElementById('anoDashboard1');
+        if (anoSel1) anoSel1.value = currentYear;
+        const mesSel1 = document.getElementById('mesDashboard1');
+        if (mesSel1) mesSel1.value = currentMonth;
         currentPageDashboard1 = 1;
         updateFilterOptions();
         updateDashboard1();
@@ -1826,6 +1884,11 @@
         document.getElementById('valorRemuneracao').value = '';
         document.getElementById('searchEstagiarios').value = '';
         reloadCurrentMonth();
+        // Sincronizar selects com o mês/ano atual
+        const anoSel2 = document.getElementById('anoDashboard2');
+        if (anoSel2) anoSel2.value = currentYear;
+        const mesSel2 = document.getElementById('mesDashboard2');
+        if (mesSel2) mesSel2.value = currentMonth;
         currentPageDashboard2 = 1;
         updateFilterOptions();
         updateDashboard2();
@@ -2313,6 +2376,13 @@
             if (tabEl) {
                 new bootstrap.Tab(tabEl).show();
                 setTimeout(() => {
+                    // Garantir que o select de mês/ano do dashboard2 reflita o período atual
+                    const anoSel = document.getElementById('anoDashboard2');
+                    if (anoSel) anoSel.value = currentYear;
+
+                    const mesSel = document.getElementById('mesDashboard2');
+                    if (mesSel) mesSel.value = currentMonth;
+
                     const el = document.getElementById('orgaoDashboard2');
                     if (el) el.value = orgao;
                     document.getElementById('nomeEstagiario').value = '';
@@ -2320,7 +2390,17 @@
                     document.getElementById('maspDashboard2').value = '';
                     document.getElementById('valorRemuneracao').value = '';
                     document.getElementById('searchEstagiarios').value = '';
-                    applyFilters('dashboard2');
+
+                    // Filtrar direto sem passar pelo switchYearData (ano já é o atual)
+                    filteredData = (allData[currentYear] || []).filter(e => {
+                        if (!e.ano_mesreferencia) return false;
+                        const [eA, eM] = e.ano_mesreferencia.split('-');
+                        if (eA !== currentYear || eM !== currentMonth) return false;
+                        if (orgao && e.orgao !== orgao) return false;
+                        return true;
+                    });
+                    currentPageDashboard2 = 1;
+                    updateDashboard2();
                 }, 350);
             }
         } catch(e) { console.error(e); }
