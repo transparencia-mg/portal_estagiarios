@@ -89,6 +89,8 @@
         .table-badge { background:#1a3a5c; color:white; padding:5px 12px; border-radius:12px; font-size:12px; font-weight:600; white-space:nowrap; }
         .table-fixed-header-container { position:relative; overflow:auto; width:100%; max-height:600px; }
         .table-fixed-header-container table thead th { background-color:#54697b; color:white !important; position:sticky; top:0; z-index:10; font-weight:600; padding:12px 10px; font-size:13px; text-transform:uppercase; white-space:nowrap; }
+        /* Dentro do modal, a rolagem é feita pelo próprio modal — sem scroll duplo */
+        .modal-body .table-fixed-header-container { max-height:none; overflow:visible; }
         .table { width:100%; font-size:13px; border-collapse:collapse; table-layout:auto; }
         .table th,.table td { border:1px solid #d6dee6; }
         .table thead th { background-color:#54697b !important; color:white !important; font-weight:600; font-size:13px; padding:12px 10px; text-transform:uppercase; border:1px solid #d6dee6; }
@@ -1262,47 +1264,75 @@ window.filtrarPorOrgao=function(orgao){
 // ============================================================
 // MODAL — HISTÓRICO
 // ============================================================
-window.showEstagiarioHistory=function(masp,nome){
+window.showEstagiarioHistory=async function(masp,nome){
     const modalEl=document.getElementById('historicModal');
-    document.getElementById('historicModalBody').innerHTML=`<div class="d-flex justify-content-center align-items-center py-5"><div class="spinner-border text-secondary me-3" role="status"></div><span style="color:#1a3a5c;font-weight:600;">Carregando histórico...</span></div>`;
+    document.getElementById('historicModalBody').innerHTML=`<div class="d-flex justify-content-center align-items-center py-5"><div class="spinner-border text-secondary me-3" role="status"></div><span style="color:#1a3a5c;font-weight:600;">Carregando histórico completo...</span></div>`;
     document.getElementById('historicModalLabel').innerHTML=`<i class="material-icons">history</i> ${nome||'Estagiário'}`;
     const ex=bootstrap.Modal.getInstance(modalEl);
     if(ex) ex.dispose();
     new bootstrap.Modal(modalEl).show();
     try {
+        // Garante que TODOS os anos disponíveis estejam carregados antes de montar o histórico
+        const todosOsAnos = Object.keys(CSV_FILES_BY_YEAR);
+        await Promise.all(todosOsAnos.map(ano => allData[ano] ? Promise.resolve() : loadYearData(ano)));
+
+        // Coleta registros do estagiário em todos os anos/meses (sem filtro de período)
         const historico=[];
-        Object.keys(allData).forEach(ano=>{
-            (allData[ano]||[]).filter(e=>e.masp===masp||e.nome_estagiario===nome).forEach(r=>historico.push(r));
+        todosOsAnos.forEach(ano=>{
+            (allData[ano]||[])
+                .filter(e => e.masp === masp || e.nome_estagiario === nome)
+                .forEach(r => historico.push(r));
         });
+
+        // Ordena do mais recente para o mais antigo
         historico.sort((a,b)=>(b.ano_mesreferencia||'').localeCompare(a.ano_mesreferencia||''));
-        if(historico.length===0){
+
+        // Remove duplicatas exatas de mês/ano (mesmo registro em cache duplicado)
+        const vistos = new Set();
+        const historicoUnico = historico.filter(h => {
+            const chave = `${h.ano_mesreferencia}|${h.masp}`;
+            if (vistos.has(chave)) return false;
+            vistos.add(chave); return true;
+        });
+
+        if(historicoUnico.length===0){
             document.getElementById('historicModalBody').innerHTML=`<div class="alert alert-warning m-3"><i class="material-icons me-2" style="vertical-align:middle;">warning</i>Histórico não encontrado para este estagiário.</div>`;
             return;
         }
-        const emp=historico[0];
+
+        const emp=historicoUnico[0];
         const sit=(!emp.data_fim||!emp.data_fim.trim())?'Em Andamento':'Concluído';
+
+        // Calcula período de atuação (data mais antiga → mais recente)
+        const periodos = historicoUnico.map(h => h.ano_mesreferencia).filter(Boolean).sort();
+        const periodoTexto = periodos.length > 1
+            ? `${formatMonthRef(periodos[0])} até ${formatMonthRef(periodos[periodos.length-1])}`
+            : formatMonthRef(periodos[0]||'');
+
         document.getElementById('historicModalBody').innerHTML=`
             <div class="mb-3"><div style="font-size:14px;font-weight:600;">${emp.nome_estagiario}</div></div>
             <div class="row g-2 mb-3">
                 <div class="col-md-3"><div class="info-card"><div class="info-label">MASP</div><div class="info-value">${emp.masp||'-'}</div></div></div>
                 <div class="col-md-3"><div class="info-card"><div class="info-label">Órgão</div><div class="info-value">${emp.orgao||'-'}</div></div></div>
                 <div class="col-md-3"><div class="info-card"><div class="info-label">Situação Atual</div><div class="info-value">${sit}</div></div></div>
-                <div class="col-md-3"><div class="info-card"><div class="info-label">Remuneração</div><div class="info-value">${formatCurrency(emp.valor_remuneracao||0)}</div></div></div>
+                <div class="col-md-3"><div class="info-card"><div class="info-label">Remuneração Atual</div><div class="info-value">${formatCurrency(emp.valor_remuneracao||0)}</div></div></div>
                 <div class="col-md-3"><div class="info-card"><div class="info-label">Data Início</div><div class="info-value">${formatDate(emp.data_inicio)}</div></div></div>
                 <div class="col-md-3"><div class="info-card"><div class="info-label">Data Fim</div><div class="info-value">${formatDate(emp.data_fim)||'-'}</div></div></div>
-                <div class="col-md-3"><div class="info-card"><div class="info-label">Total de Registros</div><div class="info-value">${historico.length} meses</div></div></div>
+                <div class="col-md-3"><div class="info-card"><div class="info-label">Período no Sistema</div><div class="info-value" style="font-size:11px;">${periodoTexto}</div></div></div>
+                <div class="col-md-3"><div class="info-card"><div class="info-label">Total de Registros</div><div class="info-value">${historicoUnico.length} meses</div></div></div>
             </div>
             <div class="table-fixed-header-container">
                 <table class="table"><thead><tr><th>MÊS/ANO</th><th>ÓRGÃO</th><th>SITUAÇÃO</th><th>DATA INÍCIO</th><th>DATA FIM</th><th>VALOR (R$)</th></tr></thead>
-                <tbody>${historico.map(h=>{
+                <tbody>${historicoUnico.map(h=>{
                     const s=(!h.data_fim||!h.data_fim.trim())?'Em Andamento':'Concluído';
                     const sc=s==='Em Andamento'?'badge-em-andamento':'badge-concluido';
                     return `<tr><td>${formatMonthRef(h.ano_mesreferencia)}</td><td>${h.orgao||'-'}<br><small style="color:#6c757d;">${h.sigla_orgao||''}</small></td><td><span class="badge-situacao ${sc}">${s}</span></td><td>${formatDate(h.data_inicio)}</td><td>${formatDate(h.data_fim)||'-'}</td><td class="text-end">${formatCurrency(h.valor_remuneracao||0)}</td></tr>`;
                 }).join('')}</tbody></table>
             </div>`;
-        window._modalHistorico=historico;
+        window._modalHistorico=historicoUnico;
         window._modalEmp=emp;
     } catch(err) {
+        console.error('Erro no histórico:', err);
         document.getElementById('historicModalBody').innerHTML=`<div class="alert alert-danger m-3"><i class="material-icons me-2" style="vertical-align:middle;">error</i>Erro ao carregar dados.</div>`;
     }
 };
