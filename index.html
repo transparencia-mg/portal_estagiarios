@@ -1525,6 +1525,8 @@
         try {
             // Busca commits do arquivo CSV do ano mais recente disponível
             const latestYear = Object.keys(CSV_FILES_BY_YEAR).sort().reverse()[0];
+	    currentYear = latestYear;
+	    await loadYearData(latestYear);
             const arq = CSV_FILES_BY_YEAR[latestYear];
             const url = `https://api.github.com/repos/transparencia-mg/estagiarios/commits?path=dataset/data/${arq}&per_page=1`;
             const response = await fetch(url);
@@ -1612,7 +1614,9 @@
             });
             ['mesDashboard1','mesDashboard2'].forEach(id => {
                 const el = document.getElementById(id);
-                if (el) el.value = currentMonth;
+                if (el && currentMonth) {
+        	    el.value = currentMonth;
+    		}
             });
             updateDashboard1();
             updateDashboard2();
@@ -1639,7 +1643,11 @@
                             const rowNormalized = {};
                             Object.keys(row).forEach(k => { rowNormalized[k.toLowerCase().trim()] = row[k]; });
 
-                            const ano_mesreferencia = (rowNormalized['ano_mesreferencia'] || '').trim();
+                            const ano_mesreferencia = 
+				rowNormalized['ano_mesreferencia'] ||
+    				rowNormalized['ano_mes'] ||
+    				rowNormalized['mes_referencia'] ||
+    				'';
                             let ANO = '', MES = '';
                             if (ano_mesreferencia.includes('-')) {
                                 [ANO, MES] = ano_mesreferencia.split('-');
@@ -1687,12 +1695,12 @@
         let ultimoMes = mesesComData[0];
         mesesComData.forEach(m => {
             if (parseInt(m.ano) > parseInt(ultimoMes.ano) ||
-               (parseInt(m.ano) === parseInt(ultimoMes.ano) && parseInt(m.mes) > parseInt(ultimoMes.mes))) {
+               (parseInt(m.ano) === parseInt(ultimoMes.ano) && 
+		parseInt(m.mes) > parseInt(ultimoMes.mes))) {
                 ultimoMes = m;
             }
         });
 
-        currentYear = ultimoMes.ano;
         currentMonth = ultimoMes.mes;
         filteredData = estagiariosData.filter(e => e.ANO === currentYear && e.MES === currentMonth);
     }
@@ -1727,6 +1735,10 @@
     // 7. OPÇÕES DE FILTRO
     // ============================================================
     function updateFilterOptions() {
+	if (!allData[currentYear] || allData[currentYear].length === 0) {
+            console.warn('Dados ainda não carregados');
+            return;
+    	}
         const anos = Object.keys(CSV_FILES_BY_YEAR).sort((a, b) => b - a);
 
         ['anoDashboard1', 'anoDashboard2'].forEach(id => {
@@ -1744,7 +1756,7 @@
 
         const mesesDisponiveis = [...new Set(
             (allData[currentYear] || [])
-                .filter(e => e.MES && e.ANO === currentYear)
+                .filter(e => e.MES && String(e.ANO) === String(currentYear))
                 .map(e => e.MES)
         )].sort((a, b) => parseInt(b) - parseInt(a));
 
@@ -1803,7 +1815,7 @@
                 }
                 if (mes) currentMonth = mes;
                 filteredData = (allData[currentYear] || []).filter(e => {
-                    if (!e.ano_mesreferencia) return false;
+                    if (!e.ano_mesreferencia || !e.ano_mesreferencia.includes('-')) return false;
                     const [eA, eM] = e.ano_mesreferencia.split('-');
                     if (eA !== currentYear || eM !== currentMonth) return false;
                     if (situacao === 'em_andamento' && e.data_fim?.trim()) return false;
