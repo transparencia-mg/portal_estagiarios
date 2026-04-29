@@ -2579,6 +2579,9 @@ function setupEventListeners() {
     document.getElementById('printDashboard2')?.addEventListener('click', () => {
         exportToPDF('dashboard2');
     });
+    document.getElementById('downloadDados')?.addEventListener('click', function () {
+    downloadYearCSV();
+});
 
     console.log('Eventos configurados com sucesso');
 }
