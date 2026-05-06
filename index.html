@@ -1512,7 +1512,7 @@ div {
                         <div class="col-12">
                             <div class="d-flex gap-3 flex-wrap">
                                 <button class="btn-search-custom" id="aplicarFiltros">
-                                    <i class="fas fa-search me-2"></i>Pesquisar
+                                    <i class="fas fa-search me-2"></i>Atualizar Filtros
                                 </button>
                                 <button class="btn-secondary-custom" id="limparFiltros">
                                     <i class="fas fa-times me-2"></i>Limpar Filtros
@@ -1726,7 +1726,7 @@ div {
                         <div class="col-12">
                             <div class="d-flex gap-3 flex-wrap">
                                 <button class="btn-search-custom" id="pesquisarEstagiarios">
-                                    <i class="fas fa-search me-2"></i>Pesquisar
+                                    <i class="fas fa-search me-2"></i>Atualizar Filtros
                                 </button>
                                 <button class="btn-secondary-custom" id="limparFiltrosDashboard2">
                                     <i class="fas fa-times me-2"></i>Limpar Filtros
@@ -2614,7 +2614,7 @@ function setupEventListeners() {
                     complete: function (results) {
                         console.log(`Parse completo para ${year}: ${results.data.length} registros`);
                         
-                        // Função para processar data no formato 2026/01
+                        // Função para processar data nos formatos 2026/01 ou 2026-01
                         const processarDataReferencia = (ref) => {
                             if (!ref || typeof ref !== 'string') {
                                 console.warn('Referência de data vazia ou inválida');
@@ -2623,9 +2623,20 @@ function setupEventListeners() {
                             
                             const str = ref.trim();
                             
-                            // Formato 2026/01
-                            if (str.includes('/')) {
-                                const [anoStr, mesStr] = str.split('/');
+                            // Formato 2026/01 ou 2026-01
+                            if (str.includes('/') || str.includes('-')) {
+                                const separador = str.includes('/') ? '/' : '-';
+                                const partes = str.split(separador);
+                                
+                                // Garantir que é AAAA/MM ou AAAA-MM (ano > mês)
+                                let anoStr, mesStr;
+                                if (partes[0].length === 4) {
+                                    [anoStr, mesStr] = partes;
+                                } else {
+                                    // Tentar inverso MM/AAAA
+                                    [mesStr, anoStr] = partes;
+                                }
+                                
                                 const ano = parseInt(anoStr, 10);
                                 const mes = parseInt(mesStr, 10);
                                 
@@ -2718,6 +2729,49 @@ function setupEventListeners() {
                                 }
                             })
                             .filter(Boolean);
+
+                        // ============================================================
+                        // REGRA: inferir data_fim para estagiários sem data_fim que
+                        // desapareceram em meses seguintes.
+                        // Se o estagiário (identificado por masp) aparece em meses
+                        // anteriores mas não aparece em meses posteriores e não possui
+                        // data_fim, define data_fim como o último dia do último mês
+                        // em que ele apareceu na consulta.
+                        // ============================================================
+                        (function inferirDataFim(registros) {
+                            // Monta um mapa: masp -> conjunto de meses em que aparece
+                            const masesPorMes = {}; // masp -> Set de "AAAA-MM"
+                            registros.forEach(r => {
+                                if (!r.masp) return;
+                                if (!masesPorMes[r.masp]) masesPorMes[r.masp] = new Set();
+                                masesPorMes[r.masp].add(r.ano_mesreferencia);
+                            });
+
+                            // Todos os meses disponíveis no dataset ordenados
+                            const todosMeses = [...new Set(registros.map(r => r.ano_mesreferencia).filter(Boolean))].sort();
+                            const ultimoMesDataset = todosMeses[todosMeses.length - 1];
+
+                            registros.forEach(r => {
+                                // Só tratar registros sem data_fim
+                                if (r.data_fim && r.data_fim.trim() !== '') return;
+                                if (!r.masp) return;
+
+                                const mesesEstagiario = masesPorMes[r.masp];
+                                // Último mês em que o estagiário aparece
+                                const ultimoMesEstagiario = [...mesesEstagiario].sort().pop();
+
+                                // Se o estagiário não aparece no último mês do dataset,
+                                // significa que ele saiu antes → inferir data_fim
+                                if (ultimoMesEstagiario && ultimoMesEstagiario !== ultimoMesDataset) {
+                                    // Calcular último dia do mês
+                                    const [anoUltimo, mesUltimo] = ultimoMesEstagiario.split('-').map(Number);
+                                    const ultimoDia = new Date(anoUltimo, mesUltimo, 0).getDate(); // dia 0 do mês seguinte = último dia do mês atual
+                                    const dataFimInferida = `${String(ultimoDia).padStart(2,'0')}/${String(mesUltimo).padStart(2,'0')}/${anoUltimo}`;
+                                    r.data_fim = dataFimInferida;
+                                    r._data_fim_inferida = true; // flag para controle interno
+                                }
+                            });
+                        })(data);
 
                         allData[year] = data;
                         estagiariosData = data;
