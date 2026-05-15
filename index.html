@@ -3857,99 +3857,132 @@ function updatePaginationDashboard2(totalPages, currentPage = 1) {
             showLoading(true);
             
             try {
-                // Encontrar todos os registros do estagiário em todos os anos
+                // Reunir todos os registros do estagiário em todos os anos carregados
                 const historico = [];
-                
-                // Procurar em todos os anos carregados
                 Object.keys(allData).forEach(ano => {
-                    const dadosAno = allData[ano];
-                    const registrosAno = dadosAno.filter(e => 
-                        e.masp === masp || e.nome_estagiario === nome
-                    );
-                    
-                    historico.push(...registrosAno);
+                    allData[ano]
+                        .filter(e => e.masp === masp || e.nome_estagiario === nome)
+                        .forEach(e => historico.push(e));
                 });
-                
-                // Ordenar histórico por data (mais recente primeiro)
-                historico.sort((a, b) => {
-                    const aDate = a.ano_mesreferencia || '';
-                    const bDate = b.ano_mesreferencia || '';
-                    return bDate.localeCompare(aDate);
+
+                // Ordenar por mês de referência (mais antigo → mais recente)
+                historico.sort((a, b) =>
+                    (a.ano_mesreferencia || '').localeCompare(b.ano_mesreferencia || '')
+                );
+
+                // Agrupar por periodoId (já atribuído pelo processarDataFimCrossYear)
+                // Se periodoId ainda não existir (ano não reprocessado), agrupar pela continuidade
+                const periodos = [];
+                let periodoAtual = null;
+                historico.forEach(r => {
+                    const pid = r.periodoId || 'unico';
+                    if (!periodoAtual || periodoAtual.id !== pid) {
+                        if (periodoAtual) periodos.push(periodoAtual);
+                        periodoAtual = { id: pid, registros: [] };
+                    }
+                    periodoAtual.registros.push(r);
                 });
-                
-                // Preparar informações do estagiário
-                const estagiario = historico[0] || {};
-                
-                // Atualizar modal
-                const modalElement = document.getElementById('historicModal');
-                const modal = new bootstrap.Modal(modalElement);
-                
-                // Informações do estagiário
+                if (periodoAtual) periodos.push(periodoAtual);
+
+                // Referência: o primeiro registro do período mais recente
+                const ultimoPeriodo  = periodos[periodos.length - 1] || { registros: [] };
+                const refEstagiario  = ultimoPeriodo.registros[0] || historico[0] || {};
+                const totalPeriodos  = periodos.length;
+                const situacaoAtual  = (!refEstagiario.data_fim || refEstagiario.data_fim.trim() === '')
+                    ? 'Em Andamento' : 'Concluído';
+
+                // Montar painel de informações
                 const infoHTML = `
                     <div class="employee-info-grid">
                         <div class="info-item">
                             <span class="info-label">MASP</span>
-                            <span class="info-value">${estagiario.masp || masp || '-'}</span>
+                            <span class="info-value">${refEstagiario.masp || masp || '-'}</span>
                         </div>
                         <div class="info-item">
                             <span class="info-label">Nome</span>
-                            <span class="info-value">${estagiario.nome_estagiario || nome || 'Nome não informado'}</span>
+                            <span class="info-value">${refEstagiario.nome_estagiario || nome || 'Nome não informado'}</span>
                         </div>
                         <div class="info-item">
-                            <span class="info-label">Órgão Atual</span>
-                            <span class="info-value">${estagiario.orgao || '-'}</span>
+                            <span class="info-label">Órgão (último período)</span>
+                            <span class="info-value">${refEstagiario.orgao || '-'}</span>
                         </div>
                         <div class="info-item">
                             <span class="info-label">Situação Atual</span>
-                            <span class="info-value">${(!estagiario.data_fim || estagiario.data_fim.trim() === '') ? 'Em Andamento' : 'Concluído'}</span>
+                            <span class="info-value">${situacaoAtual}</span>
                         </div>
                         <div class="info-item">
-                            <span class="info-label">Data Início</span>
-                            <span class="info-value">${formatDate(estagiario.data_inicio)}</span>
+                            <span class="info-label">Início (último período)</span>
+                            <span class="info-value">${formatDate(refEstagiario.data_inicio)}</span>
                         </div>
                         <div class="info-item">
-                            <span class="info-label">Data Fim</span>
-                            <span class="info-value">${formatDate(estagiario.data_fim) || '-'}</span>
+                            <span class="info-label">Fim (último período)</span>
+                            <span class="info-value">${formatDate(refEstagiario.data_fim) || '-'}</span>
                         </div>
                         <div class="info-item">
-                            <span class="info-label">Remuneração Atual</span>
-                            <span class="info-value">${formatCurrency(estagiario.valor_remuneracao || 0)}</span>
+                            <span class="info-label">Remuneração (último período)</span>
+                            <span class="info-value">${formatCurrency(refEstagiario.valor_remuneracao || 0)}</span>
                         </div>
                         <div class="info-item">
-                            <span class="info-label">Total de Registros</span>
-                            <span class="info-value">${historico.length} meses</span>
+                            <span class="info-label">Períodos de Estágio</span>
+                            <span class="info-value">${totalPeriodos} período${totalPeriodos !== 1 ? 's' : ''} · ${historico.length} mes${historico.length !== 1 ? 'es' : ''}</span>
                         </div>
                     </div>
                 `;
-                
                 document.getElementById('employeeInfo').innerHTML = infoHTML;
-                
-                // Atualizar título do modal
-                document.getElementById('historicModalLabel').innerHTML = `
-                    <i class="fas fa-history me-2"></i>${estagiario.nome_estagiario || nome || 'Estagiário'}
-                `;
-                
-                // Tabela de histórico - CORRIGIDO: FORMATO MÊS/ANO
-                const historicHTML = historico.map(registro => {
-                    const situacao = (!registro.data_fim || registro.data_fim.trim() === '') ? 'Em Andamento' : 'Concluído';
-                    return `
-                    <tr>
-                        <td>${formatMonthReference(registro.ano_mesreferencia)}</td>
-                        <td>${registro.orgao || '-'}<br><small>${registro.sigla_orgao || ''}</small></td>
-                        <td>${situacao}</td>
-                        <td>${formatDate(registro.data_inicio)}</td>
-                        <td>${formatDate(registro.data_fim) || '-'}</td>
-                        <td>${formatCurrency(registro.valor_remuneracao || 0)}</td>
-                    </tr>
-                `}).join('');
-                
-                document.getElementById('historicTableBody').innerHTML = historicHTML || 
+
+                document.getElementById('historicModalLabel').innerHTML =
+                    `<i class="fas fa-history me-2"></i>${refEstagiario.nome_estagiario || nome || 'Estagiário'}`;
+
+                // Montar tabela agrupada por período (períodos mais recentes primeiro)
+                const periodosOrdenados = [...periodos].reverse();
+                let historicHTML = '';
+
+                periodosOrdenados.forEach((periodo, idxDisplay) => {
+                    const regs = [...periodo.registros].reverse(); // mês mais recente no topo
+                    const primeiroReg = periodo.registros[0];
+                    const numPeriodo  = totalPeriodos - idxDisplay; // número decrescente
+                    const situacaoPeriodo = (!primeiroReg.data_fim || primeiroReg.data_fim.trim() === '')
+                        ? 'Em Andamento' : 'Concluído';
+                    const badgeClass = situacaoPeriodo === 'Em Andamento' ? 'badge-em-andamento' : 'badge-concluido';
+
+                    // Cabeçalho do período
+                    historicHTML += `
+                        <tr style="background:#eef2f7;">
+                            <td colspan="6" style="padding:8px 12px; font-weight:600; font-size:13px; color:#1a3a5c; border-top:2px solid #5c7387;">
+                                <span style="margin-right:10px;">📋 Estágio ${numPeriodo}</span>
+                                <span style="font-weight:400; font-size:12px; color:#555;">
+                                    Início: ${formatDate(primeiroReg.data_inicio) || '-'} &nbsp;|&nbsp;
+                                    Fim: ${formatDate(primeiroReg.data_fim) || '-'} &nbsp;|&nbsp;
+                                    ${regs.length} mes${regs.length !== 1 ? 'es' : ''}
+                                </span>
+                                <span class="badge-situacao ${badgeClass}" style="margin-left:8px; font-size:11px;">${situacaoPeriodo}</span>
+                            </td>
+                        </tr>`;
+
+                    // Linhas de cada mês do período
+                    regs.forEach(registro => {
+                        const sit = (!registro.data_fim || registro.data_fim.trim() === '') ? 'Em Andamento' : 'Concluído';
+                        const bc  = sit === 'Em Andamento' ? 'badge-em-andamento' : 'badge-concluido';
+                        historicHTML += `
+                        <tr>
+                            <td>${formatMonthReference(registro.ano_mesreferencia)}</td>
+                            <td>${registro.orgao || '-'}<br><small>${registro.sigla_orgao || ''}</small></td>
+                            <td><span class="badge-situacao ${bc}">${sit}</span></td>
+                            <td>${formatDate(registro.data_inicio)}</td>
+                            <td>${formatDate(registro.data_fim) || '-'}</td>
+                            <td>${formatCurrency(registro.valor_remuneracao || 0)}</td>
+                        </tr>`;
+                    });
+                });
+
+                document.getElementById('historicTableBody').innerHTML = historicHTML ||
                     '<tr><td colspan="6" class="text-center text-muted">Nenhum histórico encontrado</td></tr>';
-                
-                // Mostrar modal
+
+                const modalElement = document.getElementById('historicModal');
+                const modal = new bootstrap.Modal(modalElement);
                 modal.show();
                 showLoading(false);
-                
+
             } catch (error) {
                 console.error('Erro ao carregar histórico:', error);
                 showLoading(false);
@@ -4552,27 +4585,55 @@ window.filtrarPorOrgao = function(orgao) {
         });
     });
 }
-        // ==================== PROCESSAMENTO CROSS-YEAR DE DATA_FIM ====================
-        // Esta função deve ser chamada SEMPRE que um novo ano for carregado em allData.
-        // Ela opera sobre TODOS os registros de TODOS os anos já carregados, garantindo
-        // que propagação e inferência de data_fim cruzem fronteiras de ano.
+        // ==================== PROCESSAMENTO CROSS-YEAR DE DATA_FIM (COM PERÍODOS) ====================
         //
-        // Regras:
-        //  1. PROPAGAÇÃO: se o MASP tem data_fim explícita em qualquer ano/mês,
-        //     essa data é propagada para todos os seus registros em todos os anos.
-        //  2. INFERÊNCIA: se o MASP nunca teve data_fim E não aparece no último mês
-        //     global (de todos os anos carregados), inferimos data_fim = último dia
-        //     do último mês em que ele apareceu (em qualquer ano).
-        //  3. APARIÇÃO NA TABELA: um estagiário só deve aparecer na tabela do mês
-        //     em que está presente nos dados. A data_fim preenchida (real ou inferida)
-        //     fica visível em todos esses registros, mas ele não "some" de meses
-        //     anteriores — apenas recebe a flag de "Concluído" com a data correta.
+        // Chamada sempre que um novo ano é carregado. Opera sobre TODOS os anos em allData.
+        //
+        // CONCEITO DE PERÍODO:
+        //   Um mesmo MASP pode ter mais de um estágio ao longo do tempo (saiu e voltou).
+        //   Detectamos isso verificando gaps de continuidade mensal: se entre dois registros
+        //   consecutivos de um MASP há um gap > 1 mês, são dois períodos/estágios distintos.
+        //   Cada período recebe um campo `periodoId` único (ex: "12345_0", "12345_1").
+        //
+        // REGRAS POR PERÍODO:
+        //   1. DATA_FIM EXPLÍCITA: se algum registro do período tem data_fim preenchida,
+        //      ela é propagada para todos os registros desse mesmo período.
+        //   2. INFERÊNCIA: se o período não tem data_fim e seu último mês é anterior ao
+        //      último mês global → data_fim = último dia do último mês do período (Concluído).
+        //   3. EM ANDAMENTO: período cujo último mês coincide com o último mês global
+        //      e sem data_fim → permanece sem data_fim (Em Andamento).
+        //   4. DATA_INICIO DO PERÍODO: cada registro recebe a data_inicio do primeiro
+        //      registro do período (o menor `data_inicio` do grupo), garantindo consistência
+        //      dentro do período mesmo que o campo varie entre meses.
 
         function ultimoDiaDoMesStr(anoMes) {
-            // anoMes no formato "YYYY-MM"
+            // Converte "YYYY-MM" → "DD/MM/YYYY" (último dia do mês)
             const [ano, mes] = anoMes.split('-').map(Number);
             const ultimoDia = new Date(ano, mes, 0).getDate();
             return `${String(ultimoDia).padStart(2, '0')}/${String(mes).padStart(2, '0')}/${ano}`;
+        }
+
+        function anoMesParaNumero(anoMes) {
+            // "YYYY-MM" → número comparável, ex: 202604
+            if (!anoMes) return 0;
+            const [a, m] = anoMes.split('-').map(Number);
+            return a * 100 + m;
+        }
+
+        function proximoMes(anoMes) {
+            // Retorna o "YYYY-MM" do mês seguinte
+            const [ano, mes] = anoMes.split('-').map(Number);
+            if (mes === 12) return `${ano + 1}-01`;
+            return `${ano}-${String(mes + 1).padStart(2, '0')}`;
+        }
+
+        function parseDateBR(str) {
+            // Tenta parsear DD/MM/YYYY ou YYYY-MM-DD
+            if (!str || str.trim() === '') return null;
+            const s = str.trim();
+            const parts = s.split('/');
+            if (parts.length === 3) return new Date(`${parts[2]}-${parts[1]}-${parts[0]}`);
+            return new Date(s);
         }
 
         function processarDataFimCrossYear() {
@@ -4580,72 +4641,90 @@ window.filtrarPorOrgao = function(orgao) {
             const todosRegistros = Object.values(allData).flat();
             if (todosRegistros.length === 0) return;
 
-            // --- PASSO 1: descobrir data_fim mais recente por MASP (de qualquer ano) ---
-            const dataFimPorMasp = {};
-            todosRegistros.forEach(r => {
-                if (!r.masp || !r.data_fim || r.data_fim.trim() === '') return;
-                const key = r.masp.trim();
-                const df = r.data_fim.trim();
-                if (!dataFimPorMasp[key]) {
-                    dataFimPorMasp[key] = df;
-                } else {
-                    // Manter a mais recente
-                    const partsAtual = dataFimPorMasp[key].split('/');
-                    const partsNova  = df.split('/');
-                    let dAtual, dNova;
-                    if (partsAtual.length === 3) {
-                        dAtual = new Date(`${partsAtual[2]}-${partsAtual[1]}-${partsAtual[0]}`);
-                    } else {
-                        dAtual = new Date(dataFimPorMasp[key]);
-                    }
-                    if (partsNova.length === 3) {
-                        dNova = new Date(`${partsNova[2]}-${partsNova[1]}-${partsNova[0]}`);
-                    } else {
-                        dNova = new Date(df);
-                    }
-                    if (!isNaN(dNova) && dNova > dAtual) {
-                        dataFimPorMasp[key] = df;
-                    }
-                }
-            });
+            // --- PASSO 1: último mês global (de todos os anos carregados) ---
+            const todosMesesGlobal = [...new Set(
+                todosRegistros.map(r => r.ano_mesreferencia).filter(Boolean)
+            )].sort();
+            const ultimoMesGlobal = todosMesesGlobal[todosMesesGlobal.length - 1];
 
-            // --- PASSO 2: último mês global (de todos os anos carregados) ---
-            const todosMeses = [...new Set(todosRegistros.map(r => r.ano_mesreferencia).filter(Boolean))].sort();
-            const ultimoMesGlobal = todosMeses[todosMeses.length - 1]; // ex: "2026-04"
-
-            // --- PASSO 3: último mês em que cada MASP apareceu (qualquer ano) ---
-            const ultimoMesPorMasp = {};
+            // --- PASSO 2: agrupar registros por MASP, ordenados por mês ---
+            const registrosPorMasp = {};
             todosRegistros.forEach(r => {
                 if (!r.masp || !r.ano_mesreferencia) return;
                 const key = r.masp.trim();
-                if (!ultimoMesPorMasp[key] || r.ano_mesreferencia > ultimoMesPorMasp[key]) {
-                    ultimoMesPorMasp[key] = r.ano_mesreferencia;
-                }
+                if (!registrosPorMasp[key]) registrosPorMasp[key] = [];
+                registrosPorMasp[key].push(r);
             });
+            Object.values(registrosPorMasp).forEach(lista =>
+                lista.sort((a, b) => a.ano_mesreferencia.localeCompare(b.ano_mesreferencia))
+            );
 
-            // --- PASSO 4: aplicar data_fim em TODOS os registros ---
-            todosRegistros.forEach(r => {
-                if (!r.masp) return;
-                const key = r.masp.trim();
+            // --- PASSO 3: detectar períodos contínuos por MASP e processar cada um ---
+            Object.entries(registrosPorMasp).forEach(([masp, registros]) => {
+                // Dividir em períodos: gap > 1 mês entre consecutivos = novo período
+                const periodos = [];
+                let periodoAtual = [registros[0]];
 
-                if (dataFimPorMasp[key]) {
-                    // Tem data_fim explícita → propagar para todos os registros desse MASP
-                    r.data_fim = dataFimPorMasp[key];
-                } else {
-                    // Sem data_fim explícita → verificar se sumiu antes do último mês global
-                    const ultimoMesEste = ultimoMesPorMasp[key];
-                    if (ultimoMesEste && ultimoMesEste < ultimoMesGlobal) {
-                        // Saiu sem data_fim → inferir último dia do último mês em que apareceu
-                        r.data_fim = ultimoDiaDoMesStr(ultimoMesEste);
+                for (let i = 1; i < registros.length; i++) {
+                    const mesAnterior = registros[i - 1].ano_mesreferencia;
+                    const mesAtual    = registros[i].ano_mesreferencia;
+                    // Se o mês atual NÃO é o mês imediatamente seguinte ao anterior → gap → novo período
+                    if (mesAtual !== proximoMes(mesAnterior)) {
+                        periodos.push(periodoAtual);
+                        periodoAtual = [];
                     }
-                    // Caso contrário: ainda aparece no último mês → Em Andamento (sem data_fim)
+                    periodoAtual.push(registros[i]);
                 }
-            });
+                periodos.push(periodoAtual);
 
-            // Regravar nos objetos allData (todosRegistros é referência, mas garantir sincronia)
-            Object.keys(allData).forEach(ano => {
-                allData[ano].forEach(r => {
-                    // já mutados por referência acima; garantir que estagiariosData também esteja atualizado
+                // Processar cada período individualmente
+                periodos.forEach((periodo, idx) => {
+                    const periodoId = `${masp}_${idx}`;
+                    const ultimoMesPeriodo = periodo[periodo.length - 1].ano_mesreferencia;
+                    const ehUltimoPeriodo  = (idx === periodos.length - 1);
+
+                    // Encontrar data_fim explícita dentro do período (a mais recente)
+                    let dataFimExplicita = null;
+                    periodo.forEach(r => {
+                        if (!r.data_fim || r.data_fim.trim() === '') return;
+                        const d = parseDateBR(r.data_fim);
+                        if (!d || isNaN(d)) return;
+                        if (!dataFimExplicita || d > parseDateBR(dataFimExplicita)) {
+                            dataFimExplicita = r.data_fim.trim();
+                        }
+                    });
+
+                    // Determinar data_inicio do período: menor data_inicio válida do grupo
+                    let dataInicioPeriodo = null;
+                    periodo.forEach(r => {
+                        if (!r.data_inicio || r.data_inicio.trim() === '') return;
+                        const d = parseDateBR(r.data_inicio);
+                        if (!d || isNaN(d)) return;
+                        if (!dataInicioPeriodo || d < parseDateBR(dataInicioPeriodo)) {
+                            dataInicioPeriodo = r.data_inicio.trim();
+                        }
+                    });
+
+                    // Determinar data_fim final para o período
+                    let dataFimFinal;
+                    if (dataFimExplicita) {
+                        // Tem data_fim real no período → usar ela
+                        dataFimFinal = dataFimExplicita;
+                    } else if (ehUltimoPeriodo && ultimoMesPeriodo === ultimoMesGlobal) {
+                        // Último período E ainda aparece no último mês global → Em Andamento
+                        dataFimFinal = '';
+                    } else {
+                        // Período encerrado (ou seja, sumiu da tabela sem data_fim explícita)
+                        // → inferir último dia do último mês do período
+                        dataFimFinal = ultimoDiaDoMesStr(ultimoMesPeriodo);
+                    }
+
+                    // Aplicar nos registros do período
+                    periodo.forEach(r => {
+                        r.periodoId   = periodoId;
+                        r.data_fim    = dataFimFinal;
+                        if (dataInicioPeriodo) r.data_inicio = dataInicioPeriodo;
+                    });
                 });
             });
 
@@ -4654,7 +4733,7 @@ window.filtrarPorOrgao = function(orgao) {
                 estagiariosData = allData[currentYear];
             }
 
-            console.log('processarDataFimCrossYear concluído. Anos carregados:', Object.keys(allData));
+            console.log('processarDataFimCrossYear (com períodos) concluído. Anos:', Object.keys(allData));
         }
         // ─────────────────────────────────────────────────────────────────────────────
 
