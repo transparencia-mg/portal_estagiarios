@@ -2719,6 +2719,41 @@ function setupEventListeners() {
                             })
                             .filter(Boolean);
 
+                        // ── PROPAGAÇÃO DE DATA_FIM ──────────────────────────────
+                        // Para cada estagiário (identificado pelo MASP), encontrar
+                        // a data_fim mais recente presente em qualquer mês do ano
+                        // e replicá-la em todos os seus registros. Assim, quem já
+                        // encerrou o estágio aparece como "Concluído" em todos os
+                        // meses consultados, não apenas no mês em que data_fim foi
+                        // preenchida pela primeira vez.
+                        const dataFimPorMasp = {};
+                        data.forEach(registro => {
+                            if (registro.masp && registro.data_fim && registro.data_fim.trim() !== '') {
+                                const maspKey = registro.masp.trim();
+                                // Guardar a data_fim mais recente para cada MASP
+                                if (!dataFimPorMasp[maspKey]) {
+                                    dataFimPorMasp[maspKey] = registro.data_fim.trim();
+                                } else {
+                                    // Comparar datas e manter a mais recente
+                                    const atual = new Date(dataFimPorMasp[maspKey].split('/').reverse().join('-'));
+                                    const nova  = new Date(registro.data_fim.trim().split('/').reverse().join('-'));
+                                    if (!isNaN(nova) && nova > atual) {
+                                        dataFimPorMasp[maspKey] = registro.data_fim.trim();
+                                    }
+                                }
+                            }
+                        });
+                        // Propagar data_fim para todos os registros do mesmo MASP
+                        data.forEach(registro => {
+                            if (registro.masp) {
+                                const maspKey = registro.masp.trim();
+                                if (dataFimPorMasp[maspKey]) {
+                                    registro.data_fim = dataFimPorMasp[maspKey];
+                                }
+                            }
+                        });
+                        // ────────────────────────────────────────────────────────
+
                         allData[year] = data;
                         estagiariosData = data;
 
