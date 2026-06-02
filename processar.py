@@ -23,17 +23,22 @@ def log(msg):
 
 
 def localizar_arquivo_estagiarios():
+
     arquivos = [
         arq
         for arq in os.listdir(PASTA_UPLOAD)
-        if re.match(r"Estagiarios_\d{6}\.xlsx$", arq, re.IGNORECASE)
+        if re.match(r"^Estagiarios_\d{6}\.xlsx$", arq, re.IGNORECASE)
     ]
 
     if not arquivos:
         return None
 
     arquivos.sort(reverse=True)
-    return os.path.join(PASTA_UPLOAD, arquivos[0])
+
+    return os.path.join(
+        PASTA_UPLOAD,
+        arquivos[0]
+    )
 
 
 def obter_ano(nome_arquivo):
@@ -116,20 +121,24 @@ def atualizar_de_para(df, arquivo_depara):
 
 
 def atualizar_historico(df_novo, ano):
+
     arquivo_historico = os.path.join(
-        PASTA_BASE,
+        PASTA_UPLOAD,
         f"estagiarios_{ano}.xlsx"
     )
 
     if os.path.exists(arquivo_historico):
-        log(f"Lendo histórico: estagiarios_{ano}.xlsx")
+
+        log(f"Lendo histórico: {os.path.basename(arquivo_historico)}")
 
         df_hist = pd.read_excel(
             arquivo_historico,
             dtype=str
         ).fillna("")
+
     else:
-        log(f"Criando histórico: estagiarios_{ano}.xlsx")
+
+        log(f"Criando histórico: {os.path.basename(arquivo_historico)}")
 
         df_hist = pd.DataFrame()
 
@@ -143,12 +152,8 @@ def atualizar_historico(df_novo, ano):
         "Masp/Adm"
     ]
 
-    colunas_existentes = [
-        c for c in chaves
-        if c in df_final.columns
-    ]
+    if all(col in df_final.columns for col in chaves):
 
-    if len(colunas_existentes) == len(chaves):
         antes = len(df_final)
 
         df_final = df_final.drop_duplicates(
@@ -165,7 +170,7 @@ def atualizar_historico(df_novo, ano):
         index=False
     )
 
-    log(f"Arquivo atualizado: estagiarios_{ano}.xlsx")
+    log(f"Arquivo atualizado: {os.path.basename(arquivo_historico)}")
 
 
 def atualizar_github():
