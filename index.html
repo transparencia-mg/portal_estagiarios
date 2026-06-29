@@ -535,72 +535,6 @@ button.btn-export:hover {
     background-color: #1a3a5c;
     color: #ffffff;
 }
-.table-toolbar{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-
-    background:transparent;
-    padding:14px 18px;
-    border-radius:10px 10px 0 0;
-    margin-bottom:2px;
-}
-
-.toolbar-left{
-    display:flex;
-    align-items:center;
-    gap:18px;
-}
-
-.toolbar-right{
-    display:flex;
-    align-items:center;
-}
-
-.table-search-container{
-    width:700px;
-    height:82px;
-    background:#fff;
-    border:1px solid #d8dde6;
-    border-radius:12px;
-}
-
-.table-search-input{
-    font-size:15px;
-}
-
-.table-badge{
-    background:#fff;
-    color:#1a3a5c;
-    border:1px solid #d8dde6;
-    border-radius:15px;
-    padding:10px 14px;
-    font-size:14px;
-    font-weight:600;
-}
-
-.btn-download{
-    background:#fff;
-    border:1px solid #d8dde6;
-    color:#1a3a5c;
-    border-radius:12px;
-    padding:14px 24px;
-    font-size:16px;;
-    font-weight:600;
-}
-
-.btn-download:hover{
-    background:#1a3a5c;
-    color:#fff;
-}
-
-.btn-download i{
-    margin-right:8px;
-}
-
-.toast-sucesso {
-    display: none !important;
-}
 
         /* ==================== BOTÃO COMPARTILHAR ==================== */
         .share-dropdown {
@@ -641,7 +575,17 @@ button.btn-export:hover {
         .share-options a i { font-size: 18px; width: 20px; text-align: center; }
 
         /* ==================== BUSCA NA TABELA ==================== */
-       
+        .table-search-container {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+
+    background: white;
+    border: 1px solid #d6dee6;
+    border-radius: 10px;
+    padding: 2px 10px;
+}
+        
 .table-search-container {
     display: flex;
     align-items: center;
@@ -649,17 +593,15 @@ button.btn-export:hover {
 
     background: #ffffff;
     border: 1px solid #d6dee6;
-    border-radius: 12px;
+    border-radius: 10px;
 
-    padding: 0 16px;
-    height: 52px;
+    padding: 0 14px;
+    height: 40px;
 
-    width: 400px;      /* ajuste aqui */
-    min-width: 400px;
-    max-width: 400px;
+    min-width: 220px; /* antes 300px */
+    max-width: 220px;
 
     box-sizing: border-box;
-    white-space: nowrap;
 }
 
 .table-search-input {
@@ -667,9 +609,10 @@ button.btn-export:hover {
     outline: none;
     background: transparent;
 
-    font-size: 16px;
+    font-size: 14px;
     width: 100%;
-  
+    color: #94a3b8;
+
     margin: 0 10px;
 }
 
@@ -873,7 +816,7 @@ button.btn-export:hover {
     /* contorno externo mais suave */
     box-shadow: 0 0 0 0.3px #bfc1c4;
 
-    background-image: url("data:image/svg+xml;utf8,<svg fill='%235c7387' height='18' viewBox='0 0 24 24' width='18' xmlns='http://www.w3.ao/2000/svg'><path d='M7 10l5 5 5-5z'/></svg>");
+    background-image: url("data:image/svg+xml;utf8,<svg fill='%235c7387' height='18' viewBox='0 0 24 24' width='18' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/></svg>");
     background-repeat: no-repeat;
     background-position: right 12px center;
 }
@@ -1278,6 +1221,12 @@ div {
 .table tfoot td {
     background-color: #dfe3e8 !important;
     font-weight: 700;
+}
+.table-search-container {
+    display: flex;
+    align-items: center;
+    white-space: nowrap;   /* 🔥 evita quebrar */
+}
 
 .table-badge {
     white-space: nowrap;   /* 🔥 mantém "58 órgãos" na mesma linha */
@@ -1434,7 +1383,6 @@ div {
     cursor: default;
 }
 .orgao-link {
-    
     text-transform: uppercase;
 }
 .table tfoot td {
@@ -1564,7 +1512,7 @@ div {
                         <div class="col-12">
                             <div class="d-flex gap-3 flex-wrap">
                                 <button class="btn-search-custom" id="aplicarFiltros">
-                                    <i class="fas fa-search me-2"></i>Aplicar Filtros
+                                    <i class="fas fa-search me-2"></i>Pesquisar
                                 </button>
                                 <button class="btn-secondary-custom" id="limparFiltros">
                                     <i class="fas fa-times me-2"></i>Limpar Filtros
@@ -1615,64 +1563,42 @@ div {
 
                 <!-- Ações Dashboard 1 -->
                <!-- Ações Dashboard 1 -->
-<div class="table-toolbar">
+<div class="actions-container mb-3">
+    <!-- ESQUERDA = BOTÕES -->
+    <div class="export-buttons">
+        <button class="btn-export" id="exportCSVDashboard1">
+            <i class="fas fa-file-csv"></i> CSV
+        </button>
 
-    <div class="toolbar-left">
-        <div class="table-search-container">
-            <i class="bi bi-search search-icon"></i>
+        <button class="btn-export" id="printDashboard1">
+            <i class="fas fa-file-pdf"></i> PDF
+        </button>
+<button class="btn-export" onclick="copiarLink('dashboard1')">
+    <i class="fas fa-link"></i> Copiar Link
+</button>
+    </div>
 
-            <input
-                type="text"
-                id="searchResumo"
-                class="table-search-input"
-                placeholder="Buscar..."
-            >
-
-            <i class="fas fa-times close-icon"></i>
-        </div>
-
+    <!-- DIREITA = CONTADOR + BUSCA -->
+    <div class="right-aligned-container">
         <span class="table-badge" id="resumoCountDashboard1">
-            15 Órgãos
+            0 órgãos
         </span>
-    </div>
 
-    <div class="toolbar-right">
+ <div class="table-search-container">
+    <i class="bi bi-search search-icon"></i>
 
-        <div class="dropdown">
-            <button class="btn-download dropdown-toggle"
-                    data-bs-toggle="dropdown">
-                <i class="fas fa-share-alt"></i>
-                Baixar ou Compartilhar
-            </button>
+    <input
+        type="text"
+        id="searchResumo"
+        class="table-search-input"
+        placeholder="Buscar..."
+    >
 
-            <ul class="dropdown-menu dropdown-menu-end">
-
-                <li>
-                    <button class="dropdown-item" id="exportCSVDashboard1">
-                        <i class="fas fa-file-csv"></i> CSV
-                    </button>
-                </li>
-
-                <li>
-                    <button class="dropdown-item" id="printDashboard1">
-                        <i class="fas fa-file-pdf"></i> PDF
-                    </button>
-                </li>
-
-                <li>
-                    <button class="dropdown-item"
-                            onclick="copiarLink('dashboard1')">
-                        <i class="fas fa-link"></i> Copiar Link
-                    </button>
-                </li>
-
-            </ul>
-        </div>
-
-    </div>
-
+    <i class="fas fa-times close-icon"></i>
 </div>
-                  
+    </div>
+                    </div>
+                   
              
                 <!-- Tabela Dashboard 1 - VISÃO GERAL -->
                 <div class="table-container">
@@ -1800,7 +1726,7 @@ div {
                         <div class="col-12">
                             <div class="d-flex gap-3 flex-wrap">
                                 <button class="btn-search-custom" id="pesquisarEstagiarios">
-                                    <i class="fas fa-search me-2"></i>Aplicar Fitros
+                                    <i class="fas fa-search me-2"></i>Pesquisar
                                 </button>
                                 <button class="btn-secondary-custom" id="limparFiltrosDashboard2">
                                     <i class="fas fa-times me-2"></i>Limpar Filtros
@@ -1811,77 +1737,41 @@ div {
                 </div>
 
                 <!-- Ações Dashboard 2 -->
-                <div class="table-toolbar">
+                <div class="actions-container mb-4">
+                    <div class="d-flex align-items-center gap-3 w-100">
+                        <div class="export-buttons">
+                            <button class="btn-export" id="exportCSVDashboard2">
+                                <i class="fas fa-file-csv me-2"></i> CSV
+                            </button>
+                            <button class="btn-export" id="printDashboard2">
+                                <i class="fas fa-file-pdf me-2"></i> PDF
+                            </button>
+                            <!-- Botão de Compartilhar -->
+             <button class="btn-export" onclick="copiarLink('dashboard2')">
+    <i class="fas fa-link"></i> Copiar Link
+</button>
+                        </div>
 
-    <div class="toolbar-left">
+                        <div class="right-aligned-container">
+    <span class="table-badge" id="resumoCountDashboard2">
+        0 estagiários
+    </span>
 
-        <div class="table-search-container">
-            <i class="bi bi-search search-icon"></i>
+    <div class="table-search-container">
+    <i class="bi bi-search search-icon"></i>
 
-            <input
-                type="text"
-                id="searchEstagiarios"
-                class="table-search-input"
-                placeholder="Buscar..."
-            >
+    <input
+        type="text"
+        id="searchEstagiarios"
+        class="table-search-input"
+        placeholder="Buscar..."
+    >
 
-            <i class="fas fa-times close-icon"
-               id="clearSearchDashboard2"></i>
-        </div>
-
-        <span class="table-badge" id="resumoCountDashboard2">
-            0 estagiários
-        </span>
-
-    </div>
-
-    <div class="toolbar-right">
-
-        <div class="dropdown">
-
-            <button class="btn-download dropdown-toggle"
-                    type="button"
-                    data-bs-toggle="dropdown"
-                    aria-expanded="false">
-
-                <i class="fas fa-share-alt"></i>
-                Baixar ou Compartilhar
-
-            </button>
-
-            <ul class="dropdown-menu dropdown-menu-end">
-
-                <li>
-                    <button class="dropdown-item"
-                            id="exportCSVDashboard2">
-                        <i class="fas fa-file-csv me-2"></i>
-                        CSV
-                    </button>
-                </li>
-
-                <li>
-                    <button class="dropdown-item"
-                            id="printDashboard2">
-                        <i class="fas fa-file-pdf me-2"></i>
-                        PDF
-                    </button>
-                </li>
-
-                <li>
-                    <button class="dropdown-item"
-                            onclick="copiarLink('dashboard2')">
-                        <i class="fas fa-link me-2"></i>
-                        Copiar Link
-                    </button>
-                </li>
-
-            </ul>
-
-        </div>
-
-    </div>
-
+    <i class="fas fa-times close-icon" id="clearSearchDashboard2"></i>
 </div>
+</div>
+                    </div>
+                </div>
 
                 <!-- Tabela de Estagiários Dashboard 2 -->
                 <div class="table-container">
@@ -2491,9 +2381,11 @@ function copiarLink(aba = '') {
         urlFinal += `#${aba}`;
     }
 
-  navigator.clipboard.writeText(urlFinal).catch(err => {
-    console.error('Erro ao copiar:', err);
-});
+    navigator.clipboard.writeText(urlFinal).then(() => {
+        mostrarToastSucesso();
+    }).catch(err => {
+        console.error('Erro ao copiar:', err);
+    });
 }
 function mostrarToastSucesso() {
     const toast = document.getElementById("toastSucesso");
@@ -3630,11 +3522,9 @@ function setupEventListeners() {
                 return `
                 <tr>
                     <td>
-                       <a href="javascript:void(0)"
-   onclick="filtrarPorOrgao('${item.orgao.replace(/'/g, "\\'")}')"
-   class="orgao-link">
-    ${item.orgao.toUpperCase()}
-</a>
+                        <a href="javascript:void(0)" onclick="filtrarPorOrgao('${item.orgao.replace(/'/g, "\\'")}')" class="orgao-link">
+                            ${item.orgao}
+                        </a>
                     </td>
                     <td>${item.sigla}</td>
                     <td class="text-center">${item.total_estagiarios.toLocaleString('pt-BR')}</td>
