@@ -42,13 +42,15 @@
             box-sizing: border-box;
         }
 
-        html,
-body {
-    width: 100%;
-    margin: 0;
-    padding: 0;
-    overflow: hidden;
-}
+        html, body {
+            width: 100%;
+            overflow-x: hidden;
+            /* IMPORTANTE: SEM overflow-y aqui - deixar padrão */
+            margin: 0;
+            padding: 0;
+            height: auto;
+            min-height: auto;
+        }
 
         body { 
             font-family: 'Montserrat', Segoe UI, Tahoma, Geneva, Verdana, sans-serif; 
