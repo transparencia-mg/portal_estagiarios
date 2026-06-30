@@ -9,7 +9,7 @@ import pandas as pd
 # CONFIGURAÇÃO
 # =====================================================
 
-PASTA_BASE = r"C:\Users\kbomf\Google Drive\CGE\bi_atualizacao\portal_estagiarios"
+PASTA_BASE = os.path.dirname(os.path.abspath(__file__))
 PASTA_UPLOAD = os.path.join(PASTA_BASE, "upload")
 
 ARQUIVO_DEPARA = os.path.join(
