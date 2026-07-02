@@ -1609,6 +1609,9 @@ div {
                                     <th data-sort="orgao" data-order="asc" onclick="sortTable('visaoGeral', 'orgao')">
                                         Órgão <i class="bi bi-chevron-expand sort-icon"></i>
                                     </th>
+                                    <th data-sort="codigo_orgao" data-order="asc" onclick="sortTable('visaoGeral', 'codigo_orgao')">
+                                        Código <i class="bi bi-chevron-expand sort-icon"></i>
+                                    </th>
                                     <th data-sort="sigla" data-order="asc" onclick="sortTable('visaoGeral', 'sigla')">
                                         Sigla <i class="bi bi-chevron-expand sort-icon"></i>
                                     </th>
@@ -3449,7 +3452,7 @@ function setupEventListeners() {
             if (!tbody) return;
             
             if (filteredData.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted">Nenhum dado encontrado para o período atual.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">Nenhum dado encontrado para o período atual.</td></tr>';
                 if (tfoot) tfoot.innerHTML = '';
                 if (countElement) countElement.textContent = '0 órgãos';
                 if (paginationInfo) paginationInfo.textContent = 'Mostrando 0-0 de 0 registros';
@@ -3462,10 +3465,12 @@ function setupEventListeners() {
             filteredData.forEach(estagiario => {
                 const orgao = estagiario.orgao || 'Órgão não informado';
                 const sigla = estagiario.sigla_orgao || orgao.substring(0, 10);
+                const codigo_orgao = estagiario.codigo_orgao || '';
                 
                 if (!grupos[orgao]) {
                     grupos[orgao] = {
                         orgao: orgao,
+                        codigo_orgao: codigo_orgao,
                         sigla: sigla,
                         total_estagiarios: 0,
                         em_andamento: 0,
@@ -3492,6 +3497,8 @@ function setupEventListeners() {
                 
                 if (currentSortDashboard1.column === 'orgao') {
                     return order * a.orgao.localeCompare(b.orgao);
+                } else if (currentSortDashboard1.column === 'codigo_orgao') {
+                    return order * (a.codigo_orgao || '').toString().localeCompare((b.codigo_orgao || '').toString());
                 } else if (currentSortDashboard1.column === 'sigla') {
                     return order * (a.sigla || '').localeCompare(b.sigla || '');
                 } else if (currentSortDashboard1.column === 'total_estagiarios') {
@@ -3526,6 +3533,7 @@ function setupEventListeners() {
                             ${item.orgao}
                         </a>
                     </td>
+                    <td>${item.codigo_orgao || '-'}</td>
                     <td>${item.sigla}</td>
                     <td class="text-center">${item.total_estagiarios.toLocaleString('pt-BR')}</td>
                     <td class="text-center">${item.em_andamento.toLocaleString('pt-BR')}</td>
@@ -3537,6 +3545,7 @@ function setupEventListeners() {
             const footerHTML = `
                 <tr class="table-total-row">
                     <td>TOTAL GERAL</td>
+                    <td>-</td>
                     <td>-</td>
                     <td class="text-center">${totalEstagiarios.toLocaleString('pt-BR')}</td>
                     <td class="text-center">${totalEmAndamento.toLocaleString('pt-BR')}</td>
@@ -4078,10 +4087,12 @@ function updatePaginationDashboard2(totalPages, currentPage = 1) {
                 filteredData.forEach(estagiario => {
                     const orgao = estagiario.orgao || 'Órgão não informado';
                     const sigla = estagiario.sigla_orgao || orgao.substring(0, 10);
+                    const codigo_orgao = estagiario.codigo_orgao || '';
                     
                     if (!grupos[orgao]) {
                         grupos[orgao] = {
                             orgao: orgao,
+                            codigo_orgao: codigo_orgao,
                             sigla: sigla,
                             total_estagiarios: 0,
                             em_andamento: 0,
@@ -4138,6 +4149,7 @@ function updatePaginationDashboard2(totalPages, currentPage = 1) {
                 // Preparar dados para a tabela
                 const tableData = resumoArray.map(item => [
                     item.orgao,
+                    item.codigo_orgao || '-',
                     item.sigla,
                     item.total_estagiarios.toString(),
                     item.em_andamento.toString(),
@@ -4148,6 +4160,7 @@ function updatePaginationDashboard2(totalPages, currentPage = 1) {
                 tableData.push([
                     'TOTAL GERAL',
                     '-',
+                    '-',
                     totalEstagiarios.toString(),
                     totalEmAndamento.toString(),
                     totalConcluido.toString()
@@ -4155,7 +4168,7 @@ function updatePaginationDashboard2(totalPages, currentPage = 1) {
                 
                 // Configurar tabela
                 doc.autoTable({
-                    head: [['Órgão', 'Sigla', 'Total Estagiários', 'Em Andamento', 'Concluído']],
+                    head: [['Órgão', 'Código', 'Sigla', 'Total Estagiários', 'Em Andamento', 'Concluído']],
                     body: tableData,
                     startY: 40,
                     theme: 'grid',
@@ -4169,13 +4182,14 @@ function updatePaginationDashboard2(totalPages, currentPage = 1) {
                         fontSize: 9
                     },
                     columnStyles: {
-                        0: { cellWidth: 90 },
-                        1: { cellWidth: 25, halign: 'center' },
-                        2: { cellWidth: 40, halign: 'center' },
-                        3: { cellWidth: 40, halign: 'center' },
-                        4: { cellWidth: 40, halign: 'center' }
+                        0: { cellWidth: 80 },
+                        1: { cellWidth: 20, halign: 'center' },
+                        2: { cellWidth: 20, halign: 'center' },
+                        3: { cellWidth: 35, halign: 'center' },
+                        4: { cellWidth: 35, halign: 'center' },
+                        5: { cellWidth: 35, halign: 'center' }
                     },
-                    foot: [['TOTAL GERAL', '-', totalEstagiarios.toString(), totalEmAndamento.toString(), totalConcluido.toString()]],
+                    foot: [['TOTAL GERAL', '-', '-', totalEstagiarios.toString(), totalEmAndamento.toString(), totalConcluido.toString()]],
                     footStyles: {
                         fillColor: [240, 240, 240],
                         textColor: [0, 0, 0],
