@@ -1702,7 +1702,7 @@ div {
                     </div>
 
                     <div class="row">
-                        <div class="col-md-4 col-12">
+                        <div class="col-md-3 col-12">
                             <div class="mb-3">
                                 <label for="orgaoDashboard2" class="form-label filter-label">Órgão</label>
                                 <input type="text" class="form-control" list="orgaosListDashboard2" id="orgaoDashboard2" placeholder="Digite ou selecione...">
@@ -1711,13 +1711,19 @@ div {
                                 </datalist>
                             </div>
                         </div>
-                        <div class="col-md-4 col-12">
+                        <div class="col-md-3 col-12">
                             <div class="mb-3">
                                 <label for="maspDashboard2" class="form-label filter-label">MASP</label>
                                 <input type="text" class="form-control" id="maspDashboard2" placeholder="Digite o MASP...">
                             </div>
                         </div>
-                        <div class="col-md-4 col-12">
+                        <div class="col-md-3 col-12">
+                            <div class="mb-3">
+                                <label for="numeroAdmissaoDashboard2" class="form-label filter-label">Número Admissão</label>
+                                <input type="text" class="form-control" id="numeroAdmissaoDashboard2" placeholder="Digite o Nº Admissão...">
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-12">
                             <div class="mb-3">
                                 <label for="valorRemuneracao" class="form-label filter-label">Valor Remuneração (mín)</label>
                                 <input type="number" class="form-control" id="valorRemuneracao" placeholder="R$ 0,00" step="0.01" min="0">
@@ -1784,6 +1790,7 @@ div {
                                 <tr>
                                     <th data-sort="nome_estagiario" data-order="asc" onclick="sortTable('estagiarios', 'nome_estagiario')">Nome <span class="sort-icon">▼</span></th>
                                     <th data-sort="masp" data-order="asc" onclick="sortTable('estagiarios', 'masp')">MASP <span class="sort-icon">▼</span></th>
+                                    <th data-sort="numero_admissao" data-order="asc" onclick="sortTable('estagiarios', 'numero_admissao')">Nº Admissão <span class="sort-icon">▼</span></th>
                                     <th data-sort="sigla_orgao" data-order="asc" onclick="sortTable('estagiarios', 'sigla_orgao')">Sigla <span class="sort-icon">▼</span></th>
                                     <th data-sort="data_inicio" data-order="desc" onclick="sortTable('estagiarios', 'data_inicio')">Data Início <span class="sort-icon">▼</span></th>
                                     <th data-sort="data_fim" data-order="desc" onclick="sortTable('estagiarios', 'data_fim')">Data Fim <span class="sort-icon">▼</span></th>
@@ -1928,6 +1935,11 @@ div {
                                         <tr>
                                             <td>masp</td>
                                             <td>Número da Matrícula do Servidor Público (MASP)</td>
+                                            <td>Texto/Número</td>
+                                        </tr>
+                                        <tr>
+                                            <td>numero_admissao</td>
+                                            <td>Número de Admissão do estagiário</td>
                                             <td>Texto/Número</td>
                                         </tr>
                                         <tr>
@@ -2589,6 +2601,35 @@ function setupEventListeners() {
     console.log('Eventos configurados com sucesso');
 }
 
+        // ==================== SEPARAR MASP E NÚMERO DE ADMISSÃO ====================
+        // O campo bruto "masp" vem com o número de admissão colado no último dígito.
+        // Ex: "161511931" -> MASP = "1615119-3" (7 dígitos + dígito verificador)
+        //                    Número de Admissão = "1" (último dígito)
+        function splitMaspNumeroAdmissao(rawMasp) {
+            const str = (rawMasp || '').toString().trim();
+
+            if (!str) {
+                return { masp: '', numero_admissao: '' };
+            }
+
+            // Sem dígitos suficientes para separar - mantém como está
+            if (str.length < 2) {
+                return { masp: str, numero_admissao: '' };
+            }
+
+            const numero_admissao = str.slice(-1);
+            const maspDigits = str.slice(0, -1);
+
+            let masp;
+            if (maspDigits.length >= 2) {
+                masp = `${maspDigits.slice(0, -1)}-${maspDigits.slice(-1)}`;
+            } else {
+                masp = maspDigits;
+            }
+
+            return { masp, numero_admissao };
+        }
+
         // ==================== CARREGAR DADOS DO GITHUB ====================
         async function loadYearData(year) {
             // Verificar se já temos os dados em cache
@@ -2697,13 +2738,15 @@ function setupEventListeners() {
                                     // Obter nome do estagiário
                                     const nome_estagiario = (rowNormalized['nome_estagiario'] || '').trim();
 
-                                    // Obter MASP
-                                    const masp = (rowNormalized['masp'] || '').toString().trim();
+                                    // Obter MASP bruto e separar em MASP + Número de Admissão
+                                    const masp_raw = (rowNormalized['masp'] || '').toString().trim();
+                                    const { masp, numero_admissao } = splitMaspNumeroAdmissao(masp_raw);
 
                                     return {
                                         ano_mesreferencia,
                                         nome_estagiario,
                                         masp,
+                                        numero_admissao,
                                         codigo_situacao_funcional: rowNormalized['codigo_situacao_funcional'] || '',
                                         situacao_funcional: rowNormalized['situacao_funcional'] || '',
                                         data_inicio: (rowNormalized['data_inicio'] || '').trim(),
@@ -3083,6 +3126,7 @@ function setupEventListeners() {
                     const situacao = document.getElementById('situacaoDashboard2').value;
                     const orgaoInput = document.getElementById('orgaoDashboard2').value;
                     const masp = document.getElementById('maspDashboard2').value;
+                    const numeroAdmissao = document.getElementById('numeroAdmissaoDashboard2').value;
                     const valorRemuneracao = parseFloat(document.getElementById('valorRemuneracao').value) || 0;
                     
                     const orgao = orgaoInput === '' ? '' : orgaoInput;
@@ -3091,7 +3135,7 @@ function setupEventListeners() {
                     if (ano !== currentYear) {
                         switchYearData(ano).then(() => {
                             // Após carregar o ano, aplicar os filtros
-                            applyFiltersAfterYearLoad(dashboard, mes, nome, situacao, orgao, masp, valorRemuneracao);
+                            applyFiltersAfterYearLoad(dashboard, mes, nome, situacao, orgao, masp, numeroAdmissao, valorRemuneracao);
                         });
                         return;
                     }
@@ -3131,6 +3175,11 @@ function setupEventListeners() {
                         
                         // Filtro por MASP
                         if (masp && !estagiario.masp.toString().includes(masp)) {
+                            return false;
+                        }
+                        
+                        // Filtro por Número de Admissão
+                        if (numeroAdmissao && !(estagiario.numero_admissao || '').toString().includes(numeroAdmissao)) {
                             return false;
                         }
                         
@@ -3186,7 +3235,7 @@ function setupEventListeners() {
                     
                     updateDashboard1();
                 } else if (dashboard === 'dashboard2') {
-                    const [nome, situacao, orgao, masp, valorRemuneracao] = otherFilters;
+                    const [nome, situacao, orgao, masp, numeroAdmissao, valorRemuneracao] = otherFilters;
                     
                     filteredData = (allData[currentYear] || []).filter(estagiario => {
                         const anoMes = estagiario.ano_mesreferencia;
@@ -3214,6 +3263,10 @@ function setupEventListeners() {
                         }
                         
                         if (masp && !estagiario.masp.toString().includes(masp)) {
+                            return false;
+                        }
+                        
+                        if (numeroAdmissao && !(estagiario.numero_admissao || '').toString().includes(numeroAdmissao)) {
                             return false;
                         }
                         
@@ -3245,6 +3298,7 @@ function setupEventListeners() {
             const filtered = filteredData.filter(estagiario => {
                 return estagiario.nome_estagiario.toLowerCase().includes(searchTerm) ||
                        estagiario.masp.toLowerCase().includes(searchTerm) ||
+                       (estagiario.numero_admissao && estagiario.numero_admissao.toLowerCase().includes(searchTerm)) ||
                        estagiario.orgao.toLowerCase().includes(searchTerm) ||
                        (estagiario.sigla_orgao && estagiario.sigla_orgao.toLowerCase().includes(searchTerm));
             });
@@ -3321,6 +3375,7 @@ function setupEventListeners() {
             document.getElementById('situacaoDashboard2').value = '';
             document.getElementById('orgaoDashboard2').value = '';
             document.getElementById('maspDashboard2').value = '';
+            document.getElementById('numeroAdmissaoDashboard2').value = '';
             document.getElementById('valorRemuneracao').value = '';
             document.getElementById('searchEstagiarios').value = '';
             
@@ -3673,7 +3728,7 @@ function updatePaginationDashboard1(totalPages, currentPage = 1) {
             if (!tbody) return;
             
             if (filteredData.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="8" class="text-center text-muted">Nenhum estagiário encontrado para o período atual.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="9" class="text-center text-muted">Nenhum estagiário encontrado para o período atual.</td></tr>';
                 if (tfoot) tfoot.innerHTML = '';
                 if (countElement) countElement.textContent = '0 estagiários';
                 if (paginationInfo) paginationInfo.textContent = 'Mostrando 0-0 de 0 registros';
@@ -3690,6 +3745,8 @@ function updatePaginationDashboard1(totalPages, currentPage = 1) {
                     return order * (a.nome_estagiario || '').localeCompare(b.nome_estagiario || '');
                 } else if (currentSortDashboard2.column === 'masp') {
                     return order * (a.masp || '').localeCompare(b.masp || '');
+                } else if (currentSortDashboard2.column === 'numero_admissao') {
+                    return order * (a.numero_admissao || '').localeCompare(b.numero_admissao || '');
                 } else if (currentSortDashboard2.column === 'sigla_orgao') {
                     return order * (a.sigla_orgao || '').localeCompare(b.sigla_orgao || '');
                 } else if (currentSortDashboard2.column === 'data_inicio') {
@@ -3741,6 +3798,7 @@ function updatePaginationDashboard1(totalPages, currentPage = 1) {
                 <tr>
                     <td class="nome">${estagiario.nome_estagiario || 'Nome não informado'}</td>
                     <td>${estagiario.masp || '-'}</td>
+                    <td>${estagiario.numero_admissao || '-'}</td>
                     <td>${estagiario.sigla_orgao || estagiario.orgao || '-'}</td>
                     <td class="data">${formatDate(estagiario.data_inicio)}</td>
                     <td class="data">${formatDate(estagiario.data_fim)}</td>
@@ -3760,6 +3818,7 @@ function updatePaginationDashboard1(totalPages, currentPage = 1) {
 const footerHTML = `
     <tr class="table-total-row">
         <td><strong>TOTAL GERAL</strong></td>
+        <td></td>
         <td></td>
         <td></td>
         <td></td>
@@ -3908,6 +3967,10 @@ function updatePaginationDashboard2(totalPages, currentPage = 1) {
                             <span class="info-value">${refEstagiario.masp || masp || '-'}</span>
                         </div>
                         <div class="info-item">
+                            <span class="info-label">Número Admissão</span>
+                            <span class="info-value">${refEstagiario.numero_admissao || '-'}</span>
+                        </div>
+                        <div class="info-item">
                             <span class="info-label">Nome</span>
                             <span class="info-value">${refEstagiario.nome_estagiario || nome || 'Nome não informado'}</span>
                         </div>
@@ -4022,7 +4085,7 @@ function updatePaginationDashboard2(totalPages, currentPage = 1) {
                 }
                 
                 // Preparar CSV
-                const headers = ['ano_mesreferencia', 'nome_estagiario', 'masp', 'codigo_situacao_funcional', 
+                const headers = ['ano_mesreferencia', 'nome_estagiario', 'masp', 'numero_admissao', 'codigo_situacao_funcional', 
                                'situacao_funcional', 'data_inicio', 'data_fim', 'codigo_orgao', 
                                'orgao', 'sigla_orgao', 'valor_remuneracao'];
                 const csvContent = [
@@ -4031,6 +4094,7 @@ function updatePaginationDashboard2(totalPages, currentPage = 1) {
                         estagiario.ano_mesreferencia || '',
                         estagiario.nome_estagiario || '',
                         estagiario.masp || '',
+                        estagiario.numero_admissao || '',
                         estagiario.codigo_situacao_funcional || '',
                         estagiario.situacao_funcional || '',
                         estagiario.data_inicio || '',
@@ -4280,6 +4344,7 @@ function updatePaginationDashboard2(totalPages, currentPage = 1) {
                     return [
                         e.nome_estagiario || '-',
                         e.masp || '-',
+                        e.numero_admissao || '-',
                         e.sigla_orgao || e.orgao || '-',
                         formatDate(e.data_inicio),
                         formatDate(e.data_fim),
@@ -4293,6 +4358,7 @@ function updatePaginationDashboard2(totalPages, currentPage = 1) {
                 tableData.push([
                     'TOTAL GERAL',
                     '',
+                    '',
                     `${totalOrgaos} órgãos`,
                     '',
                     '',
@@ -4302,7 +4368,7 @@ function updatePaginationDashboard2(totalPages, currentPage = 1) {
                 
                 // Configurar tabela
                 doc.autoTable({
-                    head: [['Nome', 'MASP', 'Órgão', 'Data Início', 'Data Fim', 'Valor (R$)', 'Situação']],
+                    head: [['Nome', 'MASP', 'Nº Admissão', 'Órgão', 'Data Início', 'Data Fim', 'Valor (R$)', 'Situação']],
                     body: tableData,
                     startY: 40,
                     theme: 'grid',
@@ -4316,15 +4382,16 @@ function updatePaginationDashboard2(totalPages, currentPage = 1) {
                         fontSize: 8
                     },
                     columnStyles: {
-                        0: { cellWidth: 60 },
-                        1: { cellWidth: 25, halign: 'center' },
-                        2: { cellWidth: 35 },
-                        3: { cellWidth: 25, halign: 'center' },
-                        4: { cellWidth: 25, halign: 'center' },
-                        5: { cellWidth: 25, halign: 'right' }, // Alinhamento à direita
-                        6: { cellWidth: 30, halign: 'center' }
+                        0: { cellWidth: 55 },
+                        1: { cellWidth: 22, halign: 'center' },
+                        2: { cellWidth: 20, halign: 'center' },
+                        3: { cellWidth: 32 },
+                        4: { cellWidth: 22, halign: 'center' },
+                        5: { cellWidth: 22, halign: 'center' },
+                        6: { cellWidth: 22, halign: 'right' }, // Alinhamento à direita
+                        7: { cellWidth: 27, halign: 'center' }
                     },
-                    foot: [['TOTAL GERAL', '', `${totalOrgaos} órgãos`, '', '', formatCurrency(valorTotal), '']],
+                    foot: [['TOTAL GERAL', '', '', `${totalOrgaos} órgãos`, '', '', formatCurrency(valorTotal), '']],
                     footStyles: {
                         fillColor: [240, 240, 240],
                         textColor: [0, 0, 0],
@@ -4339,13 +4406,13 @@ function updatePaginationDashboard2(totalPages, currentPage = 1) {
                         }
                         
                         // Alinhar valores à direita
-                        if (data.column.index === 5 && data.row.index !== tableData.length - 1) {
+                        if (data.column.index === 6 && data.row.index !== tableData.length - 1) {
                             data.cell.styles.halign = 'right';
                             data.cell.styles.fontStyle = 'normal'; // Remover negrito
                         }
                         
                         // Datas centralizadas
-                        if (data.column.index === 3 || data.column.index === 4) {
+                        if (data.column.index === 4 || data.column.index === 5) {
                             data.cell.styles.halign = 'center';
                         }
                         
@@ -4402,6 +4469,7 @@ window.filtrarPorOrgao = function(orgao) {
             document.getElementById('nomeEstagiario').value = '';
             document.getElementById('situacaoDashboard2').value = '';
             document.getElementById('maspDashboard2').value = '';
+            document.getElementById('numeroAdmissaoDashboard2').value = '';
             document.getElementById('valorRemuneracao').value = '';
             document.getElementById('searchEstagiarios').value = '';
 
@@ -4533,7 +4601,7 @@ window.filtrarPorOrgao = function(orgao) {
                 return;
             }
             
-            const headers = ['ano_mesreferencia', 'nome_estagiario', 'masp', 'codigo_situacao_funcional', 
+            const headers = ['ano_mesreferencia', 'nome_estagiario', 'masp', 'numero_admissao', 'codigo_situacao_funcional', 
                            'situacao_funcional', 'data_inicio', 'data_fim', 'codigo_orgao', 
                            'orgao', 'sigla_orgao', 'valor_remuneracao', 'situacao'];
             const data = filteredData.map(estagiario => {
@@ -4542,6 +4610,7 @@ window.filtrarPorOrgao = function(orgao) {
                     estagiario.ano_mesreferencia || '',
                     estagiario.nome_estagiario || '',
                     estagiario.masp || '',
+                    estagiario.numero_admissao || '',
                     estagiario.codigo_situacao_funcional || '',
                     estagiario.situacao_funcional || '',
                     estagiario.data_inicio || '',
