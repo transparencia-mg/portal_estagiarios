@@ -77,6 +77,12 @@ jobs:
           CKAN_HOST: ${{ secrets.CKAN_HOST }}
           CKAN_KEY: ${{ secrets[format('CKAN_KEY_{0}', steps.string.outputs.uppercase)] }}
         run: dpckan --datastore --datapackage dataset/datapackage.json --ckan-host "$CKAN_HOST" --ckan-key "$CKAN_KEY" dataset create
+      - name: Create new resources in CKAN (ex. novo ano)
+        if: ${{ ! cancelled() }}
+        env:
+          CKAN_HOST: ${{ secrets.CKAN_HOST }}
+          CKAN_KEY: ${{ secrets[format('CKAN_KEY_{0}', steps.string.outputs.uppercase)] }}
+        run: python scripts/ckan_sync_resources.py --datapackage dataset/datapackage.json
       - name: Update dataset in CKAN with dpckan with exist
         if: ${{ ! cancelled() }}
         env:
