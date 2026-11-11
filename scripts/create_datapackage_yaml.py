@@ -8,7 +8,11 @@ from frictionless import describe
 
 load_dotenv()
 
-YAML_PATH = 'dataset/datapackage.yaml'
+DATASET_DIR = 'dataset'
+YAML_PATH = f'{DATASET_DIR}/datapackage.yaml'
+PLACEHOLDER_TITLE = 'Insira um título humanamente legível para este recurso.'
+PLACEHOLDER_DESCRIPTION = 'Insira a descrição/explicação detalhada deste recurso.'
+CHAVES_VOLATEIS = ('hash', 'bytes', 'stats')
 
 
 class IndentDumper(yaml.SafeDumper):
@@ -18,65 +22,188 @@ class IndentDumper(yaml.SafeDumper):
 
 
 def create_datapackage_yaml():
-    dataset_files = os.listdir('dataset')
+    dataset_files = os.listdir(DATASET_DIR)
     if 'datapackage.yaml' not in dataset_files:
-        package = describe('./data', type='package', basepath='./dataset')
+        package = describe('./data', type='package', basepath=f'./{DATASET_DIR}')
         package['name'] = os.getenv("DATASET_NAME")
         package['title'] = ' '.join(os.getenv("DATASET_NAME").split('-')).capitalize()
         package['owner_org'] = os.getenv("OWNER_ORG")
         for resource in package.resources:
-            resource['description'] = 'Insira a descrição/explicação detalhada deste recurso.'
-            resource['title'] = 'Insira um título humanamente legível para este recurso.'
+            resource['description'] = PLACEHOLDER_DESCRIPTION
+            resource['title'] = PLACEHOLDER_TITLE
         package.to_yaml(YAML_PATH)
     else:
-        add_new_resources()
+        sincronizar_recursos()
 
 
-def add_new_resources():
-    """Inclui no datapackage.yaml os CSVs de dataset/data que ainda não estão
-    listados. O recurso novo copia schema/dialeto do recurso mais parecido
-    (mesmo prefixo, ex.: estagiarios_2026 -> estagiarios_2027) e troca o ano
-    no título."""
+# ---------------------------------------------------------------- utilitários
+
+def normalizar_path(path):
+    path = (path or '').replace('\\', '/')
+    while path.startswith('./'):
+        path = path[2:]
+    return path
+
+
+def nomes_campos(schema):
+    if not isinstance(schema, dict):
+        return []
+    return [f.get('name') for f in schema.get('fields', [])]
+
+
+def esqueleto(nome):
+    """'estagiarios_2026_01' -> 'estagiarios_#_#'. Nomes com o mesmo esqueleto
+    pertencem à mesma série (ano, mês, versão, número de aba...)."""
+    return re.sub(r'\d+', '#', nome or '')
+
+
+def trocas_numericas(nome_antigo, nome_novo):
+    """Pares (antigo, novo) dos números que mudaram entre dois nomes da mesma série."""
+    antigos = re.findall(r'\d+', nome_antigo)
+    novos = re.findall(r'\d+', nome_novo)
+    return [(a, n) for a, n in zip(antigos, novos) if a != n]
+
+
+def aplicar_trocas(texto, trocas):
+    if not isinstance(texto, str):
+        return texto
+    for antigo, novo in trocas:
+        texto = re.sub(rf'(?<!\d){re.escape(antigo)}(?!\d)', novo, texto)
+    return texto
+
+
+def prefixo_comum(a, b):
+    n = 0
+    for x, y in zip(a, b):
+        if x != y:
+            break
+        n += 1
+    return n
+
+
+# ------------------------------------------------------------- recurso novo
+
+def escolher_modelo(resources, nome, campos):
+    """Procura um recurso existente para servir de base ao novo:
+    1º) mesma série no nome (só números diferentes) e mesmas colunas;
+    2º) mesmas colunas, qualquer nome (o mais parecido no nome);
+    3º) mesma série no nome, colunas diferentes.
+    Retorna (modelo, mesma_serie, mesmas_colunas)."""
+    candidatos = []
+    for r in resources:
+        mesma_serie = esqueleto(r.get('name')) == esqueleto(nome)
+        mesmas_colunas = bool(campos) and nomes_campos(r.get('schema')) == campos
+        if not (mesma_serie or mesmas_colunas):
+            continue
+        prioridade = 3 if (mesma_serie and mesmas_colunas) else 2 if mesmas_colunas else 1
+        candidatos.append((prioridade, prefixo_comum(r.get('name', ''), nome), r.get('name', ''), r))
+    if not candidatos:
+        return None, False, False
+    _, _, _, modelo = max(candidatos, key=lambda c: c[:3])
+    return (modelo,
+            esqueleto(modelo.get('name')) == esqueleto(nome),
+            nomes_campos(modelo.get('schema')) == campos)
+
+
+def novo_recurso(path, nome, resources):
+    descrito = describe(path, basepath=f'./{DATASET_DIR}').to_dict()
+    for chave in CHAVES_VOLATEIS:
+        descrito.pop(chave, None)
+    campos = nomes_campos(descrito.get('schema'))
+
+    modelo, mesma_serie, mesmas_colunas = escolher_modelo(resources, nome, campos)
+    if modelo is None:
+        descrito['title'] = PLACEHOLDER_TITLE
+        descrito['description'] = PLACEHOLDER_DESCRIPTION
+        return descrito, 'novo: preencher título e descrição'
+
+    novo = copy.deepcopy(modelo)
+    for chave in CHAVES_VOLATEIS:
+        novo.pop(chave, None)
+    novo['name'] = nome
+    novo['path'] = path
+
+    if mesma_serie:
+        trocas = trocas_numericas(modelo['name'], nome)
+        novo['title'] = aplicar_trocas(novo.get('title', nome), trocas)
+        novo['description'] = aplicar_trocas(novo.get('description', ''), trocas)
+    else:
+        novo['title'] = PLACEHOLDER_TITLE
+        novo['description'] = PLACEHOLDER_DESCRIPTION
+
+    if mesmas_colunas:
+        situacao = f'schema copiado de {modelo["name"]}'
+    else:
+        # Colunas mudaram: schema inferido do CSV novo, herdando a documentação
+        # e o tipo das colunas que continuam existindo.
+        doc = {f.get('name'): f for f in (modelo.get('schema') or {}).get('fields', [])}
+        for campo in descrito.get('schema', {}).get('fields', []):
+            antigo = doc.get(campo.get('name'))
+            if antigo:
+                for chave in ('title', 'description', 'type', 'format'):
+                    if chave in antigo:
+                        campo[chave] = antigo[chave]
+        novo['schema'] = descrito.get('schema')
+        if 'dialect' in descrito:
+            novo['dialect'] = descrito['dialect']
+        situacao = f'colunas diferentes de {modelo["name"]}, schema inferido: REVISAR'
+
+    if not mesma_serie:
+        situacao += '; preencher título e descrição'
+    return novo, situacao
+
+
+# ------------------------------------------------------- sincronização geral
+
+def sincronizar_recursos():
+    """Deixa o datapackage.yaml igual ao conteúdo de dataset/data:
+    inclui CSVs novos e retira recursos cujo arquivo local foi excluído."""
     with open(YAML_PATH, encoding='utf-8') as f:
-        package = yaml.safe_load(f)
+        package = yaml.safe_load(f) or {}
 
-    resources = package.setdefault('resources', [])
-    paths = {r.get('path') for r in resources}
-    csvs = sorted(f for f in os.listdir('dataset/data') if f.endswith('.csv'))
-    added = []
+    resources = package.get('resources') or []
+    csvs = sorted(f for f in os.listdir(f'{DATASET_DIR}/data') if f.lower().endswith('.csv'))
 
+    # --- exclusões
+    removidos = []
+    if csvs:
+        mantidos = []
+        for r in resources:
+            path = normalizar_path(r.get('path'))
+            local = path and not path.startswith('http')
+            if local and not os.path.exists(os.path.join(DATASET_DIR, path)):
+                removidos.append(r.get('name', path))
+            else:
+                mantidos.append(r)
+        resources = mantidos
+    elif resources:
+        print('ATENÇÃO: nenhum CSV em dataset/data. Por segurança, nenhum recurso foi '
+              'retirado do datapackage.yaml.')
+
+    # --- inclusões
+    paths = {normalizar_path(r.get('path')) for r in resources}
+    names = {r.get('name') for r in resources}
+    incluidos = []
     for csv in csvs:
         path = f'data/{csv}'
-        if path in paths:
+        nome = csv[:-4]
+        if path in paths or nome in names:
             continue
-        name = csv[:-4]
-        prefix = re.sub(r'\d+$', '', name)
-        modelo = [r for r in resources if re.sub(r'\d+$', '', r.get('name', '')) == prefix]
+        recurso, situacao = novo_recurso(path, nome, resources)
+        resources.append(recurso)
+        incluidos.append(f'{nome} ({situacao})')
 
-        if modelo:
-            novo = copy.deepcopy(modelo[-1])
-            ano_antigo = re.search(r'(\d+)$', modelo[-1]['name'])
-            ano_novo = re.search(r'(\d+)$', name)
-            titulo = novo.get('title', name)
-            if ano_antigo and ano_novo:
-                titulo = titulo.replace(ano_antigo.group(1), ano_novo.group(1))
-            novo.update({'name': name, 'path': path, 'title': titulo})
-            novo.pop('hash', None)
-            novo.pop('bytes', None)
-        else:
-            novo = describe(path, basepath='./dataset').to_dict()
-            novo['title'] = 'Insira um título humanamente legível para este recurso.'
-            novo['description'] = 'Insira a descrição/explicação detalhada deste recurso.'
+    if not (removidos or incluidos):
+        print('datapackage.yaml já está igual a dataset/data.')
+        return
 
-        resources.append(novo)
-        added.append(name)
-
-    if added:
-        with open(YAML_PATH, 'w', encoding='utf-8') as f:
-            yaml.dump(package, f, Dumper=IndentDumper, allow_unicode=True, sort_keys=False)
-        print(f"Recursos incluídos no datapackage.yaml: {', '.join(added)}")
-    else:
-        print("datapackage.yaml já contém todos os CSVs.")
+    package['resources'] = resources
+    with open(YAML_PATH, 'w', encoding='utf-8') as f:
+        yaml.dump(package, f, Dumper=IndentDumper, allow_unicode=True, sort_keys=False)
+    for nome in removidos:
+        print(f'Recurso retirado do datapackage.yaml (arquivo excluído): {nome}')
+    for item in incluidos:
+        print(f'Recurso incluído no datapackage.yaml: {item}')
 
 
 if __name__ == '__main__':

@@ -1,17 +1,22 @@
 """
-Cria no CKAN os recursos que existem no datapackage.json local mas ainda
-não existem no conjunto de dados publicado (ex.: estagiarios_2027).
+Deixa a lista de recursos do conjunto no CKAN igual à do datapackage.json local:
+  - cria no CKAN os recursos que estão no datapackage mas não no CKAN
+    (arquivo novo de qualquer tipo: novo ano, nova aba, nova tabela...);
+  - exclui do CKAN os recursos que saíram do datapackage (arquivo excluído).
 
 Por que este script existe:
   O `dpckan dataset update` só percorre os recursos listados no campo extra
-  `resources_ids` do dataset no CKAN. Um recurso novo no datapackage nunca
-  entra nessa lista e, portanto, nunca é criado. Este script cria o recurso
-  pela API do CKAN, registra o id em `resources_ids` e atualiza o
-  datapackage.json remoto. Depois disso o `dpckan dataset update` passa a
-  enxergar o recurso normalmente.
+  `resources_ids` do dataset no CKAN. Ele nunca cria um recurso novo nem apaga
+  um recurso removido. Este script faz as duas coisas pela API do CKAN, ajusta
+  `resources_ids` e atualiza o datapackage.json remoto. Depois disso o
+  `dpckan dataset update` segue normalmente.
+
+Só são excluídos recursos registrados em `resources_ids`, ou seja, criados pela
+automação. Recursos incluídos à mão no CKAN não são tocados.
 
 Uso (variáveis CKAN_HOST e CKAN_KEY no ambiente):
-  python scripts/ckan_sync_resources.py [--datapackage dataset/datapackage.json] [--no-datastore]
+  python scripts/ckan_sync_resources.py [--datapackage dataset/datapackage.json]
+                                        [--no-datastore] [--no-delete]
 """
 import argparse
 import ast
@@ -19,7 +24,7 @@ import json
 import os
 import sys
 
-from ckanapi import RemoteCKAN
+from ckanapi import RemoteCKAN, NotFound
 from dpckan.functions import (
     load_complete_datapackage,
     is_dataset_published,
@@ -67,10 +72,24 @@ def recurso_existente_por_arquivo(pacote_ckan, caminho_local):
     return None
 
 
+def excluir_recurso(ckan, nome, resource_id):
+    print(f"Excluindo recurso do CKAN: {nome} ({resource_id})")
+    try:
+        ckan.call_action("datastore_delete", {"resource_id": resource_id, "force": True})
+    except Exception:
+        pass  # recurso sem datastore ou datastore já apagado
+    try:
+        ckan.call_action("resource_delete", {"id": resource_id})
+    except NotFound:
+        print(f"  {nome} já não existia no CKAN; apenas retirado de resources_ids.")
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--datapackage", default="dataset/datapackage.json")
     parser.add_argument("--no-datastore", action="store_true")
+    parser.add_argument("--no-delete", action="store_true",
+                        help="Não exclui do CKAN recursos que saíram do datapackage.")
     args = parser.parse_args()
     datastore = not args.no_datastore
 
@@ -89,10 +108,20 @@ def main():
 
     pacote = ckan.action.package_show(id=datapackage.name)
     resources_ids = ler_resources_ids(pacote)
+    locais = list(datapackage.resource_names)
 
-    novos = [n for n in datapackage.resource_names if n not in resources_ids]
-    if not novos:
-        print("Nenhum recurso novo para criar no CKAN.")
+    novos = [n for n in locais if n not in resources_ids]
+    removidos = [n for n in resources_ids if n != "datapackage.json" and n not in locais]
+
+    if removidos and args.no_delete:
+        print(f"--no-delete: mantidos no CKAN apesar de fora do datapackage: {', '.join(removidos)}")
+        removidos = []
+    if removidos and not locais:
+        print("ATENÇÃO: datapackage local sem nenhum recurso. Por segurança, nada será excluído do CKAN.")
+        removidos = []
+
+    if not novos and not removidos:
+        print("CKAN já tem os mesmos recursos do datapackage.")
         return
 
     for nome in novos:
@@ -109,16 +138,23 @@ def main():
             criado = resource_create(ckan, datapackage.name, recurso, datastore)
             resources_ids[nome] = criado["id"]
 
+    for nome in removidos:
+        excluir_recurso(ckan, nome, resources_ids[nome])
+        resources_ids.pop(nome)
+
     if "datapackage.json" not in resources_ids:
         resources_ids["datapackage.json"] = get_ckan_datapackage_resource_id(ckan, datapackage.name)
 
     gravar_resources_ids(ckan, pacote, resources_ids)
 
-    # Atualiza o datapackage.json remoto para já conter os recursos novos,
-    # senão a comparação de metadados do dpckan falha ao procurar o recurso.
+    # Atualiza o datapackage.json remoto para refletir as inclusões/exclusões,
+    # senão a comparação de metadados do dpckan falha ao procurar os recursos.
     update_datapackage_json_resource(ckan, datapackage, resources_ids["datapackage.json"])
 
-    print(f"Recursos criados/registrados: {', '.join(novos)}")
+    if novos:
+        print(f"Recursos criados/registrados no CKAN: {', '.join(novos)}")
+    if removidos:
+        print(f"Recursos excluídos do CKAN: {', '.join(removidos)}")
 
 
 if __name__ == "__main__":
