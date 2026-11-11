@@ -1,6 +1,6 @@
 {
   "version": "4.16.6",
-  "time": 1.672,
+  "time": 1.68,
   "errors": [],
   "tasks": [
     {
@@ -71,7 +71,7 @@
           "rows": 517
         }
       },
-      "time": 0.047,
+      "time": 0.046,
       "scope": [
         "hash-count-error",
         "byte-count-error",
@@ -167,7 +167,7 @@
           "rows": 7970
         }
       },
-      "time": 0.283,
+      "time": 0.284,
       "scope": [
         "hash-count-error",
         "byte-count-error",
@@ -263,7 +263,7 @@
           "rows": 16763
         }
       },
-      "time": 0.594,
+      "time": 0.588,
       "scope": [
         "hash-count-error",
         "byte-count-error",
@@ -359,7 +359,7 @@
           "rows": 17979
         }
       },
-      "time": 0.628,
+      "time": 0.62,
       "scope": [
         "hash-count-error",
         "byte-count-error",
@@ -455,7 +455,7 @@
           "rows": 0
         }
       },
-      "time": 0.066,
+      "time": 0.065,
       "scope": [
         "hash-count-error",
         "byte-count-error",
@@ -31483,11 +31483,201 @@
         "errors": 1000
       },
       "valid": false
+    },
+    {
+      "resource": {
+        "dialect": {
+          "delimiter": ";"
+        },
+        "encoding": "utf-8-sig",
+        "format": "csv",
+        "hashing": "md5",
+        "name": "estagiarios_2027",
+        "path": "data/estagiarios_2027.csv",
+        "profile": "tabular-data-resource",
+        "schema": {
+          "fields": [
+            {
+              "name": "ano_mesreferencia",
+              "type": "integer"
+            },
+            {
+              "name": "nome_estagiario",
+              "type": "string"
+            },
+            {
+              "name": "masp",
+              "type": "integer"
+            },
+            {
+              "name": "codigo_situacao_funcional",
+              "type": "integer"
+            },
+            {
+              "name": "situacao_funcional",
+              "type": "string"
+            },
+            {
+              "name": "data_inicio",
+              "type": "date"
+            },
+            {
+              "name": "data_fim",
+              "type": "any"
+            },
+            {
+              "name": "codigo_orgao",
+              "type": "integer"
+            },
+            {
+              "name": "orgao",
+              "type": "string"
+            },
+            {
+              "name": "sigla_orgao",
+              "type": "string"
+            },
+            {
+              "name": "valor_remuneracao",
+              "type": "string"
+            }
+          ]
+        },
+        "scheme": "file",
+        "title": "Estagiários 2027",
+        "stats": {
+          "hash": "ba15fb038fab644be9ab3c2f354756f1",
+          "bytes": 409,
+          "fields": 11,
+          "rows": 2
+        }
+      },
+      "time": 0.014,
+      "scope": [
+        "hash-count-error",
+        "byte-count-error",
+        "field-count-error",
+        "row-count-error",
+        "blank-header",
+        "extra-label",
+        "missing-label",
+        "blank-label",
+        "duplicate-label",
+        "incorrect-label",
+        "blank-row",
+        "primary-key-error",
+        "foreign-key-error",
+        "extra-cell",
+        "missing-cell",
+        "type-error",
+        "constraint-error",
+        "unique-error"
+      ],
+      "partial": false,
+      "errors": [
+        {
+          "cell": "2027/01",
+          "fieldName": "ano_mesreferencia",
+          "fieldNumber": 1,
+          "fieldPosition": 1,
+          "cells": [
+            "2027/01",
+            "ABNER WILLIANS FERREIRA GOMES",
+            "164072561",
+            "32",
+            "ESTAGIARIO",
+            "2025-09-24 00:00:00",
+            "",
+            "1261",
+            "Secretaria de Estado de Educação",
+            "SEE",
+            "1365,88"
+          ],
+          "rowNumber": 1,
+          "rowPosition": 2,
+          "code": "type-error",
+          "name": "Type Error",
+          "tags": [
+            "#table",
+            "#row",
+            "#cell"
+          ],
+          "note": "type is \"integer/default\"",
+          "message": "Type error in the cell \"2027/01\" in row \"2\" and field \"ano_mesreferencia\" at position \"1\": type is \"integer/default\"",
+          "description": "The value does not match the schema type and format for this field."
+        },
+        {
+          "cell": "2025-09-24 00:00:00",
+          "fieldName": "data_inicio",
+          "fieldNumber": 6,
+          "fieldPosition": 6,
+          "cells": [
+            "2027/01",
+            "ABNER WILLIANS FERREIRA GOMES",
+            "164072561",
+            "32",
+            "ESTAGIARIO",
+            "2025-09-24 00:00:00",
+            "",
+            "1261",
+            "Secretaria de Estado de Educação",
+            "SEE",
+            "1365,88"
+          ],
+          "rowNumber": 1,
+          "rowPosition": 2,
+          "code": "type-error",
+          "name": "Type Error",
+          "tags": [
+            "#table",
+            "#row",
+            "#cell"
+          ],
+          "note": "type is \"date/default\"",
+          "message": "Type error in the cell \"2025-09-24 00:00:00\" in row \"2\" and field \"data_inicio\" at position \"6\": type is \"date/default\"",
+          "description": "The value does not match the schema type and format for this field."
+        },
+        {
+          "cell": "2027/",
+          "fieldName": "ano_mesreferencia",
+          "fieldNumber": 1,
+          "fieldPosition": 1,
+          "cells": [
+            "2027/",
+            "ABNER DA SILVA FONSECA",
+            "166963381",
+            "32",
+            "ESTAGIARIO",
+            "2026-09-21",
+            "",
+            "1261",
+            "Secretaria de Estado de Educação",
+            "SEE",
+            "1365,88"
+          ],
+          "rowNumber": 2,
+          "rowPosition": 3,
+          "code": "type-error",
+          "name": "Type Error",
+          "tags": [
+            "#table",
+            "#row",
+            "#cell"
+          ],
+          "note": "type is \"integer/default\"",
+          "message": "Type error in the cell \"2027/\" in row \"3\" and field \"ano_mesreferencia\" at position \"1\": type is \"integer/default\"",
+          "description": "The value does not match the schema type and format for this field."
+        }
+      ],
+      "stats": {
+        "errors": 3
+      },
+      "valid": false
     }
   ],
   "stats": {
-    "errors": 1000,
-    "tasks": 5
+    "errors": 1003,
+    "tasks": 6
   },
   "valid": false
 }
