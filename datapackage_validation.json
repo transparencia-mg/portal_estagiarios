@@ -1,6 +1,6 @@
 {
   "version": "4.16.6",
-  "time": 0.834,
+  "time": 0.756,
   "errors": [],
   "tasks": [
     {
@@ -71,7 +71,7 @@
           "rows": 517
         }
       },
-      "time": 0.032,
+      "time": 0.024,
       "scope": [
         "hash-count-error",
         "byte-count-error",
@@ -167,7 +167,7 @@
           "rows": 7970
         }
       },
-      "time": 0.143,
+      "time": 0.126,
       "scope": [
         "hash-count-error",
         "byte-count-error",
@@ -263,7 +263,7 @@
           "rows": 16763
         }
       },
-      "time": 0.282,
+      "time": 0.268,
       "scope": [
         "hash-count-error",
         "byte-count-error",
@@ -359,7 +359,7 @@
           "rows": 17979
         }
       },
-      "time": 0.303,
+      "time": 0.275,
       "scope": [
         "hash-count-error",
         "byte-count-error",
@@ -455,7 +455,7 @@
           "rows": 0
         }
       },
-      "time": 0.03,
+      "time": 0.027,
       "scope": [
         "hash-count-error",
         "byte-count-error",
@@ -31552,7 +31552,7 @@
           "rows": 2
         }
       },
-      "time": 0.008,
+      "time": 0.007,
       "scope": [
         "hash-count-error",
         "byte-count-error",
